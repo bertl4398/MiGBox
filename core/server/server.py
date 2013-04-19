@@ -3,6 +3,7 @@ SFTP server based on paramiko.
 """
 
 import socket, time
+import sys, traceback
 
 try:
     import paramiko
@@ -19,11 +20,14 @@ LEVEL = 'INFO' # paramiko log level
 paramiko_log_level = getattr(paramiko.common, LEVEL)
 paramiko.common.logging.basicConfig(level=paramiko_log_level)
 
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
+try:
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
 
-server_socket.bind(('', SFTP_PORT))
-server_socket.listen(BACKLOG)
+    server_socket.bind(('', SFTP_PORT))
+    server_socket.listen(BACKLOG)
+except Exception, e:
+    print str(e); traceback.print_exc(); sys.exit(1)
 
 def run():
     try:
@@ -40,9 +44,14 @@ def run():
 
             while transport.is_active():
                 time.sleep(1)
+
+    except KeyboardInterrupt:
+        print 'Done ...'
+    except Exception, e:
+        print str(e); traceback.print_exc(); sys.exit(1)
     finally:
+        transport.close()
         server_socket.close()
 
 if __name__ == '__main__':
     run()
-
