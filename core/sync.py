@@ -13,68 +13,62 @@ from fs.watch import *
 from fs.errors import *
 
 
-local_fs = OSFS('/home/dev/testdir/1')
-remote_fs = OSFS('/home/dev/testdir/2')
+local_fs = OSFS('~/testdir/1')
+remote_fs = OSFS('~/testdir/2')
 combined_fs = MountFS()
 combined_fs.mountdir('local', local_fs)
 combined_fs.mountdir('remote', remote_fs)
 
-def checksums(infile, blocksize=4096):
+def checksums(file_, blocksize=4096):
     """Generate checksums for all blocks of the input file.
 
     Args:
-        infile: input file object.
+        file_: input file object.
         blocksize: number of bytes per block.
     Returns:
         A list of checksums.
     """
-    infile.seek(0)
+    file_.seek(0)
     chck_sums = []
-    read = infile.read(blocksize)
+    read = file_.read(blocksize)
     while read:
         # Use adler32 week checksums.
         chck_sums.append(zlib.adler32(read))
-        read = infile.read(blocksize)
+        read = file_.read(blocksize)
     return chck_sums
 
-def sync(path, blocksize=4096):
+def sync(from_file, to_file, blocksize=4096):
     """Synchronize a file from local to remote filesystem.
 
     Args:
-        path: string, Path of the file to synchronize.
-    Returns:
-        True if the file was synchronized to the remote filesystem.
+        from_file: file to synchronize from.
+        to_file: file to synchronize to.
     """
-    local_file = None
-    remote_file = None
     try:
-        remote_file = remote_fs.open(path, 'w+b')
-        local_file = local_fs.open(path, 'rb')
-        local_checksums = checksums(local_file)
-        remote_checksums = checksums(remote_file)
+        from_checksums = checksums(from_file)
+        to_checksums = checksums(to_file)
 
-        for i in xrange(0,len(local_checksums)):
-            if i < len(remote_checksums):
-                if local_checksums[i] != remote_checksums[i]:
-                    local_file.seek(i*blocksize)
-                    remote_file.seek(i*blocksize)
-                    remote_file.write(local_file.read(blocksize))
+        for i in xrange(0,len(from_checksums)):
+            if i < len(to_checksums):
+                if from_checksums[i] != to_checksums[i]:
+                    from_file.seek(i*blocksize)
+                    to_file.seek(i*blocksize)
+                    to_file.write(from_file.read(blocksize))
             else:
-                local_file.seek(i*blocksize)
-                remote_file.seek(0, 2)
-                remote_file.write(local_file.read(blocksize))
+                from_file.seek(i*blocksize)
+                to_file.seek(0, 2)
+                to_file.write(from_file.read(blocksize))
 
-        remote_file.seek(local_file.seek(0, 2))
-        remote_file.truncate()
-        local_file.close()
-        remote_file.close()
+        to_file.seek(from_file.seek(0, 2))
+        to_file.truncate()
     except Exception, e:
         logging.error(e)
+        traceback.print_exc()
     finally:
-        if remote_file:
-            remote_file.close()
-        if local_file:
-            local_file.close()
+        if from_file:
+            from_file.close()
+        if to_file:
+            to_file.close()
 
 def watch(event):
     """Callback for local filesystem watcher.
@@ -87,7 +81,8 @@ def watch(event):
         if local_fs.isdir(path):
             combined_fs.makedir('/remote'+path)
         else:
-            sync(path)
+            sync(local_fs.open(path,'rb'),
+                 remote_fs.open(path,'w+b'))
     if isinstance(event, REMOVED):
         if local_fs.isdir(path):
             combined_fs.removedir('/remote'+path, recursive=True, force=True)
@@ -95,19 +90,26 @@ def watch(event):
     if isinstance(event, MODIFIED):
         if local_fs.isdir(path):
             raise NotImplementedError
-        sync(path)
+        sync(local_fs.open(path,'rb'),
+             remote_fs.open(path,'w+b'))
 
 def init():
-    """Initialize the remote filesystem.
+    """Initial synchronization.
 
-    Walks through the local filesystem and creates/recreates folders
-    and synchronize all files in each directory.
+    Walks through the remote and local filesystem and creates/recreates
+    folders and synchronizes all files in each directory according to their
+    last modification time.
     """
+    for dir_, files in remote_fs.walk():
+        combined_fs.makedir('/local'+dir_, allow_recreate=True)
+        for file_ in files:
+            sync(remote_fs.open(dir_+'/'+file_,'rb'),
+                 local_fs.open(dir_+'/'+file_,'w+b'))
     for dir_, files in local_fs.walk():
         combined_fs.makedir('/remote'+dir_, allow_recreate=True)
         for file_ in files:
-            sync(dir_+'/'+file_)
-
+            sync(local_fs.open(dir_+'/'+file_,'rb'),
+                 remote_fs.open(dir_+'/'+file_,'w+b'))
 def main():
     """Main entry point."""
     try:
