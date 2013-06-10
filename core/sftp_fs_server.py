@@ -8,13 +8,15 @@ class SecureServerInterface(BaseServerInterface):
     def check_auth_none(self, username):
         return paramiko.AUTH_FAILED
     def check_auth_password(self, username, password):
+        if username == 'test':
+            return paramiko.AUTH_SUCCESSFUL
         return paramiko.AUTH_FAILED
     def check_auth_publickey(self, username, key):
         if username == 'test':
             return paramiko.AUTH_SUCCESSFUL
         return paramiko.AUTH_FAILED
     def get_allowed_auths(self, username):
-        return "publickey"
+        return "password,publickey"
 
 class SecureSFTPRequestHandler(SFTPRequestHandler):
     def handle(self):
@@ -28,10 +30,7 @@ class SFTPServer(object):
     def serve_forever(self):
         self.server = BaseSFTPServer(('',self.port), self.fs,
                       RequestHandlerClass=SecureSFTPRequestHandler)
-        try:
-            self.server.serve_forever()
-        except Exception, e:
-            logging.error(e)
+        self.server.serve_forever()
 
     def server_close(self):
         self.server.server_close()
