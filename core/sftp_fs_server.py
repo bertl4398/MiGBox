@@ -1,3 +1,15 @@
+#!/usr/bin/python
+#
+# Copyright (C) 2013 Benjamin Ertl
+
+"""
+SFTP server
+Based on pyfilesystem 0.4.1 and paramiko.
+"""
+
+__version__ = 0.1
+__author__ = 'Benjamin Ertl'
+
 import logging
 
 from fs.expose.sftp import * 
@@ -36,6 +48,10 @@ class SFTPServer(object):
         self.server.server_close()
 
 if __name__ == "__main__":
+    from fs import __version__ as fs_version
+    if fs_version < '0.4.1':
+        raise ImportError('pyfilesystem 0.4.1 or higher required')
+
     from fs.osfs import OSFS
     fs = OSFS('.')
     port = 49152
