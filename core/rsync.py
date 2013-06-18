@@ -1,178 +1,170 @@
-## {{{ http://code.activestate.com/recipes/577518/ (r4)
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/python
+#
+# Rsync by Andrew Tridgell
+#
+# Copyright (C) 2013 Benjamin Ertl
+
 """
-This is a pure Python implementation of the [rsync algorithm](TM96).
-
-[TM96] Andrew Tridgell and Paul Mackerras. The rsync algorithm.
-Technical Report TR-CS-96-05, Canberra 0200 ACT, Australia, 1996.
-http://samba.anu.edu.au/rsync/.
-
-### Example Use Case: ###
-
-    # On the system containing the file that needs to be patched
-    >>> unpatched = open("unpatched.file", "rb")
-    >>> hashes = blockchecksums(unpatched)
-
-    # On the remote system after having received `hashes`
-    >>> patchedfile = open("patched.file", "rb")
-    >>> delta = rsyncdelta(patchedfile, hashes)
-
-    # System with the unpatched file after receiving `delta`
-    >>> unpatched.seek(0)
-    >>> save_to = open("locally-patched.file", "wb")
-    >>> patchstream(unpatched, save_to, delta)
+Rsync demo implementation with weak rolling checksum and sha1 strong checksum.
+Based on the rsync algorithm by Andrew Tridgell.
 """
 
-import collections
+__version__ = 0.1
+__author__ = 'Benjamin Ertl'
+
+import os, sys
 import hashlib
 
-if not(hasattr(__builtins__, "bytes")) or str is bytes:
-    # Python 2.x compatibility
-    def bytes(var, *args):
-        try:
-            return ''.join(map(chr, var))
-        except TypeError:
-            return map(ord, var)
+default_size = 16384
+modulo = 65536
 
-__all__ = ["rollingchecksum", "weakchecksum", "patchstream", "rsyncdelta",
-    "blockchecksums"]
+def sync(oldfile, newfile):
+    chks = block_chksums(oldfile)
+    d = delta(newfile, chks)
 
+    patchedfile = open(oldfile.name + '.patch', 'w+b')
+    
+    patch(oldfile, patchedfile, d)
 
-def rsyncdelta(datastream, remotesignatures, blocksize=4096):
-    """
-    Generates a binary patch when supplied with the weak and strong
-    hashes from an unpatched target and a readable stream for the
-    up-to-date data. The blocksize must be the same as the value
-    used to generate remotesignatures.
-    """
-    remote_weak, remote_strong = remotesignatures
+    os.rename(oldfile.name, '.' + oldfile.name + '.old')
+    os.rename(patchedfile.name, oldfile.name)
 
-    match = True
-    matchblock = -1
-    deltaqueue = collections.deque()
+    patchedfile.close()
 
-    while True:
-        if match and datastream is not None:
-            # Whenever there is a match or the loop is running for the first
-            # time, populate the window using weakchecksum instead of rolling
-            # through every single byte which takes at least twice as long.
-            window = collections.deque(bytes(datastream.read(blocksize)))
-            checksum, a, b = weakchecksum(window)
+def patch(instream, outstream, delta):
+    outstream.seek(0)
+    for block in delta:
+        if block.data:
+            outstream.write(block.data)
+        else:
+            instream.seek(block.offset)
+            outstream.write(instream.read(block.size))
 
-        try:
-            # If there are two identical weak checksums in a file, and the
-            # matching strong hash does not occur at the first match, it will
-            # be missed and the data sent over. May fix eventually, but this
-            # problem arises very rarely.
-            matchblock = remote_weak.index(checksum, matchblock + 1)
-            stronghash = hashlib.md5(bytes(window)).hexdigest()
-            matchblock = remote_strong.index(stronghash, matchblock)
+    outstream.flush()
+    instream.seek(0)
+    outstream.seek(0)
 
-            match = True
-            deltaqueue.append(matchblock)
+    #print 'old file: %s' % instream.read()
+    #print 'new file: %s' % outstream.read()
 
-            if datastream.closed:
-                break
-            continue
-
-        except ValueError:
-            # The weakchecksum did not match
+def delta(stream, block_chksums, blocksize=default_size):
+    blocks = []
+    offset = last_match_offset = 0
+    chksums = rolling_chksum(stream, offset, blocksize)
+    try:
+        while True:
+            a, _, s, _ = next(chksums)
             match = False
-            try:
-                if datastream:
-                    # Get the next byte and affix to the window
-                    newbyte = ord(datastream.read(1))
-                    window.append(newbyte)
-            except TypeError:
-                # No more data from the file; the window will slowly shrink.
-                # newbyte needs to be zero from here on to keep the checksum
-                # correct.
-                newbyte = 0
-                tailsize = datastream.tell() % blocksize
-                datastream = None
+            if a in block_chksums:
+                for block in block_chksums[a]:
+                    if block.chksum == s:
+                        stream.seek(offset)
+                        data = stream.read(blocksize)
+                        sha1 = hashlib.sha1()
+                        sha1.update(data)
+                        if sha1.hexdigest() == block.sha1:
+                            match = True
+                            stream.seek(last_match_offset)
+                            data = stream.read(offset - last_match_offset)
+                            if data:
+                                new_block = Block(last_match_offset, len(data), data)
+                                blocks.append(new_block)
+                            blocks.append(block)
+                            break
+            if match:
+                offset += block.size
+                last_match_offset = offset
+                chksums = rolling_chksum(stream, offset, blocksize)
+            else:
+                offset += 1
 
-            if datastream is None and len(window) <= tailsize:
-                # The likelihood that any blocks will match after this is
-                # nearly nil so call it quits.
-                deltaqueue.append(window)
-                break
+    except StopIteration:
+        pass
 
-            # Yank off the extra byte and calculate the new window checksum
-            oldbyte = window.popleft()
-            checksum, a, b = rollingchecksum(oldbyte, newbyte, a, b, blocksize)
+    stream.seek(last_match_offset)
+    data = stream.read()
+    if data:
+        block = Block(last_match_offset, len(data), data)
+        blocks.append(block)
 
-            # Add the old byte the file delta. This is data that was not found
-            # inside of a matching block so it needs to be sent to the target.
-            try:
-                deltaqueue[-1].append(oldbyte)
-            except (AttributeError, IndexError):
-                deltaqueue.append([oldbyte])
+    return blocks
 
-    # Return a delta that starts with the blocksize and converts all iterables
-    # to bytes.
-    deltastructure = [blocksize]
-    for element in deltaqueue:
-        if isinstance(element, int):
-            deltastructure.append(element)
-        elif element:
-            deltastructure.append(bytes(element))
+def block_chksums(stream, offset=0, blocksize=default_size):
+    table = dict()
+    stream.seek(offset)
+    while True:
+        offset = stream.tell()
+        data = stream.read(blocksize)
+        if not data:
+            break
+        a, b, s, length = weak_chksum(data)
+        sha1 = hashlib.sha1()
+        sha1.update(data)
+        block = Block(offset=offset,size=length)
+        block.chksum = s
+        block.sha1 = sha1.hexdigest()
+        if a in table:
+            table[a].append(block)
+        else:
+            table[a] = [block]
+    return table
 
-    return deltastructure
+def weak_chksum(data, M=modulo):
+    length = len(data)
+    a = sum([ord(x) for x in data]) % M
+    b = sum([(length - i) * ord(data[i]) for i in xrange(0,length)])
 
+    return (a, b, a + (b << 16), length)
 
-def blockchecksums(instream, blocksize=4096):
-    """
-    Returns a list of weak and strong hashes for each block of the
-    defined size for the given data stream.
-    """
-    weakhashes = list()
-    stronghashes = list()
-    read = instream.read(blocksize)
+def rolling_chksum(stream, offset=0, window=default_size, M=modulo):
+    stream.seek(offset)
+    data = stream.read(window)
+    a, b, s, length = weak_chksum(data, M=M)
+    yield (a, b, s, length)
+    while True:
+        stream.seek(offset)
+        x0 = stream.read(1)
+        stream.seek(offset+window)
+        x1 = stream.read(1)
+        if not x1:
+            break
+        a = (a - ord(x0) + ord(x1)) % M
+        b = (b - window * ord(x0) + a) % M
+        offset += 1
+        yield (a, b, a + (b << 16), window)        
+    offset += 1
+    stream.seek(offset)
+    data = stream.read()
+    yield weak_chksum(data, M=M)
+    
+class Block(object):
+    def __init__(self, offset=0, size=0, data=None):
+        self.offset = offset
+        self.size = size
+        self.data = data
 
-    while read:
-        weakhashes.append(weakchecksum(bytes(read))[0])
-        stronghashes.append(hashlib.md5(read).hexdigest())
-        read = instream.read(blocksize)
+    def __str__(self):
+        return """Block\n
+    offset: %d\n
+    size:   %d\n
+    data:   %s""" % (self.offset, self.size, repr(self.data))
 
-    return weakhashes, stronghashes
+def main():
+    try:
+        oldfilename = sys.argv[1]
+        newfilename = sys.argv[2]
+    except:
+        print "Usage: ", sys.argv[0], "oldfile newfile"; sys.exit(1)
 
+    oldfile = open(oldfilename, 'rb')
+    newfile = open(newfilename, 'rb')
 
-def patchstream(instream, outstream, delta):
-    """
-    Patches instream using the supplied delta and write the resultantant
-    data to outstream.
-    """
-    blocksize = delta[0]
+    sync(oldfile, newfile)
 
-    for element in delta[1:]:
-        if isinstance(element, int) and blocksize:
-            instream.seek(element * blocksize)
-            element = instream.read(blocksize)
-        outstream.write(element)
+    oldfile.close()
+    newfile.close()
 
+    sys.exit(0)
 
-def rollingchecksum(removed, new, a, b, blocksize=4096):
-    """
-    Generates a new weak checksum when supplied with the internal state
-    of the checksum calculation for the previous window, the removed
-    byte, and the added byte.
-    """
-    a -= removed - new
-    b -= removed * blocksize - a
-    return (b << 16) | a, a, b
-
-
-def weakchecksum(data):
-    """
-    Generates a weak checksum from an iterable set of bytes.
-    """
-    a = b = 0
-    l = len(data)
-    for i in range(l):
-        a += data[i]
-        b += (l - i)*data[i]
-
-    return (b << 16) | a, a, b
-## end of http://code.activestate.com/recipes/577518/ }}}
-
+if __name__ == '__main__':
+    main()
