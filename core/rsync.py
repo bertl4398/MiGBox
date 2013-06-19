@@ -9,22 +9,23 @@ Rsync demo implementation with weak rolling checksum and sha1 strong checksum.
 Based on the rsync algorithm by Andrew Tridgell.
 """
 
-__version__ = 0.1
+__version__ = 0.2
 __author__ = 'Benjamin Ertl'
 
 import os, sys
 import hashlib
 
+from collections import namedtuple
+
 default_size = 16384
 modulo = 65536
 
-def sync(oldfile, newfile):
-    chks = block_chksums(oldfile)
-    d = delta(newfile, chks)
+Weakchksum = namedtuple('Weakchksum',['a','b','s','length'])
 
-    patchedfile = open(oldfile.name + '.patch', 'w+b')
+def sync(oldfile, newfile):
+    patchedfile = open('.' + oldfile.name + '.patch', 'wb')
     
-    patch(oldfile, patchedfile, d)
+    patch(oldfile, patchedfile, delta(newfile, block_chksums(oldfile)))
 
     os.rename(oldfile.name, '.' + oldfile.name + '.old')
     os.rename(patchedfile.name, oldfile.name)
@@ -34,47 +35,58 @@ def sync(oldfile, newfile):
 def patch(instream, outstream, delta):
     outstream.seek(0)
     for block in delta:
-        if block.data:
-            outstream.write(block.data)
+        if type(block) == str:
+            outstream.write(block)
         else:
-            instream.seek(block.offset)
-            outstream.write(instream.read(block.size))
+            instream.seek(block[0])
+            outstream.write(instream.read(block[1]))
 
     outstream.flush()
     instream.seek(0)
     outstream.seek(0)
 
-    #print 'old file: %s' % instream.read()
-    #print 'new file: %s' % outstream.read()
+def equalfiles(f1, f2, delta):
+    f1.seek(0); f2.seek(0)
+    if not f1.read(1) and not f2.read(1):
+        return True
+    offset = 0; equal = False
+    for d in delta:
+        if type(d) == str:
+            return False
+        else:
+            blockoffset, size = d
+            if offset == blockoffset:
+                offset += size
+                equal = True
+            else:
+                return False
+    return equal
 
-def delta(stream, block_chksums, blocksize=default_size):
+def delta(stream, blockchksums, blocksize=default_size):
     blocks = []
     offset = last_match_offset = 0
-    chksums = rolling_chksum(stream, offset, blocksize)
+    rollingchksum = rolling_chksum(stream, offset, blocksize)
     try:
         while True:
-            a, _, s, _ = next(chksums)
+            chksum = next(rollingchksum)
             match = False
-            if a in block_chksums:
-                for block in block_chksums[a]:
-                    if block.chksum == s:
+            if chksum.a in blockchksums:
+                for block in blockchksums[chksum.a]:
+                    if chksum.s == block['weak']:
                         stream.seek(offset)
                         data = stream.read(blocksize)
-                        sha1 = hashlib.sha1()
-                        sha1.update(data)
-                        if sha1.hexdigest() == block.sha1:
+                        if strong_chksum(data) == block['strong']:
                             match = True
                             stream.seek(last_match_offset)
                             data = stream.read(offset - last_match_offset)
                             if data:
-                                new_block = Block(last_match_offset, len(data), data)
-                                blocks.append(new_block)
-                            blocks.append(block)
+                                blocks.append(data)
+                            blocks.append((block['offset'], block['size']))
                             break
             if match:
-                offset += block.size
+                offset += block['size']
                 last_match_offset = offset
-                chksums = rolling_chksum(stream, offset, blocksize)
+                rollingchksum = rolling_chksum(stream, offset, blocksize)
             else:
                 offset += 1
 
@@ -84,43 +96,49 @@ def delta(stream, block_chksums, blocksize=default_size):
     stream.seek(last_match_offset)
     data = stream.read()
     if data:
-        block = Block(last_match_offset, len(data), data)
-        blocks.append(block)
-
+        blocks.append(data)
     return blocks
 
 def block_chksums(stream, offset=0, blocksize=default_size):
     table = dict()
     stream.seek(offset)
     while True:
-        offset = stream.tell()
         data = stream.read(blocksize)
         if not data:
             break
-        a, b, s, length = weak_chksum(data)
-        sha1 = hashlib.sha1()
-        sha1.update(data)
-        block = Block(offset=offset,size=length)
-        block.chksum = s
-        block.sha1 = sha1.hexdigest()
-        if a in table:
-            table[a].append(block)
+        weakchksum = weak_chksum(data)
+        strongchksum = strong_chksum(data)
+        if weakchksum.a in table:
+            table[weakchksum.a].append({'weak':weakchksum.s,
+                                        'strong':strongchksum,
+                                        'offset':offset,
+                                        'size':weakchksum.length})
         else:
-            table[a] = [block]
+            table[weakchksum.a] = [{'weak':weakchksum.s,
+                                    'strong':strongchksum,
+                                    'offset':offset,
+                                    'size':weakchksum.length}]
+        offset += blocksize
     return table
+
+def strong_chksum(data):
+    sha1 = hashlib.sha1()
+    sha1.update(data)
+    return sha1.hexdigest()
 
 def weak_chksum(data, M=modulo):
     length = len(data)
     a = sum([ord(x) for x in data]) % M
     b = sum([(length - i) * ord(data[i]) for i in xrange(0,length)])
 
-    return (a, b, a + (b << 16), length)
+    return Weakchksum(a, b, a + (b << 16), length)
 
 def rolling_chksum(stream, offset=0, window=default_size, M=modulo):
     stream.seek(offset)
     data = stream.read(window)
-    a, b, s, length = weak_chksum(data, M=M)
-    yield (a, b, s, length)
+    weakchksum = weak_chksum(data, M=M)
+    a, b, _, _ = weakchksum
+    yield weakchksum
     while True:
         stream.seek(offset)
         x0 = stream.read(1)
@@ -131,24 +149,12 @@ def rolling_chksum(stream, offset=0, window=default_size, M=modulo):
         a = (a - ord(x0) + ord(x1)) % M
         b = (b - window * ord(x0) + a) % M
         offset += 1
-        yield (a, b, a + (b << 16), window)        
+        yield Weakchksum(a, b, a + (b << 16), window)        
     offset += 1
     stream.seek(offset)
     data = stream.read()
     yield weak_chksum(data, M=M)
     
-class Block(object):
-    def __init__(self, offset=0, size=0, data=None):
-        self.offset = offset
-        self.size = size
-        self.data = data
-
-    def __str__(self):
-        return """Block\n
-    offset: %d\n
-    size:   %d\n
-    data:   %s""" % (self.offset, self.size, repr(self.data))
-
 def main():
     try:
         oldfilename = sys.argv[1]
