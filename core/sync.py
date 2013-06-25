@@ -1,133 +1,131 @@
-#!/usr/bin/python
+# Synchronization module 
+#
+# Copyright (C) 2013 Benjamin Ertl
 
-import sys
-import zlib
+"""
+Synchronization module providing functions for synchronization from
+FileSystem abstraction to FileSystem abstraction.
+"""
+
+__version__ = 0.2
+__author__ = 'Benjamin Ertl'
+
+import os, stat
+
 import logging
-import traceback
+import rsync
 
-from fs.osfs import OSFS
-from fs.sftpfs import SFTPFS
-from fs.mountfs import MountFS
+log = {'create': 'CREATE {0}',
+       'remove': 'REMOVE {0}',
+       'sync_to': 'SYNC {0} ==> {1}',
+       'sync_eq': 'SYNC {0} == {1}',
+       'sync_er': 'SYNC {0} !! {1}',
+       'move': 'MOVE {0} ==> {1}',
+       'copy': 'COPY {0} ==> {1}'}
 
-from fs.watch import *
-from fs.errors import *
-
-
-local_fs = OSFS('~/testdir/1')
-remote_fs = OSFS('~/testdir/2')
-combined_fs = MountFS()
-combined_fs.mountdir('local', local_fs)
-combined_fs.mountdir('remote', remote_fs)
-
-def checksums(file_, blocksize=4096):
-    """Generate checksums for all blocks of the input file.
-
-    Args:
-        file_: input file object.
-        blocksize: number of bytes per block.
-    Returns:
-        A list of checksums.
+def sync_all_files(src, dst, path, modified=True):
     """
-    file_.seek(0)
-    chck_sums = []
-    read = file_.read(blocksize)
-    while read:
-        # Use adler32 week checksums.
-        chck_sums.append(zlib.adler32(read))
-        read = file_.read(blocksize)
-    return chck_sums
+    Synchronize all files from src filesystem abstraction to dst
+    filesystem abstraction starting at path and continuing recursively.
 
-def sync(from_file, to_file, blocksize=4096):
-    """Synchronize a file from local to remote filesystem.
-
-    Args:
-        from_file: file to synchronize from.
-        to_file: file to synchronize to.
+    @param src: source filesystem abstraction.
+    @type src: FileSystem
+    @param dst: destination filesystem abstraction.
+    @type dst: FileSystem
+    @param path: root path
+    @type path: str
+    @param modified: two-way synchronize modified files.
+    @type modified: bool
     """
-    try:
-        from_checksums = checksums(from_file)
-        to_checksums = checksums(to_file)
-
-        for i in xrange(0,len(from_checksums)):
-            if i < len(to_checksums):
-                if from_checksums[i] != to_checksums[i]:
-                    from_file.seek(i*blocksize)
-                    to_file.seek(i*blocksize)
-                    to_file.write(from_file.read(blocksize))
-            else:
-                from_file.seek(i*blocksize)
-                to_file.seek(0, 2)
-                to_file.write(from_file.read(blocksize))
-
-        to_file.seek(from_file.seek(0, 2))
-        to_file.truncate()
-    except Exception, e:
-        logging.error(e)
-        traceback.print_exc()
-    finally:
-        if from_file:
-            from_file.close()
-        if to_file:
-            to_file.close()
-
-def watch(event):
-    """Callback for local filesystem watcher.
-
-    Args:
-        event: The callback event.
-    """
-    path = event.path
-    if isinstance(event, CREATED):
-        if local_fs.isdir(path):
-            combined_fs.makedir('/remote'+path)
+    dirs = []
+    for pathname in src.listdir(path):
+        abs_path = os.path.join(path,pathname)
+        rel_path = src.relpath(abs_path)
+        sync_path = os.path.join(dst.root,rel_path)
+        if stat.S_ISDIR(src.stat(abs_path).st_mode):
+            dirs.append(abs_path)
+            try:
+               mtime = dst.stat(sync_path).st_mtime
+            except (OSError, IOError):
+               make_dir(dst, sync_path)
         else:
-            sync(local_fs.open(path,'rb'),
-                 remote_fs.open(path,'w+b'))
-    if isinstance(event, REMOVED):
-        if local_fs.isdir(path):
-            combined_fs.removedir('/remote'+path, recursive=True, force=True)
-        combined_fs.remove('/remote'+path)
-    if isinstance(event, MODIFIED):
-        if local_fs.isdir(path):
-            raise NotImplementedError
-        sync(local_fs.open(path,'rb'),
-             remote_fs.open(path,'w+b'))
+            try:
+                remote_mtime = dst.stat(sync_path).st_mtime
+                local_mtime = src.stat(abs_path).st_mtime
+                if remote_mtime > local_mtime and modified:
+                    sync_file(dst, sync_path, src, abs_path)
+                elif remote_mtime < local_mtime and modified:
+                    sync_file(src, abs_path, dst, sync_path)
+            except (OSError, IOError):
+                copy_file(src, abs_path, dst, sync_path)
+    for dir_ in dirs:
+        sync_all_files(src, dst, dir_, True)
 
-def init():
-    """Initial synchronization.
-
-    Walks through the remote and local filesystem and creates/recreates
-    folders and synchronizes all files in each directory according to their
-    last modification time.
+def sync_file(src, src_path, dst, dst_path):
     """
-    for dir_, files in remote_fs.walk():
-        combined_fs.makedir('/local'+dir_, allow_recreate=True)
-        for file_ in files:
-            sync(remote_fs.open(dir_+'/'+file_,'rb'),
-                 local_fs.open(dir_+'/'+file_,'w+b'))
-    for dir_, files in local_fs.walk():
-        combined_fs.makedir('/remote'+dir_, allow_recreate=True)
-        for file_ in files:
-            sync(local_fs.open(dir_+'/'+file_,'rb'),
-                 remote_fs.open(dir_+'/'+file_,'w+b'))
-def main():
-    """Main entry point."""
+    Synchronize a file from src filesystem abstraction to dst
+    filesystem abstraction from src path to dst path using rsync.
+
+    If the files given by src path and dst path are equal, nothing
+    is done.
+
+    @param src: source filesystem abstraction.
+    @type src: FileSystem
+    @param src_path: source path.
+    @type src_path: str
+    @param dst: destination filesystem abstraction.
+    @type dst: FileSystem
+    @param dst_path: destination path.
+    @type dst_path: str
+    """
     try:
-        init()
+        newfile = src.open(src_path,'rb')
+        oldfile = dst.open(dst_path,'rb')
+        tmpfile = dst.open(dst_path+'.tmp','wb')
+        delta = rsync.delta(newfile,rsync.block_chksums(oldfile))
+        if not rsync.equalfiles(newfile,oldfile,delta):
+            rsync.patch(oldfile,tmpfile,delta)
+            tmpfile.close(); oldfile.close(); newfile.close()
+            dst.remove(dst_path); dst.rename(dst_path+'.tmp',dst_path)
+            logging.info(log['sync_to'].format(src_path,dst_path))
+        else:
+            tmpfile.close(); oldfile.close(); newfile.close()
+            dst.remove(dst_path+'.tmp')
+            logging.info(log['sync_eq'].format(src_path,dst_path))
+    except:
+        logging.error(log['sync_er'].format(src_path,dst_path))
 
-        local_fs_watcher = local_fs.add_watcher(watch)
+def copy_file(src, src_path, dst, dst_path):
+    try:
+        src.copy(src, src_path, dst, dst_path)
+        logging.info(log['copy'].format(src_path,dst_path))
+    except (OSError, IOError):
+        logging.error(log['copy'].format(src_path,dst_path))
 
-        wait_for_key_to_exit = raw_input('Press key to exit ...')
-   
-    except Exception, e:
-        traceback.print_exc()
-        sys.exit(1)
+def move_file(src, src_path, dst_path):
+    try:
+        src.rename(src_path, dst_path)
+        logging.info(log['move'].format(src_path,dst_path))
+    except (OSError, IOError):
+        logging.error(log['move'].format(src_path,dst_path))
 
-    finally:
-        local_fs.del_watcher(local_fs_watcher)
-        combined_fs.close()
-        remote_fs.close()
-        local_fs.close()
+def remove_file(src, path):
+    try:
+        src.remove(path)
+        logging.info(log['remove'].format(path))
+    except (OSError, IOError):
+        logging.error(log['remove'].format(path))
 
-if __name__ == '__main__':
-    main()
+def remove_dir(src, path):
+    try:
+        src.rmdir(path)
+        logging.info(log['remove'].format(path))
+    except (OSError, IOError):
+        logging.error(log['remove'].format(path))
+
+def make_dir(src, path):
+    try:
+        src.mkdir(path)
+        logging.info(log['create'].format(path))
+    except (OSError, IOError):
+        logging.error(log['create'].format(path))

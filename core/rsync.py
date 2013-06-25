@@ -23,11 +23,11 @@ modulo = 65536
 Weakchksum = namedtuple('Weakchksum',['a','b','s','length'])
 
 def sync(oldfile, newfile):
-    patchedfile = open('.' + oldfile.name + '.patch', 'wb')
+    patchedfile = open(oldfile.name + '.patch', 'wb')
     
     patch(oldfile, patchedfile, delta(newfile, block_chksums(oldfile)))
 
-    os.rename(oldfile.name, '.' + oldfile.name + '.old')
+    os.rename(oldfile.name, oldfile.name + '.old')
     os.rename(patchedfile.name, oldfile.name)
 
     patchedfile.close()
@@ -40,10 +40,7 @@ def patch(instream, outstream, delta):
         else:
             instream.seek(block[0])
             outstream.write(instream.read(block[1]))
-
     outstream.flush()
-    instream.seek(0)
-    outstream.seek(0)
 
 def equalfiles(f1, f2, delta):
     f1.seek(0); f2.seek(0)
@@ -89,10 +86,8 @@ def delta(stream, blockchksums, blocksize=default_size):
                 rollingchksum = rolling_chksum(stream, offset, blocksize)
             else:
                 offset += 1
-
     except StopIteration:
         pass
-
     stream.seek(last_match_offset)
     data = stream.read()
     if data:
@@ -130,7 +125,6 @@ def weak_chksum(data, M=modulo):
     length = len(data)
     a = sum([ord(x) for x in data]) % M
     b = sum([(length - i) * ord(data[i]) for i in xrange(0,length)])
-
     return Weakchksum(a, b, a + (b << 16), length)
 
 def rolling_chksum(stream, offset=0, window=default_size, M=modulo):

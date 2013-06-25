@@ -8,103 +8,77 @@
 Sync daemon for MiGBox.
 """
 
-__version__ = 0.1
+__version__ = 0.2
 __author__ = 'Benjamin Ertl'
 
-import sys, time
-import shelve
+import os, sys
+import logging, traceback
+import paramiko, watchdog
 
-import rsync
+import sync
 
-import fs.utils
+from filesystem import *
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
-from fs.osfs import OSFS
-from fs.sftpfs import SFTPFS
+class EventHandler(watchdog.events.FileSystemEventHandler):
+    def __init__(self, src, dst):
+        watchdog.events.FileSystemEventHandler.__init__(self)
+        self.src = src
+        self.dst = dst
 
-from fs.watch import *
-from fs.errors import *
+    def get_syncpath(self, path):
+        rel_path = self.src.relpath(path)
+        return os.path.join(self.dst.root, rel_path)
 
-def sync_file(from_, to, file_):
-    newerfile = from_.open(file_,'rb')
-    olderfile = to.open(file_,'rb')
-    patchedfile = to.open('.' + file_ + '.new','wb')
-
-    delta = rsync.delta(newerfile, rsync.block_chksums(olderfile))
-
-    if not rsync.equalfiles(newerfile,olderfile,delta):
-        rsync.patch(newerfile,patchedfile,delta)
-        to.rename(file_,'.' + file_+ '.old')
-        to.rename('.' + file_ + '.new',file_)
-        to.remove('.' + file_ + '.old')
-    else:
-        to.remove('.' + file_ + '.new')
-
-    patchedfile.close()
-    olderfile.close()
-    newerfile.close()
-
-def sync_all_files(from_, to):
-    for file_ in from_.walkfiles():
-        if not to.exists(file_):
-            copy_file(from_,to,file_)
+    def on_created(self, event):
+        sync_path = self.get_syncpath(event.src_path)
+        if event.is_directory:
+            sync.make_dir(self.dst, sync_path)
         else:
-            from_mtime = from_.getinfo(file_)['st_mtime']
-            to_mtime = to.getinfo(file_)['st_mtime']
+            sync.copy_file(self.src, event.src_path, self.dst, sync_path)
 
-            if from_mtime > to_mtime:
-                sync_file(from_,to,file_)
+    def on_deleted(self, event):
+        sync_path = self.get_syncpath(event.src_path)
+        if event.is_directory:
+            sync.remove_dir(self.dst, sync_path)
+        else:
+            sync.remove_file(self.dst, sync_path)
 
-def sync_empty_dirs(from_, to):            
-    for dir_ in from_.walkdirs():
-        if from_.isdirempty(dir_):
-            if not to.exists(dir_):
-                to.makedir(dir_)
+    def on_modified(self, event):
+        sync_path = self.get_syncpath(event.src_path)
+        sync.sync_file(self.src, event.src_path, self.dst, sync_path)
 
-def copy_file(from_, to, file_):
-    try:
-        fs.utils.copyfile(from_, file_, to, file_)
-    except ParentDirectoryMissingError:
-        to.makedir(file_.rsplit('/',1)[0])
-        fs.utils.copyfile(from_, file_, to, file_)
+    def on_moved(self, event):
+        sync_src = self.get_syncpath(event.src_path)
+        sync_dst = self.get_syncpath(event.dest_path)
+        sync.move_file(self.dst, sync_src, sync_dst)
 
 def main():
-    local_fs = OSFS('../tests/local')
-    remote_fs = OSFS('../tests/remote')
+    logging.basicConfig(filename='sync.log', level=logging.INFO)
 
-    sync_empty_dirs(local_fs,remote_fs)
-    sync_empty_dirs(remote_fs,local_fs)
-    
-    sync_all_files(local_fs,remote_fs)
-    sync_all_files(remote_fs,local_fs)
+    src_path = '/home/benjamin/migsync/test/local'
+    dst_path = '/home/benjamin/migsync/test/remote'
 
-    def watch(event):
-        path = event.path
-        if isinstance(event, CREATED):
-            if local_fs.isdir(path):
-                remote_fs.makedir(path)
-            else:
-                copy_file(local_fs,remote_fs,path)
-        if isinstance(event, REMOVED):
-            if local_fs.isdir(path):
-                if remote_fs.exists(path):
-                    remote_fs.removedir(path, recursive=True, force=True)
-            else:
-                if remote_fs.exists(path):
-                    remote_fs.remove(path)
-        if isinstance(event, MODIFIED):
-            if local_fs.isdir(path):
-                sync_all_files(local_fs,remote_fs)
-            else:
-                sync_file(local_fs,remote_fs,path)
+    local = OSFileSystem(root=src_path)
+    remote = OSFileSystem(root=dst_path)
 
-    local_fs_watcher = local_fs.add_watcher(watch)
+    sync.sync_all_files(local, remote, local.root)
+    sync.sync_all_files(remote, local, remote.root, modified=False)
 
-    wait_for_key_to_exit = raw_input('Press key to exit ...')
+    event_handler = EventHandler(local, remote)
+    observer = Observer()
+    observer.schedule(event_handler, path=src_path, recursive=True)
+    observer.start()
 
-    local_fs.del_watcher(local_fs_watcher)
+    raw_input()
 
-    remote_fs.close()
-    local_fs.close()
+    observer.stop()
+    observer.join()
+
+    print 'exit ...'
+
+    sys.exit(0)
 
 if __name__ == '__main__':
     main()
