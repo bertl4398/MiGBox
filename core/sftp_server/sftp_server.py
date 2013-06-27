@@ -8,40 +8,52 @@
 SFTP server implementation based on paramiko.
 """
 
-__version__ = 0.1
+__version__ = 0.2
 __author__ = 'Benjamin Ertl'
 
-import time, threading, socket
+import sys, time, threading, socket
+import ConfigParser
 
 import paramiko
 
 from stub_sftp import StubServer, StubSFTPServer
 
-host = ''
-port = 50007
+def main():
+    config = ConfigParser.ConfigParser()
+    config.read('server.cfg')
 
-paramiko.common.logging.basicConfig(level=getattr(paramiko.common,'INFO'))
+    host = config.get('Connection', 'host')
+    port = int(config.get('Connection', 'port'))
+    backlog = int(config.get('Connection', 'backlog'))
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((host,port))
-s.listen(1)
+    log_level = config.get('Logging', 'level')
+    paramiko.common.logging.basicConfig(level=getattr(paramiko.common,log_level))
 
-conn, addr = s.accept()
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((host,port))
+    s.listen(backlog)
 
-t= paramiko.Transport(conn)
-t.add_server_key(paramiko.RSAKey.from_private_key_file('test_rsa'))
+    conn, addr = s.accept()
 
-event = threading.Event()
-server = StubServer()
+    t= paramiko.Transport(conn)
 
-t.set_subsystem_handler('sftp', paramiko.SFTPServer, StubSFTPServer)
+    prvkey = config.get('KeyAuth', 'prvkey')
+    t.add_server_key(paramiko.RSAKey.from_private_key_file(prvkey))
 
-t.start_server(event, server)
+    event = threading.Event()
+    server = StubServer()
 
-while t.is_active():
-    time.sleep(1)
+    t.set_subsystem_handler('sftp', paramiko.SFTPServer, StubSFTPServer)
 
-s.close()
-t.close()
+    t.start_server(event, server)
 
-print 'Done ...'
+    while t.is_active():
+        time.sleep(1)
+
+    s.close()
+    t.close()
+
+    sys.exit(0)
+
+if __name__ == '__main__':
+    main()

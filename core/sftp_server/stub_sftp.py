@@ -15,15 +15,18 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with Paramiko; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
+#
+# Modification copyright (C) 2013 Benjamin Ertl
 
 """
 A stub SFTP server for loopback SFTP testing.
+Modified for publickey authentication and config file.
 """
 
 import os
+import ConfigParser
 from paramiko import ServerInterface, SFTPServerInterface, SFTPServer, SFTPAttributes, \
     SFTPHandle, SFTP_OK, AUTH_SUCCESSFUL, OPEN_SUCCEEDED
-
 
 class StubServer (ServerInterface):
     def check_auth_password(self, username, password):
@@ -33,6 +36,8 @@ class StubServer (ServerInterface):
     def check_channel_request(self, kind, chanid):
         return OPEN_SUCCEEDED
 
+    def check_auth_publickey(self, username, key):
+        return AUTH_SUCCESSFUL
 
 class StubSFTPHandle (SFTPHandle):
     def stat(self):
@@ -52,10 +57,10 @@ class StubSFTPHandle (SFTPHandle):
 
 
 class StubSFTPServer (SFTPServerInterface):
-    # assume current folder is a fine root
-    # (the tests always create and eventualy delete a subfolder, so there shouldn't be any mess)
-    ROOT = os.path.join(os.getcwd(),'test')
-        
+    config = ConfigParser.ConfigParser()
+    config.read('server.cfg')
+    ROOT = config.get('ROOT','path')
+
     def _realpath(self, path):
         return self.ROOT + self.canonicalize(path)
 

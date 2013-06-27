@@ -11,7 +11,7 @@ Sync daemon for MiGBox.
 __version__ = 0.2
 __author__ = 'Benjamin Ertl'
 
-import os, sys
+import os, sys, time
 import logging, traceback
 import paramiko, watchdog
 
@@ -55,7 +55,9 @@ class EventHandler(watchdog.events.FileSystemEventHandler):
         sync.move_file(self.dst, sync_src, sync_dst)
 
 def main():
-    logging.basicConfig(filename='sync.log', level=logging.INFO)
+    logging.basicConfig(filename='sync.log', filemode='w',\
+                        format='%(levelname)s: %(asctime)s %(message)s',\
+                        datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 
     src_path = '/home/benjamin/migsync/test/local'
     dst_path = '/home/benjamin/migsync/test/remote'
@@ -71,12 +73,14 @@ def main():
     observer.schedule(event_handler, path=src_path, recursive=True)
     observer.start()
 
-    raw_input()
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        pass
 
     observer.stop()
     observer.join()
-
-    print 'exit ...'
 
     sys.exit(0)
 
