@@ -11,8 +11,8 @@ __version__ = 0.2
 __author__ = 'Benjamin Ertl'
 
 import os, stat
-
-import logging
+import filecmp
+import logging, traceback
 import rsync
 
 log = {'create': 'CREATE {0}',
@@ -79,21 +79,20 @@ def sync_file(src, src_path, dst, dst_path):
     @type dst_path: str
     """
     try:
-        newfile = src.open(src_path,'rb')
-        oldfile = dst.open(dst_path,'rb')
-        tmpfile = dst.open(dst_path+'.tmp','wb')
-        delta = rsync.delta(newfile,rsync.block_chksums(oldfile))
-        if not rsync.equalfiles(newfile,oldfile,delta):
+        if not filecmp.cmp(src_path,dst_path,shallow=False):
+            newfile = src.open(src_path,'rb')
+            oldfile = dst.open(dst_path,'rb')
+            tmpfile = dst.open(dst_path+'.tmp','wb')
+            delta = rsync.delta(newfile,rsync.block_chksums(oldfile))
             rsync.patch(oldfile,tmpfile,delta)
             tmpfile.close(); oldfile.close(); newfile.close()
             dst.remove(dst_path); dst.rename(dst_path+'.tmp',dst_path)
             logging.info(log['sync_to'].format(src_path,dst_path))
         else:
-            tmpfile.close(); oldfile.close(); newfile.close()
-            dst.remove(dst_path+'.tmp')
             logging.info(log['sync_eq'].format(src_path,dst_path))
     except:
         logging.error(log['sync_er'].format(src_path,dst_path))
+        traceback.print_exc()
 
 def copy_file(src, src_path, dst, dst_path):
     try:
