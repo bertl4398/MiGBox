@@ -14,6 +14,7 @@ __author__ = 'Benjamin Ertl'
 import os, sys, time
 import logging, traceback
 import paramiko, watchdog
+import ConfigParser
 
 import sync
 
@@ -55,12 +56,18 @@ class EventHandler(watchdog.events.FileSystemEventHandler):
         sync.move_file(self.dst, sync_src, sync_dst)
 
 def main():
-    logging.basicConfig(filename='sync.log', filemode='w',\
-                        format='%(levelname)s: %(asctime)s %(message)s',\
-                        datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+    config = ConfigParser.ConfigParser()
+    config.read('config.cfg')
 
-    src_path = '/home/benjamin/migsync/test/local'
-    dst_path = '/home/benjamin/migsync/test/remote'
+    log_file = config.get('Logging', 'file')
+    log_level = config.get('Logging', 'level')
+
+    src_path = config.get('Sync', 'src')
+    dst_path = config.get('Sync', 'dst')
+
+    logging.basicConfig(filename=log_file, filemode='w',\
+                        format='%(levelname)s: %(asctime)s %(message)s',\
+                        datefmt='%m/%d/%Y %I:%M:%S %p', level=getattr(logging,log_level))
 
     local = OSFileSystem(root=src_path)
     remote = OSFileSystem(root=dst_path)

@@ -37,29 +37,47 @@ def sync_all_files(src, dst, path, modified=True):
     @param modified: two-way synchronize modified files.
     @type modified: bool
     """
-    dirs = []
-    for pathname in src.listdir(path):
-        abs_path = os.path.join(path,pathname)
-        rel_path = src.relpath(abs_path)
+    #dirs = []
+    #for pathname in src.listdir(path):
+    #    abs_path = os.path.join(path,pathname)
+    #    rel_path = src.relpath(abs_path)
+    #    sync_path = os.path.join(dst.root,rel_path)
+    #    if stat.S_ISDIR(src.stat(abs_path).st_mode):
+    #        dirs.append(abs_path)
+    #        try:
+    #           mtime = dst.stat(sync_path).st_mtime
+    #        except (OSError, IOError):
+    #           make_dir(dst, sync_path)
+    #    else:
+    #        try:
+    #            remote_mtime = dst.stat(sync_path).st_mtime
+    #            local_mtime = src.stat(abs_path).st_mtime
+    #            if remote_mtime > local_mtime and modified:
+    #                sync_file(dst, sync_path, src, abs_path)
+    #            elif remote_mtime < local_mtime and modified:
+    #                sync_file(src, abs_path, dst, sync_path)
+    #        except (OSError, IOError):
+    #            copy_file(src, abs_path, dst, sync_path)
+    #for dir_ in dirs:
+    #    sync_all_files(src, dst, dir_, True)
+    for pathname in src.walk(path):
+        rel_path = src.relpath(pathname)
         sync_path = os.path.join(dst.root,rel_path)
-        if stat.S_ISDIR(src.stat(abs_path).st_mode):
-            dirs.append(abs_path)
+        if stat.S_ISDIR(src.stat(pathname).st_mode):
             try:
-               mtime = dst.stat(sync_path).st_mtime
+                mtime = dst.stat(sync_path).st_mtime
             except (OSError, IOError):
-               make_dir(dst, sync_path)
+                make_dir(dst, sync_path)
         else:
             try:
-                remote_mtime = dst.stat(sync_path).st_mtime
-                local_mtime = src.stat(abs_path).st_mtime
-                if remote_mtime > local_mtime and modified:
-                    sync_file(dst, sync_path, src, abs_path)
-                elif remote_mtime < local_mtime and modified:
-                    sync_file(src, abs_path, dst, sync_path)
+               remote_mtime = dst.stat(sync_path).st_mtime
+               local_mtime = src.stat(pathname).st_mtime
+               if remote_mtime > local_mtime and modified:
+                   sync_file(dst, sync_path, src, pathname)
+               elif remote_mtime < local_mtime and modified:
+                   sync_file(src, pathname, dst, sync_path)
             except (OSError, IOError):
-                copy_file(src, abs_path, dst, sync_path)
-    for dir_ in dirs:
-        sync_all_files(src, dst, dir_, True)
+                copy_file(src, pathname, dst, sync_path)
 
 def sync_file(src, src_path, dst, dst_path):
     """
