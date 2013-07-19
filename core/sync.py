@@ -1,13 +1,27 @@
 # Synchronization module 
 #
 # Copyright (C) 2013 Benjamin Ertl
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 """
-Synchronization module providing functions for synchronization from
-FileSystem abstraction to FileSystem abstraction.
+Synchronization methods to synchronize between file system abstractions see
+L{filesystem}.
 """
 
-__version__ = 0.2
+__version__ = 0.3
 __author__ = 'Benjamin Ertl'
 
 import os, stat
@@ -15,13 +29,13 @@ import filecmp
 import logging, traceback
 import rsync
 
-log = {'create': 'CREATE {0}',
-       'remove': 'REMOVE {0}',
-       'sync_to': 'SYNC {0} ==> {1}',
-       'sync_eq': 'SYNC {0} == {1}',
-       'sync_er': 'SYNC {0} !! {1}',
-       'move': 'MOVE {0} ==> {1}',
-       'copy': 'COPY {0} ==> {1}'}
+log = {'create': 'CREATE {0}<br />',
+       'remove': 'REMOVE {0}<br />',
+       'sync_to': 'SYNC {0} ==> {1}<br />',
+       'sync_eq': 'SYNC {0} == {1}<br />',
+       'sync_er': 'SYNC {0} !! {1}<br />',
+       'move': 'MOVE {0} ==> {1}<br />',
+       'copy': 'COPY {0} ==> {1}<br />'}
 
 def sync_all_files(src, dst, path, modified=True):
     """
@@ -37,29 +51,6 @@ def sync_all_files(src, dst, path, modified=True):
     @param modified: two-way synchronize modified files.
     @type modified: bool
     """
-    #dirs = []
-    #for pathname in src.listdir(path):
-    #    abs_path = os.path.join(path,pathname)
-    #    rel_path = src.relpath(abs_path)
-    #    sync_path = os.path.join(dst.root,rel_path)
-    #    if stat.S_ISDIR(src.stat(abs_path).st_mode):
-    #        dirs.append(abs_path)
-    #        try:
-    #           mtime = dst.stat(sync_path).st_mtime
-    #        except (OSError, IOError):
-    #           make_dir(dst, sync_path)
-    #    else:
-    #        try:
-    #            remote_mtime = dst.stat(sync_path).st_mtime
-    #            local_mtime = src.stat(abs_path).st_mtime
-    #            if remote_mtime > local_mtime and modified:
-    #                sync_file(dst, sync_path, src, abs_path)
-    #            elif remote_mtime < local_mtime and modified:
-    #                sync_file(src, abs_path, dst, sync_path)
-    #        except (OSError, IOError):
-    #            copy_file(src, abs_path, dst, sync_path)
-    #for dir_ in dirs:
-    #    sync_all_files(src, dst, dir_, True)
     for pathname in src.walk(path):
         rel_path = src.relpath(pathname)
         sync_path = os.path.join(dst.root,rel_path)

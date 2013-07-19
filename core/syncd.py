@@ -3,12 +3,26 @@
 # MiGBox sync daemon
 #
 # Copyright (C) 2013 Benjamin Ertl
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 """
 Sync daemon for MiGBox.
 """
 
-__version__ = 0.2
+__version__ = 0.3
 __author__ = 'Benjamin Ertl'
 
 import os, sys, time
@@ -59,11 +73,11 @@ def main():
     config = ConfigParser.ConfigParser()
     config.read('config.cfg')
 
-    log_file = config.get('Logging', 'file')
-    log_level = config.get('Logging', 'level')
+    log_file = config.get('Logging', 'log_file')
+    log_level = config.get('Logging', 'log_level')
 
-    src_path = config.get('Sync', 'src')
-    dst_path = config.get('Sync', 'dst')
+    src_path = config.get('Sync', 'sync_src')
+    dst_path = config.get('Sync', 'sync_dst')
 
     logging.basicConfig(filename=log_file, filemode='w',\
                         format='%(levelname)s: %(asctime)s %(message)s',\

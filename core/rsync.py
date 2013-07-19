@@ -3,13 +3,27 @@
 # Rsync by Andrew Tridgell
 #
 # Copyright (C) 2013 Benjamin Ertl
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 """
 Rsync demo implementation with weak rolling checksum and sha1 strong checksum.
 Based on the rsync algorithm by Andrew Tridgell.
 """
 
-__version__ = 0.2
+__version__ = 0.3
 __author__ = 'Benjamin Ertl'
 
 import os, sys
@@ -102,7 +116,7 @@ def block_chksums(stream, offset=0, blocksize=default_size):
         if not data:
             break
         weakchksum = weak_chksum(data)
-        strongchksum = strong_chksum(data)
+        strongchksum = None #strong_chksum(data)
         if weakchksum.a in table:
             table[weakchksum.a].append({'weak':weakchksum.s,
                                         'strong':strongchksum,

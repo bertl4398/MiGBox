@@ -17,6 +17,7 @@
 # 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
 #
 # Modification copyright (C) 2013 Benjamin Ertl
+#
 
 """
 A stub SFTP server for loopback SFTP testing.
