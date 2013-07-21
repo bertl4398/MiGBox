@@ -1,4 +1,4 @@
-# Module for checksum computation
+# Module for delta computation
 #
 # Copyright (C) 2013 Benjamin Ertl
 #
@@ -17,37 +17,62 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 """
-Module for checksum computation.
+Module for delta computation.
 Provides methods for checksum and delta computation and application. 
 """
-__version__ = 0.1
+__version__ = 0.2
 __author__ = 'Benjamin Ertl'
 
-import zlib
+import zlib, hashlib
 
-BLOCKSIZE = (64 * 1024)
+BLOCKSIZE = 65536 
+
+def weakchksum(data):
+    """
+    Compute weak checksum.
+
+    @param data: data for checksum computation.
+    @type data: str
+    @return adler32 checksum.
+    """
+    return zlib.adler32(data) & 0xffffffff
+
+def strongchksum(data):
+    """
+    Compute strong checksum.
+
+    @param data: data for checksum computation.
+    @type data: str
+    @return md5 hexdigest.
+    """
+    md5 = hashlib.md5()
+    md5.update(data)
+    return md5.hexdigest()
 
 def blockchksums(filename, size=BLOCKSIZE):
     """
     Compute block checksums for file filename with size size.
-    Chechsums are L{zlib.adler32} checksums.
+    Chechsums are L{zlib.adler32} checksums as weak checksums
+    and L{hashlib.md5} checksums as strong checksums.
 
     @param filename: filename.
     @type filename: str
     @param size: block size, default 65536.
     @type size: int
-    @return dict as hashtable of tuples as (block offset, block checksum)
+    @return dict as hashtable of tuples as
+            (block offset, weak chksum, strong chksum).
     """
     with open(filename, "rb") as f:
         results = {}; offset = 0
         data = f.read(size)
         while data:
-            h = zlib.adler32(data) % 2**32
+            hmd5 = strongchksum(data)
+            h = weakchksum(data)
             k = h >> 16
             if k in results:
-                results[k].append((offset, h))
+                results[k].append((offset, h, hmd5))
             else:
-                results[k] = [(offset, h)]
+                results[k] = [(offset, h, hmd5)]
             offset += size
             data = f.read(size)
     return results
@@ -62,39 +87,46 @@ def delta(filename, chksums, size=BLOCKSIZE):
     @type chksums: dict
     @param size: block size, default 65536.
     @type size: int
-    @return list of tuples as (block offset, data)
+    @return list of tuples as (offset, data).
     """
     diff = []
+    if not chksums:
+        return diff
     with open(filename, "rb") as f:
         offset = last = 0; match = False
         data = f.read(size)
         while data:
-            h = zlib.adler32(data) % 2**32
+            h = weakchksum(data)
             k = h >> 16
             if k in chksums:
-                for o, c in chksums[k]:
-                    if h == c:
-                        # match
-                        match = True
-                        if offset != last:
-                            # append diff data
+                for off, weak, strong in chksums[k]:
+                    if h == weak:
+                        if strong == strongchksum(data):
+                            # match
+                            match = True
                             with open(filename, "rb") as tmp:
-                                diff.append((last, tmp.read(offset - last)))
-                        # append matching block offset
-                        diff.append((o, ''))
-            if match:
-                offset += size
-                last = offset
-            else:
+                                tmp.seek(last)
+                                new_data = tmp.read(offset - last)
+                                if new_data:
+                                    diff.append((last, new_data))
+                                diff.append((off, ''))
+                            offset += size
+                            last = offset
+            if not match:
+                # no match
                 offset += 1
                 f.seek(offset)
             match = False
             data = f.read(size)
+        if not diff:
+            f.seek(0)
+            diff.append((0, f.read()))
     return diff
 
 def patch(filename, delta, size=BLOCKSIZE):
     """
     Patch file filename.
+    Write patched file to filename + .patched.
 
     @param filename: filename.
     @type filename: str
@@ -102,17 +134,15 @@ def patch(filename, delta, size=BLOCKSIZE):
     @type delta: list of tuples
     @param size: block size, default 65536.
     @type size: int
+    @return name of patched file.
     """
-    written = []
     with open(filename, "rb") as old:
         with open(filename + ".patched", "wb") as new:
             for offset, data in delta:
                 if data:
                     new.write(data)
-                    written.append(len(data))
                 else:
                     old.seek(offset)
                     d = old.read(size)
                     new.write(d)
-                    written.append(len(d))
-    return written 
+    return filename + ".patched"
