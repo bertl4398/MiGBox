@@ -47,13 +47,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, \
 MA 02110-1301 USA.
 """
 
-import sys, os
+import sys, os, threading
 from ConfigParser import ConfigParser
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-#import syncd
+import syncd
 
 def readConfig(filename):
     config = ConfigParser()
@@ -77,18 +77,20 @@ class SyncThread(QThread):
     def __init__(self, parent=None):
         super(SyncThread, self).__init__(parent)
 
-        self.exiting = False
+        self.event = threading.Event()
 
-    def __del__(self):
-        self.exiting = True
-        self.wait()
+    #def __del__(self):
+    #    self.wait()
 
-    def sync(self):
+    def sync(self, sftp):
+        self.sftp = sftp
         self.start()
 
     def run(self):
-        while not self.exiting:
-            self.sleep(1)
+        syncd.main(self.sftp, self.event)
+
+    def stop_sync(self):
+        self.event.set()
 
 class OptionsUi(QDialog):
     def __init__(self, parent=None):
@@ -96,8 +98,9 @@ class OptionsUi(QDialog):
 
         settings = QSettings()
 
-        urlRegExp = QRegExp("localhost|(\d{0,3}.\\d{0,3}.\\d{0,3}.\\d{0,3})")
-        urlValidator = QRegExpValidator(urlRegExp)
+        # TODO validate sftp host url
+        #urlRegExp = QRegExp("localhost|(\d{0,3}.\\d{0,3}.\\d{0,3}.\\d{0,3})")
+        #urlValidator = QRegExpValidator(urlRegExp)
 
         urlLabel = QLabel("URL")
         self.urlEdit = QLineEdit(settings.value("sftp_host", QVariant("localhost")).toString())
@@ -133,7 +136,7 @@ class OptionsUi(QDialog):
         settings.setValue("sftp_port", QVariant(self.portEdit.value()))
 
         writeConfig("config.cfg", "Connection", sftp_host=self.urlEdit.text(), \
-                                                        sftp_port=self.portEdit.value())
+                                                sftp_port=self.portEdit.value())
         QDialog.accept(self)
 
 class AppUi(QMainWindow):
@@ -149,13 +152,9 @@ class AppUi(QMainWindow):
         dstPath = settings.value("sync_dst", QVariant(os.getcwd())).toString()
 
         self.srcPathLabel = QLineEdit(srcPath)
-        #self.srcPathLabel.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
-        #self.srcPathLabel.setReadOnly(True)
         self.srcPathLabel.setToolTip("Source path for synchronization")
 
         self.dstPathLabel = QLineEdit(dstPath)
-        #self.dstPathLabel.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
-        #self.dstPathLabel.setReadOnly(True)
         self.dstPathLabel.setToolTip("Destination path for synchronization")
 
         self.srcPathButton = QPushButton("Path...")
@@ -172,6 +171,15 @@ class AppUi(QMainWindow):
         self.logBrowser = QTextBrowser()
         self.logBrowser.setLineWrapMode(QTextEdit.NoWrap)
         self.logBrowser.setSource(QUrl(logFile))
+        self.updateLogButton = QPushButton("&Update")
+        self.updateLogButton.setToolTip("Update log")
+
+        logLayout = QVBoxLayout()
+        logLayout.addWidget(self.logBrowser)
+        logLayout.addWidget(self.updateLogButton)
+
+        logWidget = QWidget()
+        logWidget.setLayout(logLayout)
 
         self.optionsButton = QPushButton("&Options")
         self.optionsButton.setToolTip("Configure MiGBox")
@@ -225,7 +233,7 @@ class AppUi(QMainWindow):
         tabs.addTab(mainWidget, "&Main")
         tabs.addTab(self.srcTreeView, "&Src Browser")
         tabs.addTab(self.dstTreeView, "&Dst Browser")
-        tabs.addTab(self.logBrowser, "&Log")
+        tabs.addTab(logWidget, "&Log")
         tabs.addTab(self.aboutText, "&About")
 
         self.setCentralWidget(tabs)
@@ -256,14 +264,21 @@ class AppUi(QMainWindow):
         self.connect(self.optionsButton, SIGNAL("clicked()"), self.setOptions)
         self.connect(self.syncButton, SIGNAL("clicked()"), self.synchronize)
         self.connect(self.stopButton, SIGNAL("clicked()"), self.stopSynchronize)
+        self.connect(self.updateLogButton, SIGNAL("clicked()"), self.logBrowser.reload)
+        self.connect(self.srcPathLabel, SIGNAL("textChanged(QString)"), self.saveSyncPaths)
+        self.connect(self.dstPathLabel, SIGNAL("textChanged(QString)"), self.saveSyncPaths)
 
     def saveSyncPaths(self):
-        writeConfig("config.cfg", \
+        if self.remoteCheckBox.isChecked():
+            writeConfig("config.cfg", "Sync", sync_src=self.srcPathLabel.text())
+            writeConfig("config.cfg", "Connection", sftp_host=self.dstPathLabel.text())
+        else:
+            writeConfig("config.cfg", \
                     "Sync", sync_src=self.srcPathLabel.text(), \
                             sync_dst=self.dstPathLabel.text())
         
     def stopSynchronize(self):
-        self.thread.exiting = True
+        self.thread.stop_sync()
         self.updateUi()
 
     def synchronize(self):
@@ -274,9 +289,8 @@ class AppUi(QMainWindow):
         self.stopButton.setEnabled(True)
         self.srcPathLabel.setReadOnly(True)
         self.dstPathLabel.setReadOnly(True)
-        self.thread.exiting = False
-        self.saveSyncPaths()
-        self.thread.sync()
+        self.thread.event.clear()
+        self.thread.sync(self.remoteCheckBox.isChecked())
 
     def updateUi(self):
         self.srcPathButton.setEnabled(True)
@@ -296,9 +310,12 @@ class AppUi(QMainWindow):
         if self.remoteCheckBox.isChecked():
             self.dstPathLabel.setText(settings.value("sftp_host", QVariant("localhost")).toString())
             self.dstPathButton.setVisible(False)
+            self.dstTreeView.setModel(None)
         else:
             self.dstPathLabel.setText(settings.value("sync_dst", QVariant(os.getcwd())).toString())
             self.dstPathButton.setVisible(True)
+            self.dstTreeView.setModel(self.dstFsModel)
+            self.dstTreeView.setRootIndex(self.dstFsModel.index(self.dstPathLabel.text()))
 
     def setSrcPath(self):
         path = QFileDialog.getExistingDirectory(self, "MiGBox - Set Source Path", self.srcPathLabel.text())
@@ -306,6 +323,7 @@ class AppUi(QMainWindow):
             self.srcPathLabel.setText(QDir.toNativeSeparators(path))
             self.srcFsModel.setRootPath(self.srcPathLabel.text())
             self.srcTreeView.setRootIndex(self.srcFsModel.index(self.srcPathLabel.text()))
+            self.saveSyncPaths()
 
     def setDstPath(self):
         path = QFileDialog.getExistingDirectory(self, "MiGBox - Set Destination Path", self.dstPathLabel.text())
@@ -313,6 +331,7 @@ class AppUi(QMainWindow):
             self.dstPathLabel.setText(QDir.toNativeSeparators(path))
             self.dstFsModel.setRootPath(self.dstPathLabel.text())
             self.dstTreeView.setRootIndex(self.dstFsModel.index(self.dstPathLabel.text()))
+            self.saveSyncPaths()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

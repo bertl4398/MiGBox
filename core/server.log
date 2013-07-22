@@ -1,0 +1,8 @@
+INFO:paramiko.transport:Connected (version 2.0, client OpenSSH_6.1p1)
+INFO:paramiko.transport:Auth rejected (none).
+INFO:paramiko.transport:Auth granted (password).
+INFO:paramiko.transport:Secsh channel 1 (session) opened.
+INFO:paramiko.transport:Disconnect (code 11): disconnected by user
+INFO:paramiko.transport:Connected (version 2.0, client paramiko_1.10.1)
+INFO:paramiko.transport:Auth granted (password).
+INFO:paramiko.transport:Secsh channel 1 (session) opened.

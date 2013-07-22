@@ -18,14 +18,15 @@
 
 """
 File system abstraction module.
-Provides a wrapper for uniform file system access with os and paramiko.
+Provides a wrapper for uniform file system access with os and sftp via paramiko.
 """
 
-__version__ = 0.2
+__version__ = 0.3
 __author__ = 'Benjamin Ertl'
 
 import os, shutil, stat
-import paramiko
+
+from delta import *
 
 class FileSystem(object):
     def __init__(self, instance=None, root='.'):
@@ -75,9 +76,9 @@ class FileSystem(object):
         return self.instance.rename(src, dst)
 
     def copy(self, src, src_path, dst, dst_path):
-        if isinstance(src, paramiko.SFTPClient):
+        if isinstance(src, SFTPFileSystem):
             return src.get(src_path, dst_path)
-        elif isinstance(dst, paramiko.SFTPClient):
+        elif isinstance(dst, SFTPFileSystem):
             return dst.put(src_path, dst_path)
         else:
             try:
@@ -91,7 +92,13 @@ class FileSystem(object):
     def open(self, path, mode='rb', buffering=None):
         raise NotImplementedError
 
-    def checksums(self):
+    def checksums(self, path):
+        raise NotImplementedError
+
+    def delta(self, path, chksums):
+        raise NotImplementedError
+
+    def patch(self, path, delta):
         raise NotImplementedError
 
 class OSFileSystem(FileSystem):
@@ -101,9 +108,34 @@ class OSFileSystem(FileSystem):
     def open(self, path, mode='rb', buffering=None):
         return open(path, mode)
 
+    def checksums(self, path):
+        return blockchksums(path)
+
+    def delta(self, path, chksums):
+        return delta(path, chksums)
+
+    def patch(self, path, delta):
+        patched = patch(path, delta)
+        return self.instance.rename(patched, path)
+
 class SFTPFileSystem(FileSystem):
     def __init__(self, instance, root='.'):
         FileSystem.__init__(self, instance, root)
 
     def open(self, path, mode='rb', buffering=None):
         return self.instance.open(path, mode)
+
+    def checksums(self, path):
+        return self.instance.checksums(path)
+
+    def delta(self, path, chksums):
+        return self.instance.delta(path, chksums)
+
+    def patch(self, path, delta):
+        return self.instance.patch(path, delta)
+
+    def get(self, src, dst):
+        return self.instance.get(src, dst)
+
+    def put(self, src, dst):
+        return self.instance.put(src, dst)

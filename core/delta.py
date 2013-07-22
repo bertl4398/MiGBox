@@ -20,10 +20,11 @@
 Module for delta computation.
 Provides methods for checksum and delta computation and application. 
 """
-__version__ = 0.2
+__version__ = 0.3
 __author__ = 'Benjamin Ertl'
 
 import zlib, hashlib
+import base64
 
 BLOCKSIZE = 65536 
 
@@ -68,7 +69,8 @@ def blockchksums(filename, size=BLOCKSIZE):
         while data:
             hmd5 = strongchksum(data)
             h = weakchksum(data)
-            k = h >> 16
+            # unicode keys for compatibility with json over sftp
+            k = unicode(h >> 16)
             if k in results:
                 results[k].append((offset, h, hmd5))
             else:
@@ -97,7 +99,7 @@ def delta(filename, chksums, size=BLOCKSIZE):
         data = f.read(size)
         while data:
             h = weakchksum(data)
-            k = h >> 16
+            k = unicode(h >> 16)
             if k in chksums:
                 for off, weak, strong in chksums[k]:
                     if h == weak:
@@ -107,6 +109,8 @@ def delta(filename, chksums, size=BLOCKSIZE):
                             with open(filename, "rb") as tmp:
                                 tmp.seek(last)
                                 new_data = tmp.read(offset - last)
+                                # base64 encoding for json/sftp compatibility
+                                new_data = base64.b64encode(new_data)
                                 if new_data:
                                     diff.append((last, new_data))
                                 diff.append((off, ''))
@@ -140,9 +144,10 @@ def patch(filename, delta, size=BLOCKSIZE):
         with open(filename + ".patched", "wb") as new:
             for offset, data in delta:
                 if data:
-                    new.write(data)
+                    d = base64.b64decode(data)
+                    new.write(d)
                 else:
-                    old.seek(offset)
+                    old.seek(int(offset))
                     d = old.read(size)
                     new.write(d)
     return filename + ".patched"

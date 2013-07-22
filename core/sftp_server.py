@@ -20,52 +20,90 @@
 
 """
 SFTP server implementation based on paramiko.
-Provides a SFTP server to run on the MiG server or other central server for
+Provides a SFTP server to run on the MiG server or an other central server for
 synchronization.
 """
 
-__version__ = 0.2
+__version__ = 0.3
 __author__ = 'Benjamin Ertl'
 
-import sys, time, threading, socket
+import sys, time, threading, socket, os
 import traceback
-import ConfigParser
-import hashlib
+import json
 
 import paramiko
 
+import delta
+
+from ConfigParser import ConfigParser
+
 from stub_sftp import StubServer, StubSFTPServer
 
+CMD_BLOCKCHK = 205
+CMD_DELTA = 206
+CMD_PATCH = 207
+
 class SFTPServer(paramiko.SFTPServer):
+    """
+    This class inherits from L{paramiko.SFTPServer}.
+
+    It is required here to overwrite/extend the paramiko.SFTPServer. 
+    """
     def __init__(self, channel, name, server, \
                  sftp_si=paramiko.SFTPServerInterface, *largs, **kwargs):
         paramiko.SFTPServer.__init__(self, channel, name, server, \
                                      sftp_si, *largs, **kwargs)
 
     def _process(self, t, request_number, msg):
-        if t == 205:
-            md5 = hashlib.md5()
-            md5.update(msg.get_string())
+        """
+        Overwritten method for processing incoming requests to except
+        and execute synchronization specific requests.
+
+        This is a hook into the paramiko.SFTPServer implementation
+
+        See L{paramiko.SFTPServer._process}
+        """
+        if t == CMD_BLOCKCHK:
+            path = msg.get_string()
+            bs = delta.blockchksums(self.server._realpath(path))
+            j = json.dumps(bs)
             message = paramiko.Message()
             message.add_int(request_number)
-            message.add_string(md5.hexdigest())
-            paramiko.SFTPServer._send_packet(self, t, str(message))
-            #paramiko.SFTPServer._send_status(self, request_number, 0)
+            message.add_string(j)
+            self._send_packet(t, str(message))
             return
+        elif t == CMD_DELTA:
+            path = msg.get_string()
+            bs = json.loads(msg.get_string())
+            d = delta.delta(self.server._realpath(path), bs)
+            j = json.dumps(d)
+            message = paramiko.Message()
+            message.add_int(request_number)
+            message.add_string(j)
+            self._send_packet(t, str(message))
+        elif t == CMD_PATCH:
+            path = msg.get_string()
+            d = json.loads(msg.get_string())
+            delta.patch(self.server._realpath(path), d)
+            self._send_status(request_number, self.server.rename(path + ".patched", path))
         else:
             return paramiko.SFTPServer._process(self, t, request_number, msg)
 
 def main():
-    config = ConfigParser.ConfigParser()
+    """
+    Main entry point to run the sftp server.
+    """
+    config = ConfigParser()
     config.read('server.cfg')
 
-    host = config.get('Connection', 'host')
-    port = int(config.get('Connection', 'port'))
-    backlog = int(config.get('Connection', 'backlog'))
+    host = config.get('Connection', 'sftp_host')
+    port = int(config.get('Connection', 'sftp_port'))
+    backlog = int(config.get('Connection', 'sftp_backlog'))
 
-    log_level = config.get('Logging', 'level')
-    log_level = 'DEBUG'
-    paramiko.common.logging.basicConfig(level=getattr(paramiko.common,log_level))
+    log_file = config.get('Logging', 'log_file')
+    log_level = config.get('Logging', 'log_level')
+    paramiko.common.logging.basicConfig(filename=log_file, filemode='w',\
+                                        level=getattr(paramiko.common,log_level))
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)

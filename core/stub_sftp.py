@@ -60,7 +60,7 @@ class StubSFTPHandle (SFTPHandle):
 class StubSFTPServer (SFTPServerInterface):
     config = ConfigParser.ConfigParser()
     config.read('server.cfg')
-    ROOT = config.get('ROOT','path')
+    ROOT = config.get('ROOT','root_path')
 
     def _realpath(self, path):
         return self.ROOT + self.canonicalize(path)

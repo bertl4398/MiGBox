@@ -26,15 +26,18 @@ __version__ = 0.3
 __author__ = 'Benjamin Ertl'
 
 import os, sys, time
+import threading
 import logging, traceback
 import paramiko, watchdog
-import ConfigParser
 
 import sync
 
 from filesystem import *
+from sftp_client import SFTPClient
+
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
+from ConfigParser import ConfigParser
 
 class EventHandler(watchdog.events.FileSystemEventHandler):
     def __init__(self, src, dst):
@@ -69,8 +72,8 @@ class EventHandler(watchdog.events.FileSystemEventHandler):
         sync_dst = self.get_syncpath(event.dest_path)
         sync.move_file(self.dst, sync_src, sync_dst)
 
-def main():
-    config = ConfigParser.ConfigParser()
+def main(sftp=True, event=threading.Event()):
+    config = ConfigParser()
     config.read('config.cfg')
 
     log_file = config.get('Logging', 'log_file')
@@ -79,31 +82,52 @@ def main():
     src_path = config.get('Sync', 'sync_src')
     dst_path = config.get('Sync', 'sync_dst')
 
+    sftp_host = config.get('Connection', 'sftp_host')
+    sftp_port = config.getint('Connection', 'sftp_port')
+
     logging.basicConfig(filename=log_file, filemode='w',\
                         format='%(levelname)s: %(asctime)s %(message)s',\
                         datefmt='%m/%d/%Y %I:%M:%S %p', level=getattr(logging,log_level))
 
     local = OSFileSystem(root=src_path)
-    remote = OSFileSystem(root=dst_path)
+    remote = None
 
-    sync.sync_all_files(local, remote, local.root)
-    sync.sync_all_files(remote, local, remote.root, modified=False)
+    if sftp == 'False':
+        remote = OSFileSystem(root=dst_path)
+    else:
+        client = SFTPClient(sftp_host, sftp_port)
+        try:
+            client.connect('test','test')
+            remote = SFTPFileSystem(client)
+        except Exception as e:
+            print e
 
-    event_handler = EventHandler(local, remote)
-    observer = Observer()
-    observer.schedule(event_handler, path=src_path, recursive=True)
-    observer.start()
+    if remote:
+        sync.sync_all_files(local, remote, local.root)
+        sync.sync_all_files(remote, local, remote.root, modified=False)
 
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        pass
+        event_handler = EventHandler(local, remote)
+        observer = Observer()
+        observer.schedule(event_handler, path=src_path, recursive=True)
+        observer.start()
 
-    observer.stop()
-    observer.join()
+        try:
+            while not event.isSet():
+                time.sleep(1)
+        except KeyboardInterrupt:
+            pass
 
-    sys.exit(0)
+        observer.stop()
+        observer.join()
 
 if __name__ == '__main__':
-    main()
+    try:
+        sftp = sys.argv[1]
+        print 'Local sync ...'
+    except IndexError:
+        print 'SFTP sync ...'
+
+    if sftp == 'False':
+        main(sftp)
+    else:
+        main()
