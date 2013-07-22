@@ -32,10 +32,13 @@ class FileSystem(object):
     def __init__(self, instance=None, root='.'):
         self.instance = instance
         self.root = root
+        self.cache = {}
 
-    def listdir(self, path='.'):
+    def listdir(self, path=None):
         if not self.instance:
             raise NotImplementedError
+        if not path:
+            path = self.root
         return self.instance.listdir(path)
 
     def walk(self, path):
@@ -92,6 +95,14 @@ class FileSystem(object):
     def open(self, path, mode='rb', buffering=None):
         raise NotImplementedError
 
+    def cached_checksums(self, path):
+        if not self.instance:
+            raise NotImplementedError
+        key = strongchksum(path + str(self.stat(path).st_mtime))
+        if not key in self.cache:
+            self.cache[key] = self.checksums(path)
+        return self.cache[key]
+
     def checksums(self, path):
         raise NotImplementedError
 
@@ -109,7 +120,7 @@ class OSFileSystem(FileSystem):
         return open(path, mode)
 
     def checksums(self, path):
-        return blockchksums(path)
+        return blockchksums(path) 
 
     def delta(self, path, chksums):
         return delta(path, chksums)
@@ -117,7 +128,7 @@ class OSFileSystem(FileSystem):
     def patch(self, path, delta):
         patched = patch(path, delta)
         return self.instance.rename(patched, path)
-
+    
 class SFTPFileSystem(FileSystem):
     def __init__(self, instance, root='.'):
         FileSystem.__init__(self, instance, root)
@@ -139,3 +150,5 @@ class SFTPFileSystem(FileSystem):
 
     def put(self, src, dst):
         return self.instance.put(src, dst)
+
+
