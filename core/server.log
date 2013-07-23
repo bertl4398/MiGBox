@@ -1,8 +1,15 @@
-INFO:paramiko.transport:Connected (version 2.0, client OpenSSH_6.1p1)
-INFO:paramiko.transport:Auth rejected (none).
-INFO:paramiko.transport:Auth granted (password).
-INFO:paramiko.transport:Secsh channel 1 (session) opened.
-INFO:paramiko.transport:Disconnect (code 11): disconnected by user
-INFO:paramiko.transport:Connected (version 2.0, client paramiko_1.10.1)
-INFO:paramiko.transport:Auth granted (password).
-INFO:paramiko.transport:Secsh channel 1 (session) opened.
+ERR [20130723-11:19:27.525] thr=1   paramiko.transport: Exception: Error reading SSH protocol banner
+ERR [20130723-11:19:27.526] thr=1   paramiko.transport: Traceback (most recent call last):
+ERR [20130723-11:19:27.526] thr=1   paramiko.transport:   File "/usr/local/lib/python2.7/dist-packages/paramiko-1.10.1-py2.7.egg/paramiko/transport.py", line 1555, in run
+ERR [20130723-11:19:27.526] thr=1   paramiko.transport:     self._check_banner()
+ERR [20130723-11:19:27.526] thr=1   paramiko.transport:   File "/usr/local/lib/python2.7/dist-packages/paramiko-1.10.1-py2.7.egg/paramiko/transport.py", line 1681, in _check_banner
+ERR [20130723-11:19:27.527] thr=1   paramiko.transport:     raise SSHException('Error reading SSH protocol banner' + str(x))
+ERR [20130723-11:19:27.527] thr=1   paramiko.transport: SSHException: Error reading SSH protocol banner
+ERR [20130723-11:19:27.527] thr=1   paramiko.transport: 
+INF [20130723-11:25:32.731] thr=2   paramiko.transport: Connected (version 2.0, client paramiko_1.10.1)
+INF [20130723-11:25:32.911] thr=2   paramiko.transport: Auth granted (publickey).
+INF [20130723-11:25:32.917] thr=2   paramiko.transport: Secsh channel 1 (session) opened.
+INF [20130723-13:23:21.671] thr=3   paramiko.transport: Connected (version 2.0, client paramiko_1.10.1)
+INF [20130723-13:24:02.821] thr=4   paramiko.transport: Connected (version 2.0, client paramiko_1.10.1)
+INF [20130723-13:24:02.973] thr=4   paramiko.transport: Auth granted (publickey).
+INF [20130723-13:24:02.980] thr=4   paramiko.transport: Secsh channel 1 (session) opened.

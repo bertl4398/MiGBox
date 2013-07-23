@@ -18,3 +18,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+Requirements
+------------
+
+  - python    <http://www.python.org/>
+  - paramiko  <https://github.com/paramiko/paramiko>
+  - watchdog  <https://pypi.python.org/pypi/watchdog>
+
+For the graphical user interface also
+
+  - PyQt4     <http://pyqt.sourceforge.net/Docs/PyQt4/installation.html>
+
+Installation
+------------
+
+To build and install with easy_install run following command in the MiGBox
+directory (as root):
+
+  easy_install .

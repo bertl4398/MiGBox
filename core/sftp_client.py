@@ -22,12 +22,13 @@ Provides a SFTP client to use with the abstract file system access, see
 L{filesystem}
 """
 
-__version__ = 0.1
+__version__ = 0.2
 __author__ = 'Benjamin Ertl'
 
 import socket, json
 import paramiko
 
+from ConfigParser import ConfigParser
 from delta import *
 
 CMD_BLOCKCHK = 205
@@ -38,12 +39,31 @@ class SFTPClient(object):
     def __init__(self, host, port):
         self.host = host
         self.port = port
+        self.host_key = None
 
-    def connect(self, username, password):
+        config = ConfigParser()
+        config.read('config.cfg')
+        srvkey = config.get('KeyAuth', 'srvkey')
+        prvkey = config.get('KeyAuth', 'prvkey')
+
+        # file format "ssh-rsa AAA.... user@somemachine"
+        with open(srvkey, 'rb') as f:
+            self.known_host = f.read()
+
+        # get the base64 encoded known host public key
+        self.known_host = self.known_host.split(' ')[1]
+
+        self.user_key = paramiko.RSAKey.from_private_key_file(prvkey)
+
+    def connect(self, username='', password=None):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.host,self.port))
         self.transport = paramiko.Transport(self.socket)
-        self.transport.connect(username=username, password=password)
+        self.transport.start_client()
+        self.host_key = self.transport.get_remote_server_key()
+        if not self.known_host == self.host_key.get_base64():
+            raise paramiko.BadHostKeyException(self.host, self.host_key, self.known_host)
+        self.transport.auth_publickey(username, self.user_key)
         self.server = paramiko.SFTP.from_transport(self.transport)
 
     def disconnect(self):

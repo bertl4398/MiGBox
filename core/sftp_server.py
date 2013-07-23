@@ -97,13 +97,13 @@ def main():
     config.read('server.cfg')
 
     host = config.get('Connection', 'sftp_host')
-    port = int(config.get('Connection', 'sftp_port'))
-    backlog = int(config.get('Connection', 'sftp_backlog'))
+    port = config.getint('Connection', 'sftp_port')
+    backlog = config.getint('Connection', 'sftp_backlog')
 
     log_file = config.get('Logging', 'log_file')
     log_level = config.get('Logging', 'log_level')
-    paramiko.common.logging.basicConfig(filename=log_file, filemode='w',\
-                                        level=getattr(paramiko.common,log_level))
+
+    paramiko.util.log_to_file(log_file, log_level)
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
