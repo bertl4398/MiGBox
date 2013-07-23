@@ -1,5 +1,3 @@
-#!/usr/bin/python
-#
 # MiGBox sync daemon
 #
 # Copyright (C) 2013 Benjamin Ertl
@@ -27,7 +25,7 @@ __author__ = 'Benjamin Ertl'
 
 import os, sys, time
 import threading
-import logging, traceback
+import logging
 import paramiko, watchdog
 
 import sync
@@ -92,7 +90,7 @@ def main(sftp=True, event=threading.Event()):
     local = OSFileSystem(root=src_path)
     remote = None
 
-    if sftp == 'False':
+    if not sftp:
         remote = OSFileSystem(root=dst_path)
     else:
         client = SFTPClient(sftp_host, sftp_port)
@@ -101,9 +99,15 @@ def main(sftp=True, event=threading.Event()):
             remote = SFTPFileSystem(client)
         except Exception as e:
             print e
+            logging.error(repr(e) + '<br />')
 
     if remote:
+        # copy all new files from local to remote
+        # sync all modifications from local/remote to local/remote
+        # modifications are compared by modification time, the latest wins
         sync.sync_all_files(local, remote, local.root)
+        # copy all new files from remote to local
+        # sync no modifications, already synced
         sync.sync_all_files(remote, local, remote.root, modified=False)
 
         event_handler = EventHandler(local, remote)
@@ -114,20 +118,9 @@ def main(sftp=True, event=threading.Event()):
         try:
             while not event.isSet():
                 time.sleep(1)
-        except KeyboardInterrupt:
-            pass
+        except Exception as e:
+            print e
+            logging.error(repr(e) + '<br />')
 
         observer.stop()
         observer.join()
-
-if __name__ == '__main__':
-    try:
-        sftp = sys.argv[1]
-        print 'Local sync ...'
-    except IndexError:
-        print 'SFTP sync ...'
-
-    if sftp == 'False':
-        main(sftp)
-    else:
-        main()

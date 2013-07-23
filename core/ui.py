@@ -27,7 +27,7 @@ __version__ = 0.3
 __author__ = 'Benjamin Ertl'
 
 ABOUT ="""\
-MiGBox - File Synchronization for the Minimum Intrusion Grid
+MiGBox - File Synchronization for the Minimum Intrusion Grid (MiG)
 
 Copyright (c) 2013 Benjamin Ertl
 
@@ -55,7 +55,9 @@ from PyQt4.QtGui import *
 
 import syncd
 
-def readConfig(filename):
+CONFIGFILE = 'config.cfg'
+
+def readConfig(filename=CONFIGFILE):
     config = ConfigParser()
     config.read(filename)
 
@@ -78,9 +80,6 @@ class SyncThread(QThread):
         super(SyncThread, self).__init__(parent)
 
         self.event = threading.Event()
-
-    #def __del__(self):
-    #    self.wait()
 
     def sync(self, sftp):
         self.sftp = sftp
@@ -110,18 +109,52 @@ class OptionsUi(QDialog):
         self.portEdit.setRange(0, 65535)
         self.portEdit.setValue(settings.value("sftp_port", QVariant(50007)).toInt()[0])
 
+        pubKeyLabel = QLabel("Public key")
+        self.pubKeyPathEdit = QLineEdit(settings.value("srvkey", QVariant("test_rsa.pub")).toString())
+        self.pubKeyPathButton = QPushButton("Path...")
+        self.pubKeyPathButton.setToolTip("Path to the server's public key")
+
         serverGroupBox = QGroupBox("SFTP Server")
         serverBoxLayout = QGridLayout()
         serverBoxLayout.addWidget(urlLabel, 0, 0)
         serverBoxLayout.addWidget(self.urlEdit, 0, 1)
         serverBoxLayout.addWidget(portLabel, 1, 0)
         serverBoxLayout.addWidget(self.portEdit, 1, 1)
+        serverBoxLayout.addWidget(pubKeyLabel, 2, 0)
+        serverBoxLayout.addWidget(self.pubKeyPathEdit, 2, 1)
+        serverBoxLayout.addWidget(self.pubKeyPathButton, 2, 2)
         serverGroupBox.setLayout(serverBoxLayout)
+
+        usernameLabel = QLabel("Username")
+        self.usernameEdit = QLineEdit()
+
+        passwordLabel = QLabel("Password")
+        self.passwordEdit = QLineEdit()
+        self.passwordEdit.setEchoMode(QLineEdit.Password)
+
+        prvKeyLabel = QLabel("Private key")
+        self.prvKeyPathEdit = QLineEdit(settings.value("prvkey", QVariant("user_rsa_key")).toString())
+        self.prvKeyPathButton = QPushButton("Path...")
+        self.prvKeyPathButton.setToolTip("Path to the user's private key")
+
+        clientGroupBox = QGroupBox("SFTP Client")
+        clientBoxLayout = QGridLayout()
+        clientBoxLayout.addWidget(usernameLabel, 0, 0)
+        clientBoxLayout.addWidget(self.usernameEdit, 0, 1)
+        clientBoxLayout.addWidget(QLabel("(optional)"), 0, 2)
+        clientBoxLayout.addWidget(passwordLabel, 1, 0)
+        clientBoxLayout.addWidget(self.passwordEdit, 1, 1)
+        clientBoxLayout.addWidget(QLabel("(optional)"), 1, 2)
+        clientBoxLayout.addWidget(prvKeyLabel, 2, 0)
+        clientBoxLayout.addWidget(self.prvKeyPathEdit, 2, 1)
+        clientBoxLayout.addWidget(self.prvKeyPathButton, 2, 2)
+        clientGroupBox.setLayout(clientBoxLayout)
 
         buttonBox = QDialogButtonBox(QDialogButtonBox.Ok|QDialogButtonBox.Cancel)
 
         layout = QVBoxLayout()
         layout.addWidget(serverGroupBox)
+        layout.addWidget(clientGroupBox)
         layout.addWidget(buttonBox)
         self.setLayout(layout)
 
@@ -129,15 +162,28 @@ class OptionsUi(QDialog):
 
         self.connect(buttonBox, SIGNAL("accepted()"), self.accept)
         self.connect(buttonBox, SIGNAL("rejected()"), self.reject)
+        self.connect(self.prvKeyPathButton, SIGNAL("clicked()"), \
+                     lambda: self.setPath(self.prvKeyPathEdit))
+        self.connect(self.pubKeyPathButton, SIGNAL("clicked()"), \
+                     lambda: self.setPath(self.pubKeyPathEdit))
 
     def accept(self):
         settings = QSettings()
         settings.setValue("sftp_host", QVariant(self.urlEdit.text()))
         settings.setValue("sftp_port", QVariant(self.portEdit.value()))
-
-        writeConfig("config.cfg", "Connection", sftp_host=self.urlEdit.text(), \
-                                                sftp_port=self.portEdit.value())
+        settings.setValue("prvkey", QVariant(self.prvKeyPathEdit.text()))
+        settings.setValue("srvkey", QVariant(self.pubKeyPathEdit.text()))
+        writeConfig(CONFIGFILE, "Connection", sftp_host=self.urlEdit.text(), \
+                                              sftp_port=self.portEdit.value())
+        writeConfig(CONFIGFILE, "KeyAuth", prvkey=self.prvKeyPathEdit.text(), \
+                                           srvkey=self.pubKeyPathEdit.text())
         QDialog.accept(self)
+
+    def setPath(self, lineEdit):
+        path = QFileDialog.getOpenFileName(self, "MiGBox - Set path to key file", \
+                                               lineEdit.text())
+        if path:
+            lineEdit.setText(QDir.toNativeSeparators(path))
 
 class AppUi(QMainWindow):
     def __init__(self):
@@ -246,12 +292,16 @@ class AppUi(QMainWindow):
         syncAction.triggered.connect(self.synchronize)
         stopAction = QAction(QIcon("icons/stop.png"), "Stop synchronization", self)
         stopAction.triggered.connect(self.stopSynchronize)
+        mountAction = QAction(QIcon("icons/mount.png"), "Mount sftp sync folder", self)
 
         self.statusBar()
         toolbar = self.addToolBar("Toolbar")
         toolbar.addAction(exitAction)
+        toolbar.addSeparator()
         toolbar.addAction(syncAction)
         toolbar.addAction(stopAction)
+        toolbar.addSeparator()
+        toolbar.addAction(mountAction)
 
         self.thread = SyncThread()
 
@@ -270,12 +320,12 @@ class AppUi(QMainWindow):
 
     def saveSyncPaths(self):
         if self.remoteCheckBox.isChecked():
-            writeConfig("config.cfg", "Sync", sync_src=self.srcPathLabel.text())
-            writeConfig("config.cfg", "Connection", sftp_host=self.dstPathLabel.text())
+            writeConfig(CONFIGFILE, "Sync", sync_src=self.srcPathLabel.text())
+            writeConfig(CONFIGFILE, "Connection", sftp_host=self.dstPathLabel.text())
         else:
-            writeConfig("config.cfg", \
-                    "Sync", sync_src=self.srcPathLabel.text(), \
-                            sync_dst=self.dstPathLabel.text())
+            writeConfig(CONFIGFILE, \
+                        "Sync", sync_src=self.srcPathLabel.text(), \
+                                sync_dst=self.dstPathLabel.text())
         
     def stopSynchronize(self):
         self.thread.stop_sync()
@@ -338,7 +388,7 @@ if __name__ == '__main__':
     app.setApplicationName("MiGBox")
     app.setWindowIcon(QIcon("icons/app.svg"))
 
-    readConfig("config.cfg")
+    readConfig(CONFIGFILE)
     appUi = AppUi()
     appUi.show()
 

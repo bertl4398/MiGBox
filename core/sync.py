@@ -25,7 +25,7 @@ __version__ = 0.3
 __author__ = 'Benjamin Ertl'
 
 import os, stat
-import logging, traceback
+import logging
 
 log = {'create': 'CREATE {0}<br />',
        'remove': 'REMOVE {0}<br />',
@@ -96,7 +96,6 @@ def sync_file(src, src_path, dst, dst_path):
             logging.info(log['sync_eq'].format(src_path,dst_path))
     except:
         logging.error(log['sync_er'].format(src_path,dst_path))
-        #traceback.print_exc()
 
 def copy_file(src, src_path, dst, dst_path):
     try:
