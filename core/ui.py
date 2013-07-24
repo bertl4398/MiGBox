@@ -293,6 +293,7 @@ class AppUi(QMainWindow):
         stopAction = QAction(QIcon("icons/stop.png"), "Stop synchronization", self)
         stopAction.triggered.connect(self.stopSynchronize)
         mountAction = QAction(QIcon("icons/mount.png"), "Mount sftp sync folder", self)
+        mountAction.triggered.connect(self.toTray)
 
         self.statusBar()
         toolbar = self.addToolBar("Toolbar")
@@ -302,6 +303,8 @@ class AppUi(QMainWindow):
         toolbar.addAction(stopAction)
         toolbar.addSeparator()
         toolbar.addAction(mountAction)
+
+        self.trayIcon = QSystemTrayIcon(QIcon("icons/app.svg"))
 
         self.thread = SyncThread()
 
@@ -317,6 +320,26 @@ class AppUi(QMainWindow):
         self.connect(self.updateLogButton, SIGNAL("clicked()"), self.logBrowser.reload)
         self.connect(self.srcPathLabel, SIGNAL("textChanged(QString)"), self.saveSyncPaths)
         self.connect(self.dstPathLabel, SIGNAL("textChanged(QString)"), self.saveSyncPaths)
+        self.connect(self.trayIcon, SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), \
+                     self.handleSysTray)
+
+    def closeEvent(self, event):
+        # wait for sync thread to exit?
+        # save settings?
+        # oter cleanup?
+        del(self.trayIcon)
+
+        # event.ignore()
+        event.accept()
+
+    def toTray(self):
+        self.hide()
+        self.trayIcon.show()
+
+    def handleSysTray(self, reason):
+        if reason == QSystemTrayIcon.DoubleClick:
+            self.show()
+            self.activateWindow()
 
     def saveSyncPaths(self):
         if self.remoteCheckBox.isChecked():

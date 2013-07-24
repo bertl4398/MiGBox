@@ -1,5 +1,15 @@
-INFO: 07/23/2013 04:48:33  SYNC /home/benjamin/migsync/test/remote/Kanu.pdf == /home/benjamin/migsync/test/local/Kanu.pdf<br />
-INFO: 07/23/2013 04:48:33  SYNC /home/benjamin/migsync/test/remote/2006.pdf == /home/benjamin/migsync/test/local/2006.pdf<br />
-INFO: 07/23/2013 04:48:33  SYNC /home/benjamin/migsync/test/remote/Exponential_cdf.svg == /home/benjamin/migsync/test/local/Exponential_cdf.svg<br />
-INFO: 07/23/2013 04:48:33  SYNC /home/benjamin/migsync/test/remote/New Empty File == /home/benjamin/migsync/test/local/New Empty File<br />
-INFO: 07/23/2013 04:48:33  SYNC /home/benjamin/migsync/test/local/new2006.pdf == /home/benjamin/migsync/test/remote/new2006.pdf<br />
+INFO: 07/24/2013 04:03:08  Connected (version 2.0, client paramiko_1.10.1)
+INFO: 07/24/2013 04:03:08  Authentication (publickey) successful!
+INFO: 07/24/2013 04:03:08  Secsh channel 1 opened.
+INFO: 07/24/2013 04:03:08  [chan 1] Opened sftp connection (server version 3)
+INFO: 07/24/2013 04:03:09  COPY /home/benjamin/migsync/test/local/Kanu.pdf ==> ./Kanu.pdf<br />
+INFO: 07/24/2013 04:03:10  COPY /home/benjamin/migsync/test/local/2006.pdf ==> ./2006.pdf<br />
+INFO: 07/24/2013 04:03:10  COPY /home/benjamin/migsync/test/local/Exponential_cdf.svg ==> ./Exponential_cdf.svg<br />
+INFO: 07/24/2013 04:03:10  COPY /home/benjamin/migsync/test/local/New Empty File ==> ./New Empty File<br />
+INFO: 07/24/2013 04:03:11  COPY /home/benjamin/migsync/test/local/new2006.pdf ==> ./new2006.pdf<br />
+INFO: 07/24/2013 04:06:56  COPY /home/benjamin/migsync/test/local/beer.csv ==> ./beer.csv<br />
+INFO: 07/24/2013 04:06:56  SYNC /home/benjamin/migsync/test/local/beer.csv == ./beer.csv<br />
+INFO: 07/24/2013 04:07:45  COPY /home/benjamin/migsync/test/local/.gsf-save-FPRO0W ==> ./.gsf-save-FPRO0W<br />
+ERROR: 07/24/2013 04:07:45  SYNC /home/benjamin/migsync/test/local/.gsf-save-FPRO0W !! ./.gsf-save-FPRO0W<br />
+INFO: 07/24/2013 04:07:45  MOVE ./.gsf-save-FPRO0W ==> ./beer.csv<br />
+INFO: 07/24/2013 04:07:45  SYNC /home/benjamin/migsync/test/local/beer.csv ==> ./beer.csv<br />
