@@ -38,41 +38,22 @@ type 'show' to show details
 type 'exit' to shutdown the server
 """.format(__version__, __author__)
 
-ABOUT ="""\
-MiGBox - File Synchronization for the Minimum Intrusion Grid (MiG)
-
-Copyright (c) 2013 Benjamin Ertl
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 2 of
-the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301 USA.
-"""
-
-import sys, time, threading, socket, os
-import select, json
+import os
+import sys
+import time
+import threading
+import socket
+import select
+import json
 
 import paramiko
 
-import delta
+from ConfigParser import SafeConfigParser
 
-from ConfigParser import ConfigParser
-
-from stub_sftp import StubServer, StubSFTPServer
-
-CMD_BLOCKCHK = 205
-CMD_DELTA = 206
-CMD_PATCH = 207
+from MiGBox.sftp.stub_sftp import StubServer, StubSFTPServer
+from MiGBox.sync.delta import blockchksums, delta, patch
+from MiGBox.sftp.sftp_common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH 
+from MiGBox.common import config_path, log_path, ABOUT
 
 class SFTPServer(paramiko.SFTPServer):
     """
@@ -80,10 +61,6 @@ class SFTPServer(paramiko.SFTPServer):
 
     It is required here to overwrite/extend the paramiko.SFTPServer. 
     """
-    def __init__(self, channel, name, server, \
-                 sftp_si=paramiko.SFTPServerInterface, *largs, **kwargs):
-        paramiko.SFTPServer.__init__(self, channel, name, server, \
-                                     sftp_si, *largs, **kwargs)
 
     def _process(self, t, request_number, msg):
         """
@@ -96,7 +73,7 @@ class SFTPServer(paramiko.SFTPServer):
         """
         if t == CMD_BLOCKCHK:
             path = msg.get_string()
-            bs = delta.blockchksums(self.server._realpath(path))
+            bs = blockchksums(self.server._realpath(path))
             j = json.dumps(bs)
             message = paramiko.Message()
             message.add_int(request_number)
@@ -106,7 +83,7 @@ class SFTPServer(paramiko.SFTPServer):
         elif t == CMD_DELTA:
             path = msg.get_string()
             bs = json.loads(msg.get_string())
-            d = delta.delta(self.server._realpath(path), bs)
+            d = delta(self.server._realpath(path), bs)
             j = json.dumps(d)
             message = paramiko.Message()
             message.add_int(request_number)
@@ -115,17 +92,19 @@ class SFTPServer(paramiko.SFTPServer):
         elif t == CMD_PATCH:
             path = msg.get_string()
             d = json.loads(msg.get_string())
-            delta.patch(self.server._realpath(path), d)
+            patch(self.server._realpath(path), d)
             self._send_status(request_number, self.server.rename(path + ".patched", path))
         else:
             return paramiko.SFTPServer._process(self, t, request_number, msg)
 
-class HandlerThread(threading.Thread):
-    def __init__(self, connection, address, hostkey):
-        super(HandlerThread, self).__init__()
+class SFTPHandle(threading.Thread):
+    def __init__(self, connection, address, userkey, hostkey, rootpath):
+        super(SFTPHandle, self).__init__()
         self.conn = connection
         self.addr = address
         self.prvkey = hostkey
+        self.usrkey = userkey
+        self.rootpath = rootpath
 
     def run(self):
         self.transport = paramiko.Transport(self.conn)
@@ -133,9 +112,10 @@ class HandlerThread(threading.Thread):
         self.transport.add_server_key(paramiko.RSAKey.from_private_key_file(self.prvkey))
 
         event = threading.Event()
-        server = StubServer()
 
-        self.transport.set_subsystem_handler('sftp', SFTPServer, StubSFTPServer)
+        server = StubServer(self.usrkey, self.rootpath)
+
+	self.transport.set_subsystem_handler('sftp', SFTPServer, StubSFTPServer)
 
         self.transport.start_server(event, server)
 
@@ -148,14 +128,17 @@ def main():
     """
     Main entry point to run the sftp server.
     """
-    config = ConfigParser()
-    config.read('server.cfg')
+    config = SafeConfigParser()
+    config.read(os.path.join(config_path, 'server.cfg'))
 
     host = config.get('Connection', 'sftp_host')
     port = config.getint('Connection', 'sftp_port')
     backlog = config.getint('Connection', 'sftp_backlog')
 
     prvkey = config.get('KeyAuth', 'prvkey')
+    usrkey = config.get('KeyAuth', 'usrkey')
+
+    root_path = config.get('ROOT', 'root_path')
 
     log_file = config.get('Logging', 'log_file')
     log_level = config.get('Logging', 'log_level')
@@ -180,7 +163,7 @@ def main():
         for input_ in input_ready:
             if input_ == server_socket:
                 conn, addr = server_socket.accept()
-                thread = HandlerThread(conn, addr, prvkey)
+                thread = SFTPHandle(conn, addr, usrkey, prvkey, root_path)
                 client_threads.append(thread)
                 thread.start()
             elif input_ == sys.stdin:

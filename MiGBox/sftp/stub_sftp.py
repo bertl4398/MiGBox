@@ -20,19 +20,25 @@
 #
 
 """
-A stub SFTP server for loopback SFTP testing.
-Modified for publickey authentication and config file.
+A stub SFTP server.
+
+Modified from paramiko for publickey authentication and choosing the root directory.
 """
 
-import os, base64
+import os
+import base64
 
 from binascii import hexlify
-from ConfigParser import ConfigParser
 
 from paramiko import ServerInterface, SFTPServerInterface, SFTPServer, SFTPAttributes, \
     SFTPHandle, SFTP_OK, AUTH_FAILED, AUTH_SUCCESSFUL, OPEN_SUCCEEDED, RSAKey
 
 class StubServer (ServerInterface):
+
+    def __init__(self, userkey, rootpath):
+        super(StubServer, self).__init__()
+        self.keyfile = userkey
+        self.root = rootpath
 
     # Implement this method for password auth
     #def check_auth_password(self, username, password):
@@ -43,10 +49,7 @@ class StubServer (ServerInterface):
         return OPEN_SUCCEEDED
 
     def check_auth_publickey(self, username, key):
-        config = ConfigParser()
-        config.read('server.cfg')
-        keyfile = config.get('KeyAuth', 'usrkey')
-        with open(keyfile, 'rb') as f:
+        with open(self.keyfile, 'rb') as f:
             data = f.read()
         data = data.split(' ')[1]
         usrkey = RSAKey(data=base64.decodestring(data))
@@ -58,6 +61,7 @@ class StubServer (ServerInterface):
         return 'publickey' # add ',password' for password auth
 
 class StubSFTPHandle (SFTPHandle):
+
     def stat(self):
         try:
             return SFTPAttributes.from_stat(os.fstat(self.readfile.fileno()))
@@ -75,12 +79,13 @@ class StubSFTPHandle (SFTPHandle):
 
 
 class StubSFTPServer (SFTPServerInterface):
-    config = ConfigParser()
-    config.read('server.cfg')
-    ROOT = config.get('ROOT','root_path')
+
+    def __init__(self, server, *largs, **kwargs):
+        super(SFTPServerInterface, self).__init__(*largs, **kwargs)
+        self.root = server.root
 
     def _realpath(self, path):
-        return self.ROOT + self.canonicalize(path)
+        return self.root + self.canonicalize(path)
 
     def list_folder(self, path):
         path = self._realpath(path)
@@ -196,14 +201,14 @@ class StubSFTPServer (SFTPServerInterface):
         path = self._realpath(path)
         if (len(target_path) > 0) and (target_path[0] == '/'):
             # absolute symlink
-            target_path = os.path.join(self.ROOT, target_path[1:])
+            target_path = os.path.join(self.root, target_path[1:])
             if target_path[:2] == '//':
                 # bug in os.path.join
                 target_path = target_path[1:]
         else:
             # compute relative to path
             abspath = os.path.join(os.path.dirname(path), target_path)
-            if abspath[:len(self.ROOT)] != self.ROOT:
+            if abspath[:len(self.root)] != self.root:
                 # this symlink isn't going to work anyway -- just break it immediately
                 target_path = '<error>'
         try:
@@ -220,8 +225,8 @@ class StubSFTPServer (SFTPServerInterface):
             return SFTPServer.convert_errno(e.errno)
         # if it's absolute, remove the root
         if os.path.isabs(symlink):
-            if symlink[:len(self.ROOT)] == self.ROOT:
-                symlink = symlink[len(self.ROOT):]
+            if symlink[:len(self.root)] == self.root:
+                symlink = symlink[len(self.root):]
                 if (len(symlink) == 0) or (symlink[0] != '/'):
                     symlink = '/' + symlink
             else:

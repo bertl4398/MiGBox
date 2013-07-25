@@ -29,6 +29,7 @@ any other client/server architecture supporting python.
 Required packages:
     paramiko
     watchdog
+    PyQt4 (for gui only)
 """
 
 try:
@@ -46,8 +47,8 @@ setup(name='MiGBox',
       license = 'GPL',
       url='https://github.com/bertl4398/MiGBox',
       platforms = 'Posix; MacOS X; Windows',
-      package_dir={'MiGBox': ''},
-      packages=['MiGBox', 'MiGBox.core'],
+      #package_dir={'MiGBox': ''},
+      packages=['MiGBox'],
       long_description = description,
       **d
      )

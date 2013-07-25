@@ -20,26 +20,22 @@
 Sync daemon for MiGBox.
 """
 
-__version__ = 0.3
-__author__ = 'Benjamin Ertl'
-
 import os, sys, time
 import threading
 import logging
-import paramiko, watchdog
+import paramiko
 
-import sync
-
-from filesystem import *
-from sftp_client import SFTPClient
+from MiGBox.sync import sync
+from MiGBox.fs import *
+from MiGBox.sftp import SFTPClient
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 from ConfigParser import ConfigParser
 
-class EventHandler(watchdog.events.FileSystemEventHandler):
+class EventHandler(FileSystemEventHandler):
     def __init__(self, src, dst):
-        watchdog.events.FileSystemEventHandler.__init__(self)
+        FileSystemEventHandler.__init__(self)
         self.src = src
         self.dst = dst
 
@@ -71,8 +67,9 @@ class EventHandler(watchdog.events.FileSystemEventHandler):
         sync.move_file(self.dst, sync_src, sync_dst)
 
 def main(sftp=True, event=threading.Event()):
+    # TODO check config - use defaults
     config = ConfigParser()
-    config.read('config.cfg')
+    config.read(os.path.join(os.environ['MIGBOXPATH'], 'config/migbox.cfg'))
 
     log_file = config.get('Logging', 'log_file')
     log_level = config.get('Logging', 'log_level')
@@ -124,3 +121,6 @@ def main(sftp=True, event=threading.Event()):
 
         observer.stop()
         observer.join()
+
+if __name__ == '__main__':
+    main(False)

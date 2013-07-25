@@ -22,18 +22,17 @@ Provides a SFTP client to use with the abstract file system access, see
 L{filesystem}
 """
 
-__version__ = 0.2
-__author__ = 'Benjamin Ertl'
+import os
+import socket
+import json
 
-import socket, json
 import paramiko
 
-from ConfigParser import ConfigParser
-from delta import *
+from ConfigParser import SafeConfigParser
 
-CMD_BLOCKCHK = 205
-CMD_DELTA = 206
-CMD_PATCH = 207
+from MiGBox.common import config_path, log_path
+from MiGBox.sftp.sftp_common import *
+from MiGBox.sync.delta import *
 
 class SFTPClient(object):
     def __init__(self, host, port):
@@ -41,8 +40,9 @@ class SFTPClient(object):
         self.port = port
         self.host_key = None
 
-        config = ConfigParser()
-        config.read('config.cfg')
+        config = SafeConfigParser()
+        config.read(os.path.join(config_path, 'migbox.cfg'))
+
         srvkey = config.get('KeyAuth', 'srvkey')
         prvkey = config.get('KeyAuth', 'prvkey')
 
@@ -61,8 +61,10 @@ class SFTPClient(object):
         self.transport = paramiko.Transport(self.socket)
         self.transport.start_client()
         self.host_key = self.transport.get_remote_server_key()
+
         if not self.known_host == self.host_key.get_base64():
             raise paramiko.BadHostKeyException(self.host, self.host_key, self.known_host)
+
         self.transport.auth_publickey(username, self.user_key)
         self.server = paramiko.SFTP.from_transport(self.transport)
 

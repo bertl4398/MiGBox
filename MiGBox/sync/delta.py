@@ -20,13 +20,11 @@
 Module for delta computation.
 Provides methods for checksum and delta computation and application. 
 """
-__version__ = 0.3
-__author__ = 'Benjamin Ertl'
 
 import zlib, hashlib
 import base64
 
-BLOCKSIZE = 65536 
+BLOCKSIZE = 65536
 
 def weakchksum(data):
     """

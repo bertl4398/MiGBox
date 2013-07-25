@@ -18,22 +18,19 @@
 
 """
 Synchronization methods to synchronize between file system abstractions see
-L{filesystem}.
+L{MiGBox.fs}.
 """
-
-__version__ = 0.3
-__author__ = 'Benjamin Ertl'
 
 import os, stat
 import logging
 
-log = {'create': 'CREATE {0}<br />',
-       'remove': 'REMOVE {0}<br />',
-       'sync_to': 'SYNC {0} ==> {1}<br />',
-       'sync_eq': 'SYNC {0} == {1}<br />',
-       'sync_er': 'SYNC {0} !! {1}<br />',
-       'move': 'MOVE {0} ==> {1}<br />',
-       'copy': 'COPY {0} ==> {1}<br />'}
+_log = {'create': 'CREATE {0}<br />',
+        'remove': 'REMOVE {0}<br />',
+        'sync_to': 'SYNC {0} ==> {1}<br />',
+        'sync_eq': 'SYNC {0} == {1}<br />',
+        'sync_er': 'SYNC {0} !! {1}<br />',
+        'move': 'MOVE {0} ==> {1}<br />',
+        'copy': 'COPY {0} ==> {1}<br />'}
 
 def sync_all_files(src, dst, path, modified=True):
     """
@@ -91,43 +88,43 @@ def sync_file(src, src_path, dst, dst_path):
         if set(src_bs) - set(dst_bs):
             delta = src.delta(src_path, dst_bs)
             dst.patch(dst_path, delta)
-            logging.info(log['sync_to'].format(src_path,dst_path))
+            logging.info(_log['sync_to'].format(src_path,dst_path))
         else:
-            logging.info(log['sync_eq'].format(src_path,dst_path))
+            logging.info(_log['sync_eq'].format(src_path,dst_path))
     except:
-        logging.error(log['sync_er'].format(src_path,dst_path))
+        logging.error(_log['sync_er'].format(src_path,dst_path))
 
 def copy_file(src, src_path, dst, dst_path):
     try:
         src.copy(src, src_path, dst, dst_path)
-        logging.info(log['copy'].format(src_path,dst_path))
+        logging.info(_log['copy'].format(src_path,dst_path))
     except (OSError, IOError):
-        logging.error(log['copy'].format(src_path,dst_path))
+        logging.error(_log['copy'].format(src_path,dst_path))
 
 def move_file(src, src_path, dst_path):
     try:
         src.rename(src_path, dst_path)
-        logging.info(log['move'].format(src_path,dst_path))
+        logging.info(_log['move'].format(src_path,dst_path))
     except (OSError, IOError):
-        logging.error(log['move'].format(src_path,dst_path))
+        logging.error(_log['move'].format(src_path,dst_path))
 
 def remove_file(src, path):
     try:
         src.remove(path)
-        logging.info(log['remove'].format(path))
+        logging.info(_log['remove'].format(path))
     except (OSError, IOError):
-        logging.error(log['remove'].format(path))
+        logging.error(_log['remove'].format(path))
 
 def remove_dir(src, path):
     try:
         src.rmdir(path)
-        logging.info(log['remove'].format(path))
+        logging.info(_log['remove'].format(path))
     except (OSError, IOError):
-        logging.error(log['remove'].format(path))
+        logging.error(_log['remove'].format(path))
 
 def make_dir(src, path):
     try:
         src.mkdir(path)
-        logging.info(log['create'].format(path))
+        logging.info(_log['create'].format(path))
     except (OSError, IOError):
-        logging.error(log['create'].format(path))
+        logging.error(_log['create'].format(path))

@@ -1,0 +1,16 @@
+INFO: 07/25/2013 05:40:43  SYNC /home/benjamin/migsync/MiGBox/tests/local/.1.swp == /home/benjamin/migsync/MiGBox/tests/remote/.1.swp<br />
+INFO: 07/25/2013 05:40:43  SYNC /home/benjamin/migsync/MiGBox/tests/remote/1 == /home/benjamin/migsync/MiGBox/tests/local/1<br />
+INFO: 07/25/2013 05:40:43  SYNC /home/benjamin/migsync/MiGBox/tests/remote/dir1/1 == /home/benjamin/migsync/MiGBox/tests/local/dir1/1<br />
+INFO: 07/25/2013 05:40:49  COPY /home/benjamin/migsync/MiGBox/tests/local/.2.swp ==> /home/benjamin/migsync/MiGBox/tests/remote/.2.swp<br />
+ERROR: 07/25/2013 05:40:49  COPY /home/benjamin/migsync/MiGBox/tests/local/.2.swpx ==> /home/benjamin/migsync/MiGBox/tests/remote/.2.swpx<br />
+ERROR: 07/25/2013 05:40:49  SYNC /home/benjamin/migsync/MiGBox/tests/local/.2.swpx !! /home/benjamin/migsync/MiGBox/tests/remote/.2.swpx<br />
+ERROR: 07/25/2013 05:40:49  REMOVE /home/benjamin/migsync/MiGBox/tests/remote/.2.swpx<br />
+INFO: 07/25/2013 05:40:49  SYNC /home/benjamin/migsync/MiGBox/tests/local/.2.swp == /home/benjamin/migsync/MiGBox/tests/remote/.2.swp<br />
+INFO: 07/25/2013 05:40:49  REMOVE /home/benjamin/migsync/MiGBox/tests/remote/.2.swp<br />
+ERROR: 07/25/2013 05:40:53  SYNC /home/benjamin/migsync/MiGBox/tests/local/.2.swp !! /home/benjamin/migsync/MiGBox/tests/remote/.2.swp<br />
+ERROR: 07/25/2013 05:40:56  SYNC /home/benjamin/migsync/MiGBox/tests/local/.2.swp !! /home/benjamin/migsync/MiGBox/tests/remote/.2.swp<br />
+INFO: 07/25/2013 05:40:59  COPY /home/benjamin/migsync/MiGBox/tests/local/2 ==> /home/benjamin/migsync/MiGBox/tests/remote/2<br />
+INFO: 07/25/2013 05:40:59  SYNC /home/benjamin/migsync/MiGBox/tests/local/2 == /home/benjamin/migsync/MiGBox/tests/remote/2<br />
+INFO: 07/25/2013 05:40:59  SYNC /home/benjamin/migsync/MiGBox/tests/local/2 == /home/benjamin/migsync/MiGBox/tests/remote/2<br />
+ERROR: 07/25/2013 05:40:59  SYNC /home/benjamin/migsync/MiGBox/tests/local/.2.swp !! /home/benjamin/migsync/MiGBox/tests/remote/.2.swp<br />
+ERROR: 07/25/2013 05:40:59  REMOVE /home/benjamin/migsync/MiGBox/tests/remote/.2.swp<br />

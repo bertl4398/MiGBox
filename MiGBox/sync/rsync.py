@@ -23,9 +23,6 @@ Rsync demo implementation with weak rolling checksum and sha1 strong checksum.
 Based on the rsync algorithm by Andrew Tridgell.
 """
 
-__version__ = 0.3
-__author__ = 'Benjamin Ertl'
-
 import os, sys
 import hashlib
 

@@ -21,12 +21,11 @@ File system abstraction module.
 Provides a wrapper for uniform file system access with os and sftp via paramiko.
 """
 
-__version__ = 0.3
-__author__ = 'Benjamin Ertl'
+import os
+import stat
+import shutil
 
-import os, shutil, stat
-
-from delta import *
+from MiGBox.sync.delta import *
 
 class FileSystem(object):
     def __init__(self, instance=None, root='.'):
@@ -79,15 +78,13 @@ class FileSystem(object):
         return self.instance.rename(src, dst)
 
     def copy(self, src, src_path, dst, dst_path):
+        if not self.instance:
+            raise NotImplementedError
         if isinstance(src, SFTPFileSystem):
             return src.get(src_path, dst_path)
         elif isinstance(dst, SFTPFileSystem):
             return dst.put(src_path, dst_path)
-        else:
-            try:
-                return shutil.copy(src_path, dst_path)
-            except:
-                raise NotImplementedError
+        return shutil.copy(src_path, dst_path)
 
     def relpath(self, path):
         return path.replace(self.root+os.path.sep,'')
