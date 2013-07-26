@@ -1,5 +1,5 @@
-INF [20130725-20:04:52.371] thr=1   paramiko.transport: Connected (version 2.0, client OpenSSH_6.1p1)
-INF [20130725-20:04:52.490] thr=1   paramiko.transport: Auth rejected (none).
-INF [20130725-20:04:52.496] thr=1   paramiko.transport: Auth granted (publickey).
-INF [20130725-20:04:52.498] thr=1   paramiko.transport: Secsh channel 1 (session) opened.
-INF [20130725-20:05:16.410] thr=1   paramiko.transport: Disconnect (code 11): disconnected by user
+INF [20130726-17:57:56.266] thr=1   paramiko.transport: Connected (version 2.0, client OpenSSH_6.1p1)
+INF [20130726-17:57:56.363] thr=1   paramiko.transport: Auth rejected (none).
+INF [20130726-17:57:56.367] thr=1   paramiko.transport: Auth granted (publickey).
+INF [20130726-17:57:56.369] thr=1   paramiko.transport: Secsh channel 1 (session) opened.
+INF [20130726-17:57:59.804] thr=1   paramiko.transport: Disconnect (code 11): disconnected by user

@@ -33,32 +33,8 @@ from binascii import hexlify
 from paramiko import ServerInterface, SFTPServerInterface, SFTPServer, SFTPAttributes, \
     SFTPHandle, SFTP_OK, AUTH_FAILED, AUTH_SUCCESSFUL, OPEN_SUCCEEDED, RSAKey
 
-class StubServer (ServerInterface):
-
-    def __init__(self, userkey, rootpath):
-        super(StubServer, self).__init__()
-        self.keyfile = userkey
-        self.root = rootpath
-
-    # Implement this method for password auth
-    #def check_auth_password(self, username, password):
-    #    # all are allowed
-    #    return AUTH_SUCCESSFUL
-
-    def check_channel_request(self, kind, chanid):
-        return OPEN_SUCCEEDED
-
-    def check_auth_publickey(self, username, key):
-        with open(self.keyfile, 'rb') as f:
-            data = f.read()
-        data = data.split(' ')[1]
-        usrkey = RSAKey(data=base64.decodestring(data))
-        if key == usrkey:
-            return AUTH_SUCCESSFUL
-        return AUTH_FAILED  
-
-    def get_allowed_auths(self, username):
-        return 'publickey' # add ',password' for password auth
+class StubServer(object):
+    pass
 
 class StubSFTPHandle (SFTPHandle):
 

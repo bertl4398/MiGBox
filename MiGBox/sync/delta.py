@@ -26,7 +26,7 @@ import base64
 
 BLOCKSIZE = 65536
 
-def weakchksum(data):
+def weakchecksum(data):
     """
     Compute weak checksum.
 
@@ -36,7 +36,7 @@ def weakchksum(data):
     """
     return zlib.adler32(data) & 0xffffffff
 
-def strongchksum(data):
+def strongchecksum(data):
     """
     Compute strong checksum.
 
@@ -48,7 +48,7 @@ def strongchksum(data):
     md5.update(data)
     return md5.hexdigest()
 
-def blockchksums(filename, size=BLOCKSIZE):
+def blockchecksums(filename, size=BLOCKSIZE):
     """
     Compute block checksums for file filename with size size.
     Chechsums are L{zlib.adler32} checksums as weak checksums
@@ -59,14 +59,14 @@ def blockchksums(filename, size=BLOCKSIZE):
     @param size: block size, default 65536.
     @type size: int
     @return dict as hashtable of tuples as
-            (block offset, weak chksum, strong chksum).
+            (block offset, weak checksum, strong checksum).
     """
     with open(filename, "rb") as f:
         results = {}; offset = 0
         data = f.read(size)
         while data:
-            hmd5 = strongchksum(data)
-            h = weakchksum(data)
+            hmd5 = strongchecksum(data)
+            h = weakchecksum(data)
             # unicode keys for compatibility with json over sftp
             k = unicode(h >> 16)
             if k in results:
@@ -77,31 +77,31 @@ def blockchksums(filename, size=BLOCKSIZE):
             data = f.read(size)
     return results
 
-def delta(filename, chksums, size=BLOCKSIZE):
+def delta(filename, checksums, size=BLOCKSIZE):
     """
     Compute delta for file filename with size size.
         
     @param filename: filename.
     @type filename: str
-    @param chksums: checksums from L{blockchksums}
-    @type chksums: dict
+    @param checksums: checksums from L{blockchecksums}
+    @type checksums: dict
     @param size: block size, default 65536.
     @type size: int
     @return list of tuples as (offset, data).
     """
     diff = []
-    if not chksums:
+    if not checksums:
         return diff
     with open(filename, "rb") as f:
         offset = last = 0; match = False
         data = f.read(size)
         while data:
-            h = weakchksum(data)
+            h = weakchecksum(data)
             k = unicode(h >> 16)
-            if k in chksums:
-                for off, weak, strong in chksums[k]:
+            if k in checksums:
+                for off, weak, strong in checksums[k]:
                     if h == weak:
-                        if strong == strongchksum(data):
+                        if strong == strongchecksum(data):
                             # match
                             match = True
                             with open(filename, "rb") as tmp:

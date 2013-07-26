@@ -19,14 +19,11 @@
 __version__ = 0.3
 __author__ = 'Benjamin Ertl'
 
-from sftp_client import SFTPClient
-from sftp_server import SFTPServer, SFTPHandle
-from stub_sftp import StubServer, StubSFTPHandle, StubSFTPServer
-from sftp_common import *
+from client import SFTPClient
+from server import Server, SFTPServer
+from server_interface import SFTPServerInterface
 
 __all__ = [ 'SFTPClient',
+            'Server',
             'SFTPServer',
-            'SFTPHandle',
-            'StubServer',
-            'StubSFTPHandle'
-            'StubSFTPServer' ]
+            'SFTPServerInterface' ]

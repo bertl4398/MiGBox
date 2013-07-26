@@ -52,9 +52,9 @@ import paramiko
 from ConfigParser import SafeConfigParser
 
 from MiGBox.sync.delta import blockchecksums, delta, patch
-from MiGBox.sftp.common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH 
+from MiGBox.sftp.common  import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH 
 from MiGBox.common import ABOUT
-from server_interface import SFTPServerInterface
+from MiGBox.sftp.server_interface import SFTPServerInterface
 
 class Server(paramiko.ServerInterface):
     """

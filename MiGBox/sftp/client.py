@@ -27,7 +27,7 @@ import json
 
 import paramiko
 
-from MiGBox.sftp.common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH
+from common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH
 
 class SFTPClient(paramiko.SFTPClient):
     """
