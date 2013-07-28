@@ -49,8 +49,6 @@ import base64
 
 import paramiko
 
-from ConfigParser import SafeConfigParser
-
 from MiGBox.sync.delta import blockchecksums, delta, patch
 from MiGBox.sftp.common  import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH 
 from MiGBox.common import ABOUT
@@ -135,35 +133,23 @@ class SFTPServer(paramiko.SFTPServer):
         else:
             return paramiko.SFTPServer._process(self, t, request_number, msg)
 
-def run_server(conn, addr, hostkey, userkey, root):
-    transport = paramiko.Transport(conn)
-    transport.add_server_key(paramiko.RSAKey.from_private_key_file(hostkey))
-    transport.set_subsystem_handler('sftp', SFTPServer, SFTPServerInterface)
-    transport.start_server(threading.Event(), Server(root, userkey))
+    def run_server(cls, conn, addr, hostkey, userkey, root):
+        transport = paramiko.Transport(conn)
+        transport.add_server_key(paramiko.RSAKey.from_private_key_file(hostkey))
+        transport.set_subsystem_handler('sftp', cls, SFTPServerInterface)
+        transport.start_server(threading.Event(), Server(root, userkey))
 
-    while transport.is_active():
-        time.sleep(1)
+        while transport.is_active():
+            time.sleep(1)
 
-    transport.close()
+        transport.close()
 
-def main():
+    run_server = classmethod(run_server)
+
+def main(host, port, backlog, prvkey, usrkey, root_path, log_file, log_level):
     """
     Main entry point to run the sftp server.
     """
-    config = SafeConfigParser()
-    config.read('/home/benjamin/migsync/MiGBox/config/server.cfg')
-
-    host = config.get('Connection', 'sftp_host')
-    port = config.getint('Connection', 'sftp_port')
-    backlog = config.getint('Connection', 'sftp_backlog')
-
-    prvkey = config.get('KeyAuth', 'prvkey')
-    usrkey = config.get('KeyAuth', 'usrkey')
-
-    root_path = config.get('ROOT', 'root_path')
-
-    log_file = config.get('Logging', 'log_file')
-    log_level = config.get('Logging', 'log_level')
 
     paramiko.util.log_to_file(log_file, log_level)
 
@@ -185,7 +171,7 @@ def main():
         for input_ in input_ready:
             if input_ == server_socket:
                 conn, addr = server_socket.accept()
-                thread = threading.Thread(target=run_server,
+                thread = threading.Thread(target=SFTPServer.run_server,
                                           args=(conn, addr, prvkey, usrkey, root_path))
                 client_threads.append(thread)
                 thread.start()
@@ -205,4 +191,16 @@ def main():
     sys.exit(0)
 
 if __name__ == '__main__':
-    main()
+    host = '' 
+    port = 50007 
+    backlog = 10 
+
+    prvkey = '/home/benjamin/MiGBox/keys/server_rsa_key'
+    usrkey = '/home/benjamin/MiGBox/keys/user_rsa_key.pub'
+
+    root_path = '/home/benjamin/MiGBox/MiGBox/sftp'
+
+    log_file = '/home/benjamin/MiGBox/MiGBox/sftp/log'
+    log_level = 'INFO' 
+
+    main(host, port, backlog, prvkey, usrkey, root_path, log_file, log_level)

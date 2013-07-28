@@ -32,7 +32,6 @@ from ConfigParser import SafeConfigParser
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from MiGBox.common import config_path, icons_path, log_path, ABOUT
 from MiGBox.sync import syncd
 
 def _readConfig():

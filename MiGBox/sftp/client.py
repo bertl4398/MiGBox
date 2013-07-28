@@ -27,7 +27,7 @@ import json
 
 import paramiko
 
-from common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH
+from MiGBox.sftp.common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH
 
 class SFTPClient(paramiko.SFTPClient):
     """
@@ -81,7 +81,6 @@ class SFTPClient(paramiko.SFTPClient):
 
         transport.auth_publickey(username, paramiko.RSAKey.from_private_key_file(user_key))
 
-        # this is part of paramiko, see paramiko.SFTPClient.from_transport
         chan = transport.open_session()
         if chan is None:
             return None

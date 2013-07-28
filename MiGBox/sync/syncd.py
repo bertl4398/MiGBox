@@ -26,12 +26,11 @@ import logging
 import paramiko
 
 from MiGBox.sync import sync
-from MiGBox.fs import *
+from MiGBox.fs import OSFileSystem, SFTPFileSystem
 from MiGBox.sftp import SFTPClient
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
-from ConfigParser import ConfigParser
 
 class EventHandler(FileSystemEventHandler):
     def __init__(self, src, dst):
@@ -66,61 +65,52 @@ class EventHandler(FileSystemEventHandler):
         sync_dst = self.get_syncpath(event.dest_path)
         sync.move_file(self.dst, sync_src, sync_dst)
 
-def main(sftp=True, event=threading.Event()):
-    # TODO check config - use defaults
-    config = ConfigParser()
-    config.read(os.path.join(os.environ['MIGBOXPATH'], 'config/migbox.cfg'))
-
-    log_file = config.get('Logging', 'log_file')
-    log_level = config.get('Logging', 'log_level')
-
-    src_path = config.get('Sync', 'sync_src')
-    dst_path = config.get('Sync', 'sync_dst')
-
-    sftp_host = config.get('Connection', 'sftp_host')
-    sftp_port = config.getint('Connection', 'sftp_port')
+def run(src_path, dst_path, sftp_host, sftp_port, host_key, user_key,
+         log_file, log_level, event=threading.Event()):
 
     logging.basicConfig(filename=log_file, filemode='w',\
                         format='%(levelname)s: %(asctime)s %(message)s',\
                         datefmt='%m/%d/%Y %I:%M:%S %p', level=getattr(logging,log_level))
 
     local = OSFileSystem(root=src_path)
-    remote = None
+    remote = OSFileSystem(root=dst_path)
 
-    if not sftp:
-        remote = OSFileSystem(root=dst_path)
-    else:
-        client = SFTPClient(sftp_host, sftp_port)
-        try:
-            client.connect('test','test')
-            remote = SFTPFileSystem(client)
-        except Exception as e:
-            print e
-            logging.error(repr(e) + '<br />')
+#   client = SFTPClient()
+#   client.connect(sftp_host, sftp_port, host_key, user_key)
+#   remote = SFTPFileSystem(client)
 
-    if remote:
-        # copy all new files from local to remote
-        # sync all modifications from local/remote to local/remote
-        # modifications are compared by modification time, the latest wins
-        sync.sync_all_files(local, remote, local.root)
-        # copy all new files from remote to local
-        # sync no modifications, already synced
-        sync.sync_all_files(remote, local, remote.root, modified=False)
+    # copy all new files from local to remote
+    # sync all modifications from local/remote to local/remote
+    # modifications are compared by modification time, the latest wins
+    sync.sync_all_files(local, remote, local.root)
+    # copy all new files from remote to local
+    # sync no modifications, already synced
+    sync.sync_all_files(remote, local, remote.root, modified=False)
 
-        event_handler = EventHandler(local, remote)
-        observer = Observer()
-        observer.schedule(event_handler, path=src_path, recursive=True)
-        observer.start()
+    event_handler = EventHandler(local, remote)
+    observer = Observer()
+    observer.schedule(event_handler, path=src_path, recursive=True)
+    observer.start()
 
-        try:
-            while not event.isSet():
-                time.sleep(1)
-        except Exception as e:
-            print e
-            logging.error(repr(e) + '<br />')
+    while not event.isSet():
+        time.sleep(1)
 
-        observer.stop()
-        observer.join()
+    observer.stop()
+    observer.join()
 
 if __name__ == '__main__':
-    main(False)
+
+    log_file = '/home/benjamin/MiGBox/log/sync.log'
+    log_level = 'INFO'
+
+    src_path = '/home/benjamin/MiGBox/tests/local'
+    dst_path = '/home/benjamin/MiGBox/tests/remote'
+
+    sftp_host = ''
+    sftp_port = 50007 
+
+    host_key = '/home/benjamin/MiGBox/keys/server_rsa_key.pub'
+    user_key = '/home/benjamin/MiGBox/keys/user_rsa_key'
+
+    run(src_path, dst_path, sftp_host, sftp_port, host_key, user_key,
+         log_file, log_level)

@@ -21,9 +21,6 @@ SFTP server interface implementation based on paramiko.
 Provides a SFTP server interface for the MiG SFTP server.
 """
 
-__version__ = 0.1
-__author__ = 'Benjamin Ertl'
-
 import os
 
 import paramiko
@@ -89,6 +86,7 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         overridden to perform any necessary setup before handling callbacks
         from SFTP operations.
         """
+        # TODO implement necessary setup?
         pass
 
     def session_ended(self):
@@ -98,26 +96,16 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         necessary cleanup before this C{paramiko.SFTPServerInterface} object is
         destroyed.
         """
+        # TODO implement clean up?
         pass
 
     def _get_path(self, path):
-        #return os.path.join(self.root, os.path.normpath(path))
         return self.root + self.canonicalize(path)
 
     def open(self, path, flags, attr):
         """
-        This implementation was taken and modified from the L{paramiko.tests.stub_sftp} module.
-
-        
-        Copyright (C) 2003-2009  Robey Pointer <robeypointer@gmail.com>, license LGPL.
-
         Open a file on the server and create a handle for future operations
-        on that file.  On success, a new object subclassed from L{paramiko.SFTPHandle}
-        should be returned.  This handle will be used for future operations
-        on the file (read, write, etc).  On failure, an error code is returned.
-        
-        @note: The SFTP protocol defines all files to be in "binary" mode.
-            There is no equivalent to python's "text" mode.
+        on that file.
 
         @param path: relative path of the file to be opened.
         @type path: str
@@ -181,7 +169,8 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         try:
             files = os.listdir(path)
             for file_ in files:
-                attr = paramiko.SFTPAttributes.from_stat(os.stat(os.path.join(path, file_)))
+                stat = os.stat(os.path.join(path, file_))
+                attr = paramiko.SFTPAttributes.from_stat(stat)
                 attr.filename = file_
                 attr_list.append(attr)
             return attr_list
@@ -190,8 +179,8 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
 
     def stat(self, path):
         """
-        Return an L{paramiko.SFTPAttributes} object for a path on the server, or an
-        error code.
+        Return an L{paramiko.SFTPAttributes} object for a path on the server,
+        or an error code.
 
         @param path: relative path for stat infos.
         @type path: str
@@ -207,8 +196,8 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
 
     def lstat(self, path):
         """
-        Return an L{paramiko.SFTPAttributes} object for a path on the server, or an
-        error code.
+        Return an L{paramiko.SFTPAttributes} object for a path on the server,
+        or an error code.
 
         @param path: relative path for stat infos.
         @type path: str
@@ -316,16 +305,6 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         except OSError as e:
             return paramiko.SFTPServer.convert_errno(e.errno)
 
-#    def canonicalize(self, path):
-#        """
-#        Return the canonical form of a path on the server.
-#
-#        For security issues we don't want this method to reveal path
-#        names outside that folder. Therefore, it is no supported.
-#        """
-#
-#        return paramiko.SFTP_OP_UNSUPPORTED
-    
     def readlink(self, path):
         """
         Return the target of a symbolic link (or shortcut) on the server.

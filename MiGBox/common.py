@@ -33,11 +33,6 @@ else:
     # parent dir as valid path to config/, log/, etc.
     migbox_path = os.path.abspath(os.pardir)
 
-config_path = os.path.join(migbox_path, "config")
-icons_path = os.path.join(migbox_path, "icons")
-log_path = os.path.join(migbox_path, "log")
-keys_path = os.path.join(migbox_path, "keys")
-
 # string to show short version of the license in gui, cli and server
 ABOUT ="""
 MiGBox - File Synchronization for the Minimum Intrusion Grid (MiG)
