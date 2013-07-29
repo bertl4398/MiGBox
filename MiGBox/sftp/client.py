@@ -40,7 +40,7 @@ class SFTPClient(paramiko.SFTPClient):
     authentication information.
     """
 
-    def connect(cls, host, port, host_key, user_key, username='', password=None):
+    def connect(cls, host, port, hostkey, userkey, username='', password=None):
         """
         Create a new SFTP client.
 
@@ -51,10 +51,10 @@ class SFTPClient(paramiko.SFTPClient):
         @type host: str
         @param port: the host port.
         @type port: int
-        @param host_key: the path to the host's public key.
-        @type host_key: str
-        @param user_key: the path to the user's private key.
-        @type user_key: str
+        @param hostkey: the path to the host's public key.
+        @type hostkey: str
+        @param userkey: the path to the user's private key.
+        @type userkey: str
         @param username: the user's name (optional).
         @type username: str
         @param password: the user's password (optional).
@@ -63,7 +63,7 @@ class SFTPClient(paramiko.SFTPClient):
 
         known_host = ''
         # file format "ssh-rsa AAA.... user@somemachine"
-        with open(host_key, 'rb') as f:
+        with open(hostkey, 'rb') as f:
             known_host = f.read()
 
         # get the base64 encoded data of the host's public key
@@ -79,7 +79,7 @@ class SFTPClient(paramiko.SFTPClient):
         if not known_host == key_data: 
             raise paramiko.BadHostKeyException(host, key_data, known_host)
 
-        transport.auth_publickey(username, paramiko.RSAKey.from_private_key_file(user_key))
+        transport.auth_publickey(username, paramiko.RSAKey.from_private_key_file(userkey))
 
         chan = transport.open_session()
         if chan is None:

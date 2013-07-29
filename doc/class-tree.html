@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class Hierarchy</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="MiGBox-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Trees&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >MiGBox Documentation</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">&nbsp;</td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="class-tree.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<center><b>
+ [ <a href="module-tree.html">Module Hierarchy</a>
+ | <a href="class-tree.html">Class Hierarchy</a> ]
+</b></center><br />
+<h1 class="epydoc">Class Hierarchy</h1>
+<ul class="nomargin-top">
+    <li> <strong class="uidlink">object</strong>:
+      <em class="summary">The most base type</em>
+    <ul>
+    <li> <strong class="uidlink">paramiko.BaseSFTP</strong>
+    <ul>
+    <li> <strong class="uidlink">paramiko.SFTPClient</strong>:
+      <em class="summary">SFTP client object.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.sftp.client.SFTPClient-class.html">MiGBox.sftp.client.SFTPClient</a></strong>:
+      <em class="summary">SFTP client to connect to the MiGBox SFTP server.</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">paramiko.SFTPServer</strong>:
+      <em class="summary">Server-side SFTP subsystem support.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.sftp.server.SFTPServer-class.html">MiGBox.sftp.server.SFTPServer</a></strong>:
+      <em class="summary">This class inherits from <a 
+        href="MiGBox.sftp.server.SFTPServer-class.html" 
+        class="link">paramiko.SFTPServer</a>.</em>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="MiGBox.fs.filesystem.FileSystem-class.html">MiGBox.fs.filesystem.FileSystem</a></strong>:
+      <em class="summary">This class provides uniform access to a local or remote file system
+        for a number of specified methods.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.fs.filesystem.OSFileSystem-class.html">MiGBox.fs.filesystem.OSFileSystem</a></strong>:
+      <em class="summary">This class represents a file system implemented by the python os 
+        module.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="MiGBox.fs.filesystem.SFTPFileSystem-class.html">MiGBox.fs.filesystem.SFTPFileSystem</a></strong>:
+      <em class="summary">This class represents a file system implemented by the <a 
+        href="MiGBox.sftp.client.SFTPClient-class.html" 
+        class="link">MiGBox.sftp.SFTPClient</a>.</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">watchdog.events.FileSystemEventHandler</strong>:
+      <em class="summary">Base file system event handler that you can override methods from.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.sync.syncd.EventHandler-class.html">MiGBox.sync.syncd.EventHandler</a></strong>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">paramiko.SFTPHandle</strong>:
+      <em class="summary">Abstract object representing a handle to an open file (or folder) 
+        in an SFTP server implementation.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.sftp.server_interface.SFTPHandle-class.html">MiGBox.sftp.server_interface.SFTPHandle</a></strong>:
+      <em class="summary">This class inherits from <a 
+        href="MiGBox.sftp.server_interface.SFTPHandle-class.html" 
+        class="link">paramiko.SFTPHandle</a>.</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">paramiko.SFTPServerInterface</strong>:
+      <em class="summary">This class defines an interface for controlling the behavior of 
+        paramiko when using the <a 
+        href="MiGBox.sftp.server.SFTPServer-class.html" 
+        class="link">SFTPServer</a> subsystem to provide an SFTP server.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html">MiGBox.sftp.server_interface.SFTPServerInterface</a></strong>:
+      <em class="summary">This class inherits from <a 
+        href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html" 
+        class="link">paramiko.SFTPServerInterface</a>.</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">paramiko.ServerInterface</strong>:
+      <em class="summary">This class defines an interface for controlling the behavior of 
+        paramiko in server mode.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.sftp.server.Server-class.html">MiGBox.sftp.server.Server</a></strong>:
+      <em class="summary">This class inherits from <a 
+        href="MiGBox.sftp.server.SFTPServer-class.html" 
+        class="link">paramiko.SFTPServer</a>.</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">threading._Verbose</strong>
+    <ul>
+    <li> <strong class="uidlink">threading.Thread</strong>:
+      <em class="summary">A class that represents a thread of control.</em>
+    <ul>
+    <li> <strong class="uidlink">paramiko.SubsystemHandler</strong>:
+      <em class="summary">Handler for a subsytem in server mode.</em>
+    <ul>
+    <li> <strong class="uidlink">paramiko.SFTPServer</strong>:
+      <em class="summary">Server-side SFTP subsystem support.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.sftp.server.SFTPServer-class.html">MiGBox.sftp.server.SFTPServer</a></strong>:
+      <em class="summary">This class inherits from <a 
+        href="MiGBox.sftp.server.SFTPServer-class.html" 
+        class="link">paramiko.SFTPServer</a>.</em>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">int</strong>:
+      <em class="summary">int(x=0) -&gt; int or long int(x, base=10) -&gt; int or long</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="PyQt4.QtGui.QDialog.DialogCode-class.html">PyQt4.QtGui.QDialog.DialogCode</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="PyQt4.QtGui.QMainWindow.DockOption-class.html">PyQt4.QtGui.QMainWindow.DockOption</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="PyQt4.QtGui.QPaintDevice.PaintDeviceMetric-class.html">PyQt4.QtGui.QPaintDevice.PaintDeviceMetric</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="PyQt4.QtCore.QThread.Priority-class.html">PyQt4.QtCore.QThread.Priority</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="PyQt4.QtGui.QWidget.RenderFlag-class.html">PyQt4.QtGui.QWidget.RenderFlag</a></strong>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">sip.simplewrapper</strong>
+    <ul>
+    <li> <strong class="uidlink"><a href="PyQt4.QtGui.QMainWindow.DockOptions-class.html">PyQt4.QtGui.QMainWindow.DockOptions</a></strong>:
+      <em class="summary">QMainWindow.DockOptions(QMainWindow.DockOptions) 
+        QMainWindow.DockOptions(int) QMainWindow.DockOptions()</em>
+    </li>
+    <li> <strong class="uidlink">PyQt4.QtGui.QPaintDevice</strong>:
+      <em class="summary">QPaintDevice()</em>
+    <ul>
+    <li> <strong class="uidlink">PyQt4.QtGui.QWidget</strong>:
+      <em class="summary">QWidget(QWidget parent=None, Qt.WindowFlags flags=0)</em>
+    <ul>
+    <li> <strong class="uidlink">PyQt4.QtGui.QDialog</strong>:
+      <em class="summary">QDialog(QWidget parent=None, Qt.WindowFlags flags=0)</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.gui.ui.OptionsUi-class.html">MiGBox.gui.ui.OptionsUi</a></strong>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">PyQt4.QtGui.QMainWindow</strong>:
+      <em class="summary">QMainWindow(QWidget parent=None, Qt.WindowFlags flags=0)</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.gui.ui.AppUi-class.html">MiGBox.gui.ui.AppUi</a></strong>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="PyQt4.QtGui.QWidget.RenderFlags-class.html">PyQt4.QtGui.QWidget.RenderFlags</a></strong>:
+      <em class="summary">QWidget.RenderFlags(QWidget.RenderFlags) QWidget.RenderFlags(int) 
+        QWidget.RenderFlags()</em>
+    </li>
+    <li> <strong class="uidlink">sip.wrapper</strong>
+    <ul>
+    <li> <strong class="uidlink">PyQt4.QtCore.QObject</strong>:
+      <em class="summary">QObject(QObject parent=None)</em>
+    <ul>
+    <li> <strong class="uidlink">PyQt4.QtCore.QThread</strong>:
+      <em class="summary">QThread(QObject parent=None)</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.gui.ui.SyncThread-class.html">MiGBox.gui.ui.SyncThread</a></strong>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">PyQt4.QtGui.QWidget</strong>:
+      <em class="summary">QWidget(QWidget parent=None, Qt.WindowFlags flags=0)</em>
+    <ul>
+    <li> <strong class="uidlink">PyQt4.QtGui.QDialog</strong>:
+      <em class="summary">QDialog(QWidget parent=None, Qt.WindowFlags flags=0)</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.gui.ui.OptionsUi-class.html">MiGBox.gui.ui.OptionsUi</a></strong>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">PyQt4.QtGui.QMainWindow</strong>:
+      <em class="summary">QMainWindow(QWidget parent=None, Qt.WindowFlags flags=0)</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.gui.ui.AppUi-class.html">MiGBox.gui.ui.AppUi</a></strong>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink">tuple</strong>:
+      <em class="summary">tuple() -&gt; empty tuple tuple(iterable) -&gt; tuple initialized 
+        from iterable's items</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.sync.rsync.Weakchksum-class.html">MiGBox.sync.rsync.Weakchksum</a></strong>:
+      <em class="summary">Weakchksum(a, b, s, length)</em>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+</ul>
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="MiGBox-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Trees&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >MiGBox Documentation</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Mon Jul 29 19:15:37 2013
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

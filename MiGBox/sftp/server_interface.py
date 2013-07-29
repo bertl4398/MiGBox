@@ -107,7 +107,7 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         Open a file on the server and create a handle for future operations
         on that file.
 
-        @param path: relative path of the file to be opened.
+        @param path: path of the file to be opened.
         @type path: str
         @param flags: flags or'd together from the C{os} module.
         @type flags: int
@@ -157,7 +157,7 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         """
         Return a list of files within a given folder.
 
-        @param path: relative path to be listed.
+        @param path: path to be listed.
         @type path: str
         @return: a list of the files in the given folder, using
             L{paramiko.SFTPAttributes} objects.
@@ -182,7 +182,7 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         Return an L{paramiko.SFTPAttributes} object for a path on the server,
         or an error code.
 
-        @param path: relative path for stat infos.
+        @param path: path for stat infos.
         @type path: str
         @return: an attributes object for the given path, or error code.
         @rtype: L{paramiko.SFTPAttributes} I{or error code}
@@ -199,7 +199,7 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         Return an L{paramiko.SFTPAttributes} object for a path on the server,
         or an error code.
 
-        @param path: relative path for stat infos.
+        @param path: path for stat infos.
         @type path: str
         @return: an attributes object for the given file, or an error code.
         @rtype: L{SFTPAttributes} I{or error code}
@@ -215,7 +215,7 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         """
         Delete a file, if possible.
 
-        @param path: relative path the file to delete.
+        @param path: path the file to delete.
         @type path: str
         @return: return code.
         @rtype: int
@@ -232,7 +232,7 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         """
         Rename (or move) a file.
 
-        @param oldpath: relative path of the existing file.
+        @param oldpath: path of the existing file.
         @type oldpath: str
         @param newpath: new path of the file.
         @type newpath: str

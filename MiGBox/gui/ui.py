@@ -32,26 +32,8 @@ from ConfigParser import SafeConfigParser
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from MiGBox.common import ABOUT
 from MiGBox.sync import syncd
-
-def _readConfig():
-    config = SafeConfigParser()
-    config.read(os.path.join(config_path, "migbox.cfg"))
-
-    settings = QSettings()
-    for section in config.sections():
-        for name, value in config.items(section):
-            settings.setValue(name, value)
-
-def _writeConfig(section, **kargs):
-    config = SafeConfigParser()
-    file_ = os.path.join(config_path, "migbox.cfg")
-    config.read(file_)
-    for key in kargs:
-        config.set(section, key, kargs[key])
-    
-    with open(file_, "wb") as configfile:
-            config.write(configfile)
 
 class SyncThread(QThread):
     def __init__(self, parent=None):
@@ -64,7 +46,20 @@ class SyncThread(QThread):
         self.start()
 
     def run(self):
-        syncd.main(self.sftp, self.event)
+        settings = QSettings()
+
+        src = str(settings.value("sync_src").toString())
+        dst = str(settings.value("sync_dst").toString())
+        host = str(settings.value("sftp_host").toString())
+        port = int(settings.value("sftp_port").toInt()[0])
+        hostkey = str(settings.value("hostkey").toString())
+        userkey = str(settings.value("userkey").toString())
+        log_file = str(settings.value("log_file").toString())
+        log_level = str(settings.value("log_level").toString())
+
+        mode = 'remote' if self.sftp else 'local'
+        syncd.run(mode, src, dst, host, port, hostkey, userkey,
+                  log_file, log_level, self.event)
 
     def stop_sync(self):
         self.event.set()
@@ -80,16 +75,15 @@ class OptionsUi(QDialog):
         #urlValidator = QRegExpValidator(urlRegExp)
 
         urlLabel = QLabel("URL")
-        self.urlEdit = QLineEdit(settings.value("sftp_host",
-                                 QVariant("localhost")).toString())
+        self.urlEdit = QLineEdit(settings.value("sftp_host").toString())
 
         portLabel = QLabel("Port")
         self.portEdit = QSpinBox()
         self.portEdit.setRange(0, 65535)
-        self.portEdit.setValue(settings.value("sftp_port", QVariant(50007)).toInt()[0])
+        self.portEdit.setValue(settings.value("sftp_port").toInt()[0])
 
         pubKeyLabel = QLabel("Public key")
-        self.pubKeyPathEdit = QLineEdit(settings.value("srvkey").toString())
+        self.pubKeyPathEdit = QLineEdit(settings.value("hostkey").toString())
 
         self.pubKeyPathButton = QPushButton("Path...")
         self.pubKeyPathButton.setToolTip("Path to the server's public key")
@@ -113,7 +107,7 @@ class OptionsUi(QDialog):
         self.passwordEdit.setEchoMode(QLineEdit.Password)
 
         prvKeyLabel = QLabel("Private key")
-        self.prvKeyPathEdit = QLineEdit(settings.value("prvkey").toString())
+        self.prvKeyPathEdit = QLineEdit(settings.value("userkey").toString())
 
         self.prvKeyPathButton = QPushButton("Path...")
         self.prvKeyPathButton.setToolTip("Path to the user's private key")
@@ -152,13 +146,9 @@ class OptionsUi(QDialog):
         settings = QSettings()
         settings.setValue("sftp_host", QVariant(self.urlEdit.text()))
         settings.setValue("sftp_port", QVariant(self.portEdit.value()))
-        settings.setValue("prvkey", QVariant(self.prvKeyPathEdit.text()))
-        settings.setValue("srvkey", QVariant(self.pubKeyPathEdit.text()))
+        settings.setValue("userkey", QVariant(self.prvKeyPathEdit.text()))
+        settings.setValue("hostkey", QVariant(self.pubKeyPathEdit.text()))
 
-        _writeConfig("Connection", sftp_host=str(self.urlEdit.text()),
-                                   sftp_port=str(self.portEdit.value()))
-        _writeConfig("KeyAuth", prvkey=str(self.prvKeyPathEdit.text()),
-                                srvkey=str(self.pubKeyPathEdit.text()))
         QDialog.accept(self)
 
     def _setPath(self, lineEdit):
@@ -167,12 +157,22 @@ class OptionsUi(QDialog):
             lineEdit.setText(QDir.toNativeSeparators(path))
 
 class AppUi(QMainWindow):
-    def __init__(self):
+    def __init__(self, configfile, icons_path):
         super(AppUi, self).__init__(None)
 
-        _readConfig()
+        self.configfile = configfile
 
+        config = SafeConfigParser()
+        config.read(configfile)
         settings = QSettings()
+        settings.setValue("sync_src", str(config.get("Sync", "sync_src")))
+        settings.setValue("sync_dst", str(config.get("Sync", "sync_dst")))
+        settings.setValue("sftp_host", str(config.get("Connection", "sftp_host")))
+        settings.setValue("sftp_port", int(config.getint("Connection", "sftp_port")))
+        settings.setValue("hostkey", str(config.get("KeyAuth", "hostkey")))
+        settings.setValue("userkey", str(config.get("KeyAuth", "userkey")))
+        settings.setValue("log_file", str(config.get("Logging", "log_file")))
+        settings.setValue("log_level", str(config.get("Logging", "log_level")))
 
         srcPathLabel = QLabel("Source path")
         dstPathLabel = QLabel("Destination path")
@@ -184,16 +184,15 @@ class AppUi(QMainWindow):
         self.dstPathEdit.setToolTip("Destination path for synchronization")
 
         self.srcPathButton = QPushButton("Path...")
-        self.srcPathButton.setToolTip("Sets the source path")
+        self.srcPathButton.setToolTip("Sets the source path for synchronization")
 
         self.dstPathButton = QPushButton("Path...")
-        self.dstPathButton.setToolTip("Sets the destination path")
+        self.dstPathButton.setToolTip("Sets the destination path for synchronization")
 
         self.remoteCheckBox = QCheckBox("&SFTP Server")
-        self.remoteCheckBox.setToolTip("Connect to  SFTP server")
+        self.remoteCheckBox.setToolTip("Connect to SFTP server")
 
-        logFile = settings.value("log_file",
-                                 QVariant(os.path.join(log_path, "sync.log"))).toString()
+        logFile = settings.value("log_file").toString()
 
         self.logBrowser = QTextBrowser()
         self.logBrowser.setLineWrapMode(QTextEdit.NoWrap)
@@ -309,10 +308,24 @@ class AppUi(QMainWindow):
                      self._handleSysTray)
 
     def closeEvent(self, event):
-        # wait for sync thread to exit?
-        # save settings?
         # other cleanup?
         del(self.trayIcon)
+
+        self._stopSynchronize()
+
+        settings = QSettings()
+        config = SafeConfigParser()
+        config.read(self.configfile)
+        config.set("Sync", "sync_src", str(settings.value("sync_src").toString()))
+        config.set("Sync", "sync_dst", str(settings.value("sync_dst").toString()))
+        config.set("Connection", "sftp_host", str(settings.value("sftp_host").toString()))
+        config.set("Connection", "sftp_port", str(settings.value("sftp_port").toString()))
+        config.set("KeyAuth", "hostkey", str(settings.value("hostkey").toString()))
+        config.set("KeyAuth", "userkey", str(settings.value("userkey").toString()))
+        config.set("Logging", "log_file", str(settings.value("log_file").toString()))
+        config.set("Logging", "log_level", str(settings.value("log_level").toString()))
+        with open(self.configfile, 'wb') as f:
+            config.write(f)
 
         # event.ignore()
         event.accept()
@@ -328,12 +341,13 @@ class AppUi(QMainWindow):
             self.trayIcon.hide()
 
     def _saveSyncPaths(self):
+        settings = QSettings()
         if self.remoteCheckBox.isChecked():
-            _writeConfig("Sync", sync_src=str(self.srcPathEdit.text()))
-            _writeConfig("Connection", sftp_host=str(self.dstPathEdit.text()))
+            settings.setValue("sync_src", str(self.srcPathEdit.text()))
+            settings.setValue("sftp_host", str(self.dstPathEdit.text()))
         else:
-            _writeConfig("Sync", sync_src=str(self.srcPathEdit.text()),
-                                 sync_dst=str(self.dstPathEdit.text()))
+            settings.setValue("sync_src", str(self.srcPathEdit.text()))
+            settings.setValue("sync_dst", str(self.dstPathEdit.text()))
         
     def _stopSynchronize(self):
         self.thread.stop_sync()
@@ -393,12 +407,31 @@ class AppUi(QMainWindow):
             self.dstTreeView.setRootIndex(self.dstFsModel.index(self.dstPathEdit.text()))
             self._saveSyncPaths()
 
-if __name__ == '__main__':
+def run(configfile=None):
+    if not configfile:
+        # try to read from MIGBOXPATH environment variable
+        if 'MIGBOXPATH' in os.environ:
+            configfile = os.path.join(os.environ['MIGBOXPATH'], 'config/migbox.cfg')
+            icons_path = os.path.join(os.environ['MIGBOXPATH'], 'icons')
+        else:
+            # try to read default location
+            configfile = os.path.join(os.pardir, os.pardir, 'config/migbox.cfg')
+            icons_path = os.path.join(os.pardir, os.pardir, 'icons')
+    if not os.path.exists(configfile):
+        print "Could not find configuration file!"
+        sys.exit(1)
+    if not os.path.exists(icons_path):
+        print "Could not find application icons"
+        sys.exit(1)
+
     app = QApplication(sys.argv)
     app.setApplicationName("MiGBox")
     app.setWindowIcon(QIcon(os.path.join(icons_path, "app.svg")))
 
-    appUi = AppUi()
+    appUi = AppUi(configfile, icons_path)
     appUi.show()
 
     sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    run()

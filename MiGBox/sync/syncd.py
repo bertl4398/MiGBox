@@ -38,46 +38,47 @@ class EventHandler(FileSystemEventHandler):
         self.src = src
         self.dst = dst
 
-    def get_syncpath(self, path):
-        rel_path = self.src.relpath(path)
+    def _get_syncpath(self, path):
+        rel_path = self.src.get_relative_path(path)
         return os.path.join(self.dst.root, rel_path)
 
     def on_created(self, event):
-        sync_path = self.get_syncpath(event.src_path)
+        sync_path = self._get_syncpath(event.src_path)
         if event.is_directory:
             sync.make_dir(self.dst, sync_path)
         else:
             sync.copy_file(self.src, event.src_path, self.dst, sync_path)
 
     def on_deleted(self, event):
-        sync_path = self.get_syncpath(event.src_path)
+        sync_path = self._get_syncpath(event.src_path)
         if event.is_directory:
             sync.remove_dir(self.dst, sync_path)
         else:
             sync.remove_file(self.dst, sync_path)
 
     def on_modified(self, event):
-        sync_path = self.get_syncpath(event.src_path)
+        sync_path = self._get_syncpath(event.src_path)
         sync.sync_file(self.src, event.src_path, self.dst, sync_path)
 
     def on_moved(self, event):
-        sync_src = self.get_syncpath(event.src_path)
-        sync_dst = self.get_syncpath(event.dest_path)
+        sync_src = self._get_syncpath(event.src_path)
+        sync_dst = self._get_syncpath(event.dest_path)
         sync.move_file(self.dst, sync_src, sync_dst)
 
-def run(src_path, dst_path, sftp_host, sftp_port, host_key, user_key,
+def run(mode, src_path, dst_path, host, port, hostkey, userkey,
          log_file, log_level, event=threading.Event()):
 
-    logging.basicConfig(filename=log_file, filemode='w',\
-                        format='%(levelname)s: %(asctime)s %(message)s',\
+    logging.basicConfig(filename=log_file, filemode='w',
+                        format='%(levelname)s: %(asctime)s %(message)s',
                         datefmt='%m/%d/%Y %I:%M:%S %p', level=getattr(logging,log_level))
 
     local = OSFileSystem(root=src_path)
-    remote = OSFileSystem(root=dst_path)
 
-#   client = SFTPClient()
-#   client.connect(sftp_host, sftp_port, host_key, user_key)
-#   remote = SFTPFileSystem(client)
+    if mode == 'local':
+        remote = OSFileSystem(root=dst_path)
+    elif mode == 'remote':
+        client = SFTPClient.connect(host, port, hostkey, userkey)
+        remote = SFTPFileSystem(client)
 
     # copy all new files from local to remote
     # sync all modifications from local/remote to local/remote
@@ -97,20 +98,3 @@ def run(src_path, dst_path, sftp_host, sftp_port, host_key, user_key,
 
     observer.stop()
     observer.join()
-
-if __name__ == '__main__':
-
-    log_file = '/home/benjamin/MiGBox/log/sync.log'
-    log_level = 'INFO'
-
-    src_path = '/home/benjamin/MiGBox/tests/local'
-    dst_path = '/home/benjamin/MiGBox/tests/remote'
-
-    sftp_host = ''
-    sftp_port = 50007 
-
-    host_key = '/home/benjamin/MiGBox/keys/server_rsa_key.pub'
-    user_key = '/home/benjamin/MiGBox/keys/user_rsa_key'
-
-    run(src_path, dst_path, sftp_host, sftp_port, host_key, user_key,
-         log_file, log_level)

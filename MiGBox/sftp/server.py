@@ -1,5 +1,3 @@
-#!/usr/bin/python
-#
 # SFTP server based on paramiko
 #
 # Copyright (C) 2013 Benjamin Ertl
@@ -27,14 +25,14 @@ synchronization.
 __version__ = 0.3
 __author__ = 'Benjamin Ertl'
 
-HEADER = """
+HEADER = """\
 SFTP server for MiGBox - version {0}
 Copyright (c) 2013 {1}
 
 MiGBox comes with ABSOLUTELY NO WARRANTY. This is free software,
 and you are welcome to redistribute it under certain conditions.
 
-type 'show' to show details
+type 'license' to show license information
 type 'exit' to shutdown the server
 """.format(__version__, __author__)
 
@@ -146,7 +144,7 @@ class SFTPServer(paramiko.SFTPServer):
 
     run_server = classmethod(run_server)
 
-def main(host, port, backlog, prvkey, usrkey, root_path, log_file, log_level):
+def run(host, port, backlog, hostkey, userkey, root_path, log_file, log_level):
     """
     Main entry point to run the sftp server.
     """
@@ -172,12 +170,12 @@ def main(host, port, backlog, prvkey, usrkey, root_path, log_file, log_level):
             if input_ == server_socket:
                 conn, addr = server_socket.accept()
                 thread = threading.Thread(target=SFTPServer.run_server,
-                                          args=(conn, addr, prvkey, usrkey, root_path))
+                                          args=(conn, addr, hostkey, userkey, root_path))
                 client_threads.append(thread)
                 thread.start()
             elif input_ == sys.stdin:
                 in_ = sys.stdin.readline()
-                if in_.rstrip() == 'show':
+                if in_.rstrip() == 'license':
                     print ABOUT
                 if in_.rstrip() == 'exit':
                     running = False
@@ -187,20 +185,3 @@ def main(host, port, backlog, prvkey, usrkey, root_path, log_file, log_level):
     server_socket.close()
 
     print 'Done'
-
-    sys.exit(0)
-
-if __name__ == '__main__':
-    host = '' 
-    port = 50007 
-    backlog = 10 
-
-    prvkey = '/home/benjamin/MiGBox/keys/server_rsa_key'
-    usrkey = '/home/benjamin/MiGBox/keys/user_rsa_key.pub'
-
-    root_path = '/home/benjamin/MiGBox/MiGBox/sftp'
-
-    log_file = '/home/benjamin/MiGBox/MiGBox/sftp/log'
-    log_level = 'INFO' 
-
-    main(host, port, backlog, prvkey, usrkey, root_path, log_file, log_level)

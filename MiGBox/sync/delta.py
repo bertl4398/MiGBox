@@ -32,7 +32,8 @@ def weakchecksum(data):
 
     @param data: data for checksum computation.
     @type data: str
-    @return adler32 checksum.
+    @return: adler32 checksum.
+    @rtype: str
     """
     return zlib.adler32(data) & 0xffffffff
 
@@ -42,7 +43,8 @@ def strongchecksum(data):
 
     @param data: data for checksum computation.
     @type data: str
-    @return md5 hexdigest.
+    @return: md5 hexdigest.
+    @rtype: str
     """
     md5 = hashlib.md5()
     md5.update(data)
@@ -58,8 +60,9 @@ def blockchecksums(filename, size=BLOCKSIZE):
     @type filename: str
     @param size: block size, default 65536.
     @type size: int
-    @return dict as hashtable of tuples as
+    @return: dict as hashtable of tuples as
             (block offset, weak checksum, strong checksum).
+    @rtype: dict
     """
     with open(filename, "rb") as f:
         results = {}; offset = 0
@@ -87,12 +90,16 @@ def delta(filename, checksums, size=BLOCKSIZE):
     @type checksums: dict
     @param size: block size, default 65536.
     @type size: int
-    @return list of tuples as (offset, data).
+    @return: list of tuples as (offset, data).
+    @rtype: list
     """
     diff = []
-    if not checksums:
-        return diff
     with open(filename, "rb") as f:
+        if not checksums:
+            # checksums file was empty, diff is whole file
+            f.seek(0)
+            diff.append((0, base64.b64encode(f.read())))
+            return diff
         offset = last = 0; match = False
         data = f.read(size)
         while data:
@@ -115,14 +122,15 @@ def delta(filename, checksums, size=BLOCKSIZE):
                             offset += size
                             last = offset
             if not match:
-                # no match
+                # no match, search for matching blocks by moving one byte forward
                 offset += 1
                 f.seek(offset)
             match = False
             data = f.read(size)
         if not diff:
+            # no matching checksums, diff is whole file
             f.seek(0)
-            diff.append((0, f.read()))
+            diff.append((0, base64.b64encode(f.read())))
     return diff
 
 def patch(filename, delta, size=BLOCKSIZE):
@@ -136,15 +144,18 @@ def patch(filename, delta, size=BLOCKSIZE):
     @type delta: list of tuples
     @param size: block size, default 65536.
     @type size: int
-    @return name of patched file.
+    @return: name of patched file.
+    @rtype: str
     """
     with open(filename, "rb") as old:
         with open(filename + ".patched", "wb") as new:
             for offset, data in delta:
                 if data:
+                    # there was no matching block, write new data
                     d = base64.b64decode(data)
                     new.write(d)
                 else:
+                    # there is a matching block we can reuse the data
                     old.seek(int(offset))
                     d = old.read(size)
                     new.write(d)

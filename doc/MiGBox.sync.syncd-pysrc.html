@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>MiGBox.sync.syncd</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="MiGBox-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >MiGBox Documentation</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="MiGBox-module.html">Package&nbsp;MiGBox</a> ::
+        <a href="MiGBox.sync-module.html">Package&nbsp;sync</a> ::
+        Module&nbsp;syncd
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="MiGBox.sync.syncd-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="MiGBox.sync.syncd-module.html">Module MiGBox.sync.syncd</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment"># MiGBox sync daemon</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-comment"># Copyright (C) 2013 Benjamin Ertl</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-comment"># This program is free software; you can redistribute it and/or modify</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-comment"># it under the terms of the GNU General Public License as published by</tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-comment"># the Free Software Foundation; either version 2 of the License, or</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-comment"># (at your option) any later version.</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-comment"># This program is distributed in the hope that it will be useful,</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-comment"># but WITHOUT ANY WARRANTY; without even the implied warranty of</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-comment"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-comment"># GNU General Public License for more details.</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-comment"># You should have received a copy of the GNU General Public License along</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-comment"># with this program; if not, write to the Free Software Foundation, Inc.,</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"><tt class="py-comment"># 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-docstring">Sync daemon for MiGBox.</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">os</tt><tt class="py-op">,</tt> <tt class="py-name">sys</tt><tt class="py-op">,</tt> <tt class="py-name">time</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">threading</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">logging</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">paramiko</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Package MiGBox=MiGBox-module.html"><a title="MiGBox" class="py-name" href="#" onclick="return doclink('link-0', 'MiGBox', 'link-0');">MiGBox</a></tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Method MiGBox.gui.ui.SyncThread.sync()=MiGBox.gui.ui.SyncThread-class.html#sync,Package MiGBox.sync=MiGBox.sync-module.html,Function MiGBox.sync.rsync.sync()=MiGBox.sync.rsync-module.html#sync,Module MiGBox.sync.sync=MiGBox.sync.sync-module.html"><a title="MiGBox.gui.ui.SyncThread.sync
+MiGBox.sync
+MiGBox.sync.rsync.sync
+MiGBox.sync.sync" class="py-name" href="#" onclick="return doclink('link-1', 'sync', 'link-1');">sync</a></tt> <tt class="py-keyword">import</tt> <tt id="link-2" class="py-name"><a title="MiGBox.gui.ui.SyncThread.sync
+MiGBox.sync
+MiGBox.sync.rsync.sync
+MiGBox.sync.sync" class="py-name" href="#" onclick="return doclink('link-2', 'sync', 'link-1');">sync</a></tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-3" class="py-name"><a title="MiGBox" class="py-name" href="#" onclick="return doclink('link-3', 'MiGBox', 'link-0');">MiGBox</a></tt><tt class="py-op">.</tt><tt id="link-4" class="py-name" targets="Package MiGBox.fs=MiGBox.fs-module.html"><a title="MiGBox.fs" class="py-name" href="#" onclick="return doclink('link-4', 'fs', 'link-4');">fs</a></tt> <tt class="py-keyword">import</tt> <tt id="link-5" class="py-name" targets="Class MiGBox.fs.filesystem.OSFileSystem=MiGBox.fs.filesystem.OSFileSystem-class.html"><a title="MiGBox.fs.filesystem.OSFileSystem" class="py-name" href="#" onclick="return doclink('link-5', 'OSFileSystem', 'link-5');">OSFileSystem</a></tt><tt class="py-op">,</tt> <tt id="link-6" class="py-name" targets="Class MiGBox.fs.filesystem.SFTPFileSystem=MiGBox.fs.filesystem.SFTPFileSystem-class.html"><a title="MiGBox.fs.filesystem.SFTPFileSystem" class="py-name" href="#" onclick="return doclink('link-6', 'SFTPFileSystem', 'link-6');">SFTPFileSystem</a></tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-7" class="py-name"><a title="MiGBox" class="py-name" href="#" onclick="return doclink('link-7', 'MiGBox', 'link-0');">MiGBox</a></tt><tt class="py-op">.</tt><tt id="link-8" class="py-name" targets="Package MiGBox.sftp=MiGBox.sftp-module.html"><a title="MiGBox.sftp" class="py-name" href="#" onclick="return doclink('link-8', 'sftp', 'link-8');">sftp</a></tt> <tt class="py-keyword">import</tt> <tt id="link-9" class="py-name" targets="Class MiGBox.sftp.client.SFTPClient=MiGBox.sftp.client.SFTPClient-class.html"><a title="MiGBox.sftp.client.SFTPClient" class="py-name" href="#" onclick="return doclink('link-9', 'SFTPClient', 'link-9');">SFTPClient</a></tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line"> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">watchdog</tt><tt class="py-op">.</tt><tt class="py-name">events</tt> <tt class="py-keyword">import</tt> <tt class="py-name">FileSystemEventHandler</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">watchdog</tt><tt class="py-op">.</tt><tt class="py-name">observers</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Observer</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"> </tt>
+<a name="EventHandler"></a><div id="EventHandler-def"><a name="L35"></a><tt class="py-lineno"> 35</tt> <a class="py-toggle" href="#" id="EventHandler-toggle" onclick="return toggle('EventHandler');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="MiGBox.sync.syncd.EventHandler-class.html">EventHandler</a><tt class="py-op">(</tt><tt class="py-base-class">FileSystemEventHandler</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="EventHandler-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="EventHandler-expanded"><a name="EventHandler.__init__"></a><div id="EventHandler.__init__-def"><a name="L36"></a><tt class="py-lineno"> 36</tt> <a class="py-toggle" href="#" id="EventHandler.__init__-toggle" onclick="return toggle('EventHandler.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="MiGBox.sync.syncd.EventHandler-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">src</tt><tt class="py-op">,</tt> <tt class="py-param">dst</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="EventHandler.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="EventHandler.__init__-expanded"><a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line">        <tt class="py-name">FileSystemEventHandler</tt><tt class="py-op">.</tt><tt id="link-10" class="py-name" targets="Method MiGBox.fs.filesystem.FileSystem.__init__()=MiGBox.fs.filesystem.FileSystem-class.html#__init__,Method MiGBox.fs.filesystem.OSFileSystem.__init__()=MiGBox.fs.filesystem.OSFileSystem-class.html#__init__,Method MiGBox.fs.filesystem.SFTPFileSystem.__init__()=MiGBox.fs.filesystem.SFTPFileSystem-class.html#__init__,Method MiGBox.gui.ui.AppUi.__init__()=MiGBox.gui.ui.AppUi-class.html#__init__,Method MiGBox.gui.ui.OptionsUi.__init__()=MiGBox.gui.ui.OptionsUi-class.html#__init__,Method MiGBox.gui.ui.SyncThread.__init__()=MiGBox.gui.ui.SyncThread-class.html#__init__,Method MiGBox.sftp.server.Server.__init__()=MiGBox.sftp.server.Server-class.html#__init__,Method MiGBox.sftp.server_interface.SFTPServerInterface.__init__()=MiGBox.sftp.server_interface.SFTPServerInterface-class.html#__init__,Method MiGBox.sync.syncd.EventHandler.__init__()=MiGBox.sync.syncd.EventHandler-class.html#__init__"><a title="MiGBox.fs.filesystem.FileSystem.__init__
+MiGBox.fs.filesystem.OSFileSystem.__init__
+MiGBox.fs.filesystem.SFTPFileSystem.__init__
+MiGBox.gui.ui.AppUi.__init__
+MiGBox.gui.ui.OptionsUi.__init__
+MiGBox.gui.ui.SyncThread.__init__
+MiGBox.sftp.server.Server.__init__
+MiGBox.sftp.server_interface.SFTPServerInterface.__init__
+MiGBox.sync.syncd.EventHandler.__init__" class="py-name" href="#" onclick="return doclink('link-10', '__init__', 'link-10');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">)</tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">src</tt> <tt class="py-op">=</tt> <tt class="py-name">src</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">dst</tt> <tt class="py-op">=</tt> <tt class="py-name">dst</tt> </tt>
+</div><a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line"> </tt>
+<a name="EventHandler._get_syncpath"></a><div id="EventHandler._get_syncpath-def"><a name="L41"></a><tt class="py-lineno"> 41</tt> <a class="py-toggle" href="#" id="EventHandler._get_syncpath-toggle" onclick="return toggle('EventHandler._get_syncpath');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="MiGBox.sync.syncd.EventHandler-class.html#_get_syncpath">_get_syncpath</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">path</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="EventHandler._get_syncpath-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="EventHandler._get_syncpath-expanded"><a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line">        <tt class="py-name">rel_path</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">src</tt><tt class="py-op">.</tt><tt id="link-11" class="py-name" targets="Method MiGBox.fs.filesystem.FileSystem.get_relative_path()=MiGBox.fs.filesystem.FileSystem-class.html#get_relative_path"><a title="MiGBox.fs.filesystem.FileSystem.get_relative_path" class="py-name" href="#" onclick="return doclink('link-11', 'get_relative_path', 'link-11');">get_relative_path</a></tt><tt class="py-op">(</tt><tt class="py-name">path</tt><tt class="py-op">)</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">path</tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">dst</tt><tt class="py-op">.</tt><tt class="py-name">root</tt><tt class="py-op">,</tt> <tt class="py-name">rel_path</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line"> </tt>
+<a name="EventHandler.on_created"></a><div id="EventHandler.on_created-def"><a name="L45"></a><tt class="py-lineno"> 45</tt> <a class="py-toggle" href="#" id="EventHandler.on_created-toggle" onclick="return toggle('EventHandler.on_created');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="MiGBox.sync.syncd.EventHandler-class.html#on_created">on_created</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="EventHandler.on_created-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="EventHandler.on_created-expanded"><a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">        <tt class="py-name">sync_path</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-12" class="py-name" targets="Method MiGBox.sync.syncd.EventHandler._get_syncpath()=MiGBox.sync.syncd.EventHandler-class.html#_get_syncpath"><a title="MiGBox.sync.syncd.EventHandler._get_syncpath" class="py-name" href="#" onclick="return doclink('link-12', '_get_syncpath', 'link-12');">_get_syncpath</a></tt><tt class="py-op">(</tt><tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">src_path</tt><tt class="py-op">)</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">is_directory</tt><tt class="py-op">:</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">            <tt id="link-13" class="py-name"><a title="MiGBox.gui.ui.SyncThread.sync
+MiGBox.sync
+MiGBox.sync.rsync.sync
+MiGBox.sync.sync" class="py-name" href="#" onclick="return doclink('link-13', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt id="link-14" class="py-name" targets="Function MiGBox.sync.sync.make_dir()=MiGBox.sync.sync-module.html#make_dir"><a title="MiGBox.sync.sync.make_dir" class="py-name" href="#" onclick="return doclink('link-14', 'make_dir', 'link-14');">make_dir</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">dst</tt><tt class="py-op">,</tt> <tt class="py-name">sync_path</tt><tt class="py-op">)</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">            <tt id="link-15" class="py-name"><a title="MiGBox.gui.ui.SyncThread.sync
+MiGBox.sync
+MiGBox.sync.rsync.sync
+MiGBox.sync.sync" class="py-name" href="#" onclick="return doclink('link-15', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt id="link-16" class="py-name" targets="Function MiGBox.sync.sync.copy_file()=MiGBox.sync.sync-module.html#copy_file"><a title="MiGBox.sync.sync.copy_file" class="py-name" href="#" onclick="return doclink('link-16', 'copy_file', 'link-16');">copy_file</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">src</tt><tt class="py-op">,</tt> <tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">src_path</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">dst</tt><tt class="py-op">,</tt> <tt class="py-name">sync_path</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line"> </tt>
+<a name="EventHandler.on_deleted"></a><div id="EventHandler.on_deleted-def"><a name="L52"></a><tt class="py-lineno"> 52</tt> <a class="py-toggle" href="#" id="EventHandler.on_deleted-toggle" onclick="return toggle('EventHandler.on_deleted');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="MiGBox.sync.syncd.EventHandler-class.html#on_deleted">on_deleted</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="EventHandler.on_deleted-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="EventHandler.on_deleted-expanded"><a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">        <tt class="py-name">sync_path</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-17" class="py-name"><a title="MiGBox.sync.syncd.EventHandler._get_syncpath" class="py-name" href="#" onclick="return doclink('link-17', '_get_syncpath', 'link-12');">_get_syncpath</a></tt><tt class="py-op">(</tt><tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">src_path</tt><tt class="py-op">)</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">is_directory</tt><tt class="py-op">:</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">            <tt id="link-18" class="py-name"><a title="MiGBox.gui.ui.SyncThread.sync
+MiGBox.sync
+MiGBox.sync.rsync.sync
+MiGBox.sync.sync" class="py-name" href="#" onclick="return doclink('link-18', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt id="link-19" class="py-name" targets="Function MiGBox.sync.sync.remove_dir()=MiGBox.sync.sync-module.html#remove_dir"><a title="MiGBox.sync.sync.remove_dir" class="py-name" href="#" onclick="return doclink('link-19', 'remove_dir', 'link-19');">remove_dir</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">dst</tt><tt class="py-op">,</tt> <tt class="py-name">sync_path</tt><tt class="py-op">)</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">            <tt id="link-20" class="py-name"><a title="MiGBox.gui.ui.SyncThread.sync
+MiGBox.sync
+MiGBox.sync.rsync.sync
+MiGBox.sync.sync" class="py-name" href="#" onclick="return doclink('link-20', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt id="link-21" class="py-name" targets="Function MiGBox.sync.sync.remove_file()=MiGBox.sync.sync-module.html#remove_file"><a title="MiGBox.sync.sync.remove_file" class="py-name" href="#" onclick="return doclink('link-21', 'remove_file', 'link-21');">remove_file</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">dst</tt><tt class="py-op">,</tt> <tt class="py-name">sync_path</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line"> </tt>
+<a name="EventHandler.on_modified"></a><div id="EventHandler.on_modified-def"><a name="L59"></a><tt class="py-lineno"> 59</tt> <a class="py-toggle" href="#" id="EventHandler.on_modified-toggle" onclick="return toggle('EventHandler.on_modified');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="MiGBox.sync.syncd.EventHandler-class.html#on_modified">on_modified</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="EventHandler.on_modified-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="EventHandler.on_modified-expanded"><a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">        <tt class="py-name">sync_path</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-22" class="py-name"><a title="MiGBox.sync.syncd.EventHandler._get_syncpath" class="py-name" href="#" onclick="return doclink('link-22', '_get_syncpath', 'link-12');">_get_syncpath</a></tt><tt class="py-op">(</tt><tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">src_path</tt><tt class="py-op">)</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">        <tt id="link-23" class="py-name"><a title="MiGBox.gui.ui.SyncThread.sync
+MiGBox.sync
+MiGBox.sync.rsync.sync
+MiGBox.sync.sync" class="py-name" href="#" onclick="return doclink('link-23', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt id="link-24" class="py-name" targets="Function MiGBox.sync.sync.sync_file()=MiGBox.sync.sync-module.html#sync_file"><a title="MiGBox.sync.sync.sync_file" class="py-name" href="#" onclick="return doclink('link-24', 'sync_file', 'link-24');">sync_file</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">src</tt><tt class="py-op">,</tt> <tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">src_path</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">dst</tt><tt class="py-op">,</tt> <tt class="py-name">sync_path</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line"> </tt>
+<a name="EventHandler.on_moved"></a><div id="EventHandler.on_moved-def"><a name="L63"></a><tt class="py-lineno"> 63</tt> <a class="py-toggle" href="#" id="EventHandler.on_moved-toggle" onclick="return toggle('EventHandler.on_moved');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="MiGBox.sync.syncd.EventHandler-class.html#on_moved">on_moved</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="EventHandler.on_moved-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="EventHandler.on_moved-expanded"><a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">        <tt class="py-name">sync_src</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-25" class="py-name"><a title="MiGBox.sync.syncd.EventHandler._get_syncpath" class="py-name" href="#" onclick="return doclink('link-25', '_get_syncpath', 'link-12');">_get_syncpath</a></tt><tt class="py-op">(</tt><tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">src_path</tt><tt class="py-op">)</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">        <tt class="py-name">sync_dst</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-26" class="py-name"><a title="MiGBox.sync.syncd.EventHandler._get_syncpath" class="py-name" href="#" onclick="return doclink('link-26', '_get_syncpath', 'link-12');">_get_syncpath</a></tt><tt class="py-op">(</tt><tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">dest_path</tt><tt class="py-op">)</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">        <tt id="link-27" class="py-name"><a title="MiGBox.gui.ui.SyncThread.sync
+MiGBox.sync
+MiGBox.sync.rsync.sync
+MiGBox.sync.sync" class="py-name" href="#" onclick="return doclink('link-27', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt id="link-28" class="py-name" targets="Function MiGBox.sync.sync.move_file()=MiGBox.sync.sync-module.html#move_file"><a title="MiGBox.sync.sync.move_file" class="py-name" href="#" onclick="return doclink('link-28', 'move_file', 'link-28');">move_file</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">dst</tt><tt class="py-op">,</tt> <tt class="py-name">sync_src</tt><tt class="py-op">,</tt> <tt class="py-name">sync_dst</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line"> </tt>
+<a name="run"></a><div id="run-def"><a name="L68"></a><tt class="py-lineno"> 68</tt> <a class="py-toggle" href="#" id="run-toggle" onclick="return toggle('run');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="MiGBox.sync.syncd-module.html#run">run</a><tt class="py-op">(</tt><tt class="py-param">mode</tt><tt class="py-op">,</tt> <tt class="py-param">src_path</tt><tt class="py-op">,</tt> <tt class="py-param">dst_path</tt><tt class="py-op">,</tt> <tt class="py-param">host</tt><tt class="py-op">,</tt> <tt class="py-param">port</tt><tt class="py-op">,</tt> <tt class="py-param">hostkey</tt><tt class="py-op">,</tt> <tt class="py-param">userkey</tt><tt class="py-op">,</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">         <tt class="py-param">log_file</tt><tt class="py-op">,</tt> <tt class="py-param">log_level</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">=</tt><tt class="py-name">threading</tt><tt class="py-op">.</tt><tt class="py-name">Event</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="run-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="run-expanded"><a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line"> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">    <tt class="py-name">logging</tt><tt class="py-op">.</tt><tt class="py-name">basicConfig</tt><tt class="py-op">(</tt><tt class="py-name">filename</tt><tt class="py-op">=</tt><tt class="py-name">log_file</tt><tt class="py-op">,</tt> <tt class="py-name">filemode</tt><tt class="py-op">=</tt><tt class="py-string">'w'</tt><tt class="py-op">,</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">                        <tt class="py-name">format</tt><tt class="py-op">=</tt><tt class="py-string">'%(levelname)s: %(asctime)s %(message)s'</tt><tt class="py-op">,</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">                        <tt class="py-name">datefmt</tt><tt class="py-op">=</tt><tt class="py-string">'%m/%d/%Y %I:%M:%S %p'</tt><tt class="py-op">,</tt> <tt class="py-name">level</tt><tt class="py-op">=</tt><tt class="py-name">getattr</tt><tt class="py-op">(</tt><tt class="py-name">logging</tt><tt class="py-op">,</tt><tt class="py-name">log_level</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line"> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">    <tt class="py-name">local</tt> <tt class="py-op">=</tt> <tt id="link-29" class="py-name"><a title="MiGBox.fs.filesystem.OSFileSystem" class="py-name" href="#" onclick="return doclink('link-29', 'OSFileSystem', 'link-5');">OSFileSystem</a></tt><tt class="py-op">(</tt><tt class="py-name">root</tt><tt class="py-op">=</tt><tt class="py-name">src_path</tt><tt class="py-op">)</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line"> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">mode</tt> <tt class="py-op">==</tt> <tt class="py-string">'local'</tt><tt class="py-op">:</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">        <tt class="py-name">remote</tt> <tt class="py-op">=</tt> <tt id="link-30" class="py-name"><a title="MiGBox.fs.filesystem.OSFileSystem" class="py-name" href="#" onclick="return doclink('link-30', 'OSFileSystem', 'link-5');">OSFileSystem</a></tt><tt class="py-op">(</tt><tt class="py-name">root</tt><tt class="py-op">=</tt><tt class="py-name">dst_path</tt><tt class="py-op">)</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line">    <tt class="py-keyword">elif</tt> <tt class="py-name">mode</tt> <tt class="py-op">==</tt> <tt class="py-string">'remote'</tt><tt class="py-op">:</tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">        <tt id="link-31" class="py-name" targets="Module MiGBox.sftp.client=MiGBox.sftp.client-module.html"><a title="MiGBox.sftp.client" class="py-name" href="#" onclick="return doclink('link-31', 'client', 'link-31');">client</a></tt> <tt class="py-op">=</tt> <tt id="link-32" class="py-name"><a title="MiGBox.sftp.client.SFTPClient" class="py-name" href="#" onclick="return doclink('link-32', 'SFTPClient', 'link-9');">SFTPClient</a></tt><tt class="py-op">.</tt><tt id="link-33" class="py-name" targets="Class Method MiGBox.sftp.client.SFTPClient.connect()=MiGBox.sftp.client.SFTPClient-class.html#connect"><a title="MiGBox.sftp.client.SFTPClient.connect" class="py-name" href="#" onclick="return doclink('link-33', 'connect', 'link-33');">connect</a></tt><tt class="py-op">(</tt><tt class="py-name">host</tt><tt class="py-op">,</tt> <tt class="py-name">port</tt><tt class="py-op">,</tt> <tt class="py-name">hostkey</tt><tt class="py-op">,</tt> <tt class="py-name">userkey</tt><tt class="py-op">)</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">        <tt class="py-name">remote</tt> <tt class="py-op">=</tt> <tt id="link-34" class="py-name"><a title="MiGBox.fs.filesystem.SFTPFileSystem" class="py-name" href="#" onclick="return doclink('link-34', 'SFTPFileSystem', 'link-6');">SFTPFileSystem</a></tt><tt class="py-op">(</tt><tt id="link-35" class="py-name"><a title="MiGBox.sftp.client" class="py-name" href="#" onclick="return doclink('link-35', 'client', 'link-31');">client</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line"> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line">    <tt class="py-comment"># copy all new files from local to remote</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">    <tt class="py-comment"># sync all modifications from local/remote to local/remote</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">    <tt class="py-comment"># modifications are compared by modification time, the latest wins</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">    <tt id="link-36" class="py-name"><a title="MiGBox.gui.ui.SyncThread.sync
+MiGBox.sync
+MiGBox.sync.rsync.sync
+MiGBox.sync.sync" class="py-name" href="#" onclick="return doclink('link-36', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt id="link-37" class="py-name" targets="Function MiGBox.sync.sync.sync_all_files()=MiGBox.sync.sync-module.html#sync_all_files"><a title="MiGBox.sync.sync.sync_all_files" class="py-name" href="#" onclick="return doclink('link-37', 'sync_all_files', 'link-37');">sync_all_files</a></tt><tt class="py-op">(</tt><tt class="py-name">local</tt><tt class="py-op">,</tt> <tt class="py-name">remote</tt><tt class="py-op">,</tt> <tt class="py-name">local</tt><tt class="py-op">.</tt><tt class="py-name">root</tt><tt class="py-op">)</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">    <tt class="py-comment"># copy all new files from remote to local</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">    <tt class="py-comment"># sync no modifications, already synced</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">    <tt id="link-38" class="py-name"><a title="MiGBox.gui.ui.SyncThread.sync
+MiGBox.sync
+MiGBox.sync.rsync.sync
+MiGBox.sync.sync" class="py-name" href="#" onclick="return doclink('link-38', 'sync', 'link-1');">sync</a></tt><tt class="py-op">.</tt><tt id="link-39" class="py-name"><a title="MiGBox.sync.sync.sync_all_files" class="py-name" href="#" onclick="return doclink('link-39', 'sync_all_files', 'link-37');">sync_all_files</a></tt><tt class="py-op">(</tt><tt class="py-name">remote</tt><tt class="py-op">,</tt> <tt class="py-name">local</tt><tt class="py-op">,</tt> <tt class="py-name">remote</tt><tt class="py-op">.</tt><tt class="py-name">root</tt><tt class="py-op">,</tt> <tt class="py-name">modified</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">)</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line"> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">    <tt class="py-name">event_handler</tt> <tt class="py-op">=</tt> <tt id="link-40" class="py-name" targets="Class MiGBox.sync.syncd.EventHandler=MiGBox.sync.syncd.EventHandler-class.html"><a title="MiGBox.sync.syncd.EventHandler" class="py-name" href="#" onclick="return doclink('link-40', 'EventHandler', 'link-40');">EventHandler</a></tt><tt class="py-op">(</tt><tt class="py-name">local</tt><tt class="py-op">,</tt> <tt class="py-name">remote</tt><tt class="py-op">)</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">    <tt class="py-name">observer</tt> <tt class="py-op">=</tt> <tt class="py-name">Observer</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line">    <tt class="py-name">observer</tt><tt class="py-op">.</tt><tt class="py-name">schedule</tt><tt class="py-op">(</tt><tt class="py-name">event_handler</tt><tt class="py-op">,</tt> <tt class="py-name">path</tt><tt class="py-op">=</tt><tt class="py-name">src_path</tt><tt class="py-op">,</tt> <tt class="py-name">recursive</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">    <tt class="py-name">observer</tt><tt class="py-op">.</tt><tt class="py-name">start</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line"> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">    <tt class="py-keyword">while</tt> <tt class="py-keyword">not</tt> <tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">isSet</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">        <tt class="py-name">time</tt><tt class="py-op">.</tt><tt class="py-name">sleep</tt><tt class="py-op">(</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line"> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">    <tt class="py-name">observer</tt><tt class="py-op">.</tt><tt class="py-name">stop</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line">    <tt class="py-name">observer</tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="MiGBox-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >MiGBox Documentation</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Mon Jul 29 19:15:38 2013
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

@@ -25,19 +25,188 @@ Runs by default the graphical user interface.
 Can also run command line interface or sftp server.
 """
 
-__version__ = 0.1
+__version__ = 0.3
 __author__ = 'Benjamin Ertl'
 
+import os
 import sys
 
+from ConfigParser import SafeConfigParser
+
+from MiGBox.gui import ui
+from MiGBox import cli
+from MiGBox.sftp import server
+
+def check_server_args(host, port, backlog, hostkey, userkey, root_path, log_file, log_level):
+    # TODO check valid host
+    if not port > 0 and port < 65535:
+        print "Port number out of range"
+        sys.exit(1)
+    if not backlog > 0 and backlog < 10:
+        print "Backlog min: 1, max: 10"
+        sys.exit(1) 
+    if not hostkey:
+        print "No host key specified .. trying default path 'keys/server_rsa_key'"
+        hostkey = os.path.abspath('keys/server_rsa_key')
+    if not userkey: 
+        print "No user key specified .. trying default path 'keys/user_rsa_key.pub'"
+        userkey = os.path.abspath('keys/user_rsa_key.pub')
+    if not root_path:
+        print "No root path specified .. using default path 'tests/remote'"
+        root_path = os.path.abspath('tests/remote')
+    if not log_file:
+        print "No log path specified .. using default path 'log/server.log'"
+        log_file = os.path.abspath('log/server.log')
+    if not log_level:
+        print "No log level specified .. using default level 'INFO'"
+        log_level = 'INFO'
+
+    if not os.path.exists(hostkey):
+        print "Could not find host key, please specify!"
+        sys.exit(1)
+    if not os.path.exists(userkey):
+        print "Could not find user key, please specify!"
+        sys.exit(1)
+    if not os.path.exists(root_path):
+        print "Could not find root path, please specify!"
+        sys.exit(1)
+    if not os.path.exists(log_file):
+        print "Could not find log path, please specify!"
+        sys.exit(1)
+
+    print """
+Using host      {0}
+Using port      {1}
+Using host key  {2}
+Using user key  {3}
+Using root path {4}
+Using log path  {5}
+Using log level {6}
+""".format(host, port, hostkey, userkey, root_path, log_file, log_level)
+
+    return [host, port, backlog, hostkey, userkey, root_path, log_file, log_level]
+
 def start_server(args):
-    print "Start server..."
+
+    if args.config:
+        config = SafeConfigParser()
+        config.read(args.config)
+
+        host = config.get("Connection", "sftp_host")
+        port = config.getint("Connection", "sftp_port")
+        backlog = config.getint("Connection", "sftp_backlog")
+        hostkey = config.get("KeyAuth", "hostkey")
+        userkey = config.get("KeyAuth", "userkey")
+        root_path = config.get("ROOT", "root_path")
+        log_file = config.get("Logging", "log_file")
+        log_level = config.get("Logging", "log_level")
+
+    else:
+        host = args.host
+        port = args.port
+        backlog = 10
+        hostkey = args.hostkey
+        userkey = args.userkey
+        root_path = args.root
+        log_file = args.log
+        log_level = args.loglevel
+
+    server.run(
+        *check_server_args(host, port, backlog, hostkey, userkey, root_path, log_file, log_level))
+
+def check_cli_args(mode, src, dst, host, port, hostkey, userkey, log_file, log_level):
+    if not src:
+        print "No source path specified .. using default path 'tests/local'"
+        src = os.path.abspath('tests/local')
+    if mode == 'local' and not dst:
+        print "No destination path specified .. using default path 'tests/remote'"
+        dst = os.path.abspath('tests/remote')
+    if mode == 'remote':
+        # TODO check valid host name/ip
+        if not port > 0 and port < 65535:
+            print "Port number out of range"
+            sys.exit(1)
+        if not hostkey:
+            print "No host key specified .. trying default path 'keys/server_rsa_key.pub'"
+            hostkey = os.path.abspath('keys/server_rsa_key.pub')
+        if not userkey: 
+            print "No user key specified .. trying default path 'keys/user_rsa_key'"
+            userkey = os.path.abspath('keys/user_rsa_key')
+    if not log_file:
+        print "No log path specified .. using default path 'log/sync.log'"
+        log_file = os.path.abspath('log/sync.log')
+    if not log_level:
+        print "No log level specified .. using default level 'INFO'"
+        log_level = 'INFO'
+
+    if not os.path.exists(src):
+        print "Could not find source path, please specify!"
+        sys.exit(1)
+    if mode == 'local' and not os.path.exists(dst):
+        print "Could not find destination path, please specify!"
+        sys.exit(1)
+    if mode == 'remote':
+        if not os.path.exists(hostkey):
+            print "Could not find host key, please specify!"
+            sys.exit(1)
+        if not os.path.exists(userkey):
+            print "Could not find user key, please specify!"
+            sys.exit(1)
+    if not os.path.exists(log_file):
+        print "Could not find log path, please specify!"
+        sys.exit(1)
+
+    if mode == 'local':
+        print """
+Using source      {0}
+Using destination {1}
+Using log path    {2}
+Using log level   {3}
+""".format(src, dst, log_file, log_level)
+    elif mode == 'remote':
+        print """
+Using source    {0}
+Using host      {1}
+Using port      {2}
+Using host key  {3}
+Using user key  {4}
+Using log path  {5}
+Using log level {6}
+""".format(src, host, port, hostkey, userkey, log_file, log_level)
+
+    return [mode, src, dst, host, port, hostkey, userkey, log_file, log_level]
 
 def start_cli(args):
-    print "Start console..."
+    if args.config:
+        config = SafeConfigParser()
+        config.read(args.config)
+        src = config.get("Sync", "sync_src")
+        dst = config.get("Sync", "sync_dst")
+        host = config.get("Connection", "sftp_host")
+        port = config.getint("Connection", "sftp_port")
+        hostkey = config.get("KeyAuth", "hostkey")
+        userkey = config.get("KeyAuth", "userkey")
+        log_file = config.get("Logging", "log_file")
+        log_level = config.get("Logging", "log_level") 
+    else:
+        src = args.source
+        dst = args.destination
+        host = args.host
+        port = args.port
+        hostkey = args.hostkey
+        userkey = args.userkey
+        log_file = args.log
+        log_level = args.loglevel
+
+    mode = args.mode
+
+    cli.run(*check_cli_args(mode, src, dst, host, port, hostkey, userkey, log_file, log_level))
 
 def start_gui(args):
-    print "Start gui..."
+    if args.config:
+        ui.run(args.config)
+    else:
+        ui.run()
 
 def _parseargs():
     from argparse import ArgumentParser
@@ -47,22 +216,50 @@ def _parseargs():
     subparsers = parser.add_subparsers()
 
     guiparser = subparsers.add_parser("gui", help="start MiGBox (default)")
+    guiparser.add_argument("-c", "--config", help="path to the MiGBox config file")
     guiparser.set_defaults(func=start_gui)
 
     cliparser = subparsers.add_parser("cli", help="start MiGBox console")
+    cliparser.add_argument("mode", type=str, choices=['local', 'remote'],
+                           help="synchronization mode")
+    cliparser.add_argument("-c", "--config", help="path to the MiGBox config file")
+    cliparser.add_argument("-src", "--source", help="source path for synchronization")
+    cliparser.add_argument("-dst", "--destination", help="destination path for synchronization")
+    cliparser.add_argument("-H", "--host", type=str, default="localhost",  help="host name or ip")
+    cliparser.add_argument("-p", "--port", type=int, default=50007, help="host port number")
+    cliparser.add_argument("-hk", "--hostkey", type=str, help="path to the server's public key")
+    cliparser.add_argument("-uk", "--userkey", type=str, help="path to the user's private key")
+    cliparser.add_argument("-l", "--log", type=str, help="path to the log file")
+    cliparser.add_argument("-ll", "--loglevel", type=str, choices=['INFO', 'DEBUG'],
+                              help="log level for logging")
+
     cliparser.set_defaults(func=start_cli)
 
-    serverparser = subparsers.add_parser("server", help="start MiGBox server")
-    serverparser.add_argument("-c", "--config", help="server config file", \
-                              action="store_true")
+    serverparser = subparsers.add_parser("server", help="start the  MiGBox server")
+    serverparser.add_argument("-c", "--config", help="path to the server's config file")
+    serverparser.add_argument("-H", "--host", type=str, default="localhost",  help="host name or ip")
+    serverparser.add_argument("-p", "--port", type=int, default=50007, help="host port number")
+    serverparser.add_argument("-hk", "--hostkey", type=str, help="path to the server's private key")
+    serverparser.add_argument("-uk", "--userkey", type=str, help="path to the user's public key")
+    serverparser.add_argument("-r", "--root", type=str, help="root path of the server")
+    serverparser.add_argument("-l", "--log", type=str, help="path to the log file")
+    serverparser.add_argument("-ll", "--loglevel", type=str, choices=['INFO', 'DEBUG'],
+                              help="log level for logging")
+
     serverparser.set_defaults(func=start_server)
 
     args = parser.parse_args()
+    print args
     args.func(args)
 
-if len(sys.argv) > 1:
-    _parseargs()
-else:
-    start_gui(None)
+def main():
+    os.environ['MIGBOXPATH'] = os.path.abspath(os.curdir)
+    if len(sys.argv) > 1:
+        _parseargs()
+    else:
+        start_gui(None)
+
+if __name__ == '__main__':
+    main()
 
 

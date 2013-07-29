@@ -18,7 +18,7 @@
 
 """
 Synchronization methods to synchronize between file system abstractions see
-L{MiGBox.fs}.
+L{MiGBox.FileSystem}.
 """
 
 import os, stat
@@ -29,25 +29,27 @@ _log = {'create': 'CREATE {0}<br />',
         'sync_to': 'SYNC {0} ==> {1}<br />',
         'sync_eq': 'SYNC {0} == {1}<br />',
         'sync_er': 'SYNC {0} !! {1}<br />',
+        'sync_conf': 'SYNC {0} !CONFLICT! {1}<br />',
         'move': 'MOVE {0} ==> {1}<br />',
         'copy': 'COPY {0} ==> {1}<br />'}
 
 def sync_all_files(src, dst, path, modified=True):
     """
-    Synchronize all files from src filesystem abstraction to dst
-    filesystem abstraction starting at path and continuing recursively.
+    Synchronize all files from C{src} file system abstraction to C{dst}
+    file system abstraction starting at C{path} and continuing recursively.
 
-    @param src: source filesystem abstraction.
-    @type src: FileSystem
-    @param dst: destination filesystem abstraction.
-    @type dst: FileSystem
+    @param src: source file system abstraction.
+    @type src: L{MiGBox.FileSystem}
+    @param dst: destination file system abstraction.
+    @type dst: L{MiGBox.FileSystem}
     @param path: root path
     @type path: str
     @param modified: two-way synchronize modified files.
     @type modified: bool
     """
+
     for pathname in src.walk(path):
-        rel_path = src.relpath(pathname)
+        rel_path = src.get_relative_path(pathname)
         sync_path = os.path.join(dst.root,rel_path)
         if stat.S_ISDIR(src.stat(pathname).st_mode):
             try:
@@ -67,24 +69,27 @@ def sync_all_files(src, dst, path, modified=True):
 
 def sync_file(src, src_path, dst, dst_path):
     """
-    Synchronize a file from src filesystem abstraction to dst
-    filesystem abstraction from src path to dst path using rsync.
+    Synchronize a file from C{src} file system abstraction to C{dst}
+    file system abstraction from C{src_path} to C{dst_path}.
 
-    If the files given by src path and dst path are equal, nothing
+    If the files given by C{src_path} and C{dst_path} are equal, nothing
     is done.
 
-    @param src: source filesystem abstraction.
-    @type src: FileSystem
+    @param src: source file system abstraction.
+    @type src: L{MiGBox.FileSystem}
     @param src_path: source path.
     @type src_path: str
-    @param dst: destination filesystem abstraction.
-    @type dst: FileSystem
+    @param dst: destination file system abstraction.
+    @type dst: L{MiGBox.FileSystem}
     @param dst_path: destination path.
     @type dst_path: str
     """
+
     try:
-        dst_bs = dst.checksums(dst_path)
-        src_bs = src.checksums(src_path)
+        dst_mod, dst_bs = dst.cached_checksums(dst_path)
+        src_mod, src_bs = src.cached_checksums(src_path)
+        if dst_mod:
+            logging.info(_log['sync_conf'].format(src_path,dst_path))
         if set(src_bs) - set(dst_bs):
             delta = src.delta(src_path, dst_bs)
             dst.patch(dst_path, delta)
@@ -95,6 +100,19 @@ def sync_file(src, src_path, dst, dst_path):
         logging.error(_log['sync_er'].format(src_path,dst_path))
 
 def copy_file(src, src_path, dst, dst_path):
+    """
+    Copy a file from C{src} C{src_path} to C{dst} C{dst_path}.
+
+    @param src: source file system abstraction.
+    @type src: L{MiGBox.FileSystem}
+    @param src_path: source path.
+    @type src_path: str
+    @param dst: destination file system abstraction.
+    @type dst: L{MiGBox.FileSystem}
+    @param dst_path: destination path.
+    @type dst_path: str
+    """
+
     try:
         src.copy(src, src_path, dst, dst_path)
         logging.info(_log['copy'].format(src_path,dst_path))
@@ -102,6 +120,18 @@ def copy_file(src, src_path, dst, dst_path):
         logging.error(_log['copy'].format(src_path,dst_path))
 
 def move_file(src, src_path, dst_path):
+    """
+    Move a file from C{src} C{src_path} to C{dst_path} on the same
+    file system.
+
+    @param src: source file system abstraction.
+    @type src: L{MiGBox.FileSystem}
+    @param src_path: source path.
+    @type src_path: str
+    @param dst_path: destination path.
+    @type dst_path: str
+    """
+ 
     try:
         src.rename(src_path, dst_path)
         logging.info(_log['move'].format(src_path,dst_path))
@@ -109,6 +139,15 @@ def move_file(src, src_path, dst_path):
         logging.error(_log['move'].format(src_path,dst_path))
 
 def remove_file(src, path):
+    """
+    Remove a file from C{src} given by C{path}.
+
+    @param src: source file system abstraction.
+    @type src: L{MiGBox.FileSystem}
+    @param path: path.
+    @type path: str
+    """
+ 
     try:
         src.remove(path)
         logging.info(_log['remove'].format(path))
@@ -116,6 +155,15 @@ def remove_file(src, path):
         logging.error(_log['remove'].format(path))
 
 def remove_dir(src, path):
+    """
+    Remove a directory from C{src} given by C{path}.
+
+    @param src: source file system abstraction.
+    @type src: L{MiGBox.FileSystem}
+    @param path: path.
+    @type path: str
+    """
+ 
     try:
         src.rmdir(path)
         logging.info(_log['remove'].format(path))
@@ -123,6 +171,15 @@ def remove_dir(src, path):
         logging.error(_log['remove'].format(path))
 
 def make_dir(src, path):
+    """
+    Make a new directory at C{src} given by C{path}.
+
+    @param src: source file system abstraction.
+    @type src: L{MiGBox.FileSystem}
+    @param path: path.
+    @type path: str
+    """
+ 
     try:
         src.mkdir(path)
         logging.info(_log['create'].format(path))

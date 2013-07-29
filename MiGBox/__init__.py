@@ -19,6 +19,6 @@
 __version__ = 0.3
 __author__ = 'Benjamin Ertl'
 
-import sync, sftp, fs, gui, common
+import sync, sftp, fs, gui, common, cli
 
-__all__ = [ 'sync', 'sftp', 'fs', 'gui', 'common' ]
+__all__ = [ 'sync', 'sftp', 'fs', 'gui', 'common', 'cli'  ]
