@@ -114,7 +114,7 @@ def start_server(args):
     server.run(
         *check_server_args(host, port, backlog, hostkey, userkey, root_path, log_file, log_level))
 
-def check_cli_args(mode, src, dst, host, port, hostkey, userkey, log_file, log_level):
+def check_cli_args(mode, src, dst, host, port, hostkey, userkey, log_file, log_level, mountpath):
     if not src:
         print "No source path specified .. using default path 'tests/local'"
         src = os.path.abspath('tests/local')
@@ -132,6 +132,9 @@ def check_cli_args(mode, src, dst, host, port, hostkey, userkey, log_file, log_l
         if not userkey: 
             print "No user key specified .. trying default path 'keys/user_rsa_key'"
             userkey = os.path.abspath('keys/user_rsa_key')
+        if not mountpath:
+            print "No mount path specified .. trying default path 'mount/'"
+            mountpath = os.path.abspath('mount')
     if not log_file:
         print "No log path specified .. using default path 'log/sync.log'"
         log_file = os.path.abspath('log/sync.log')
@@ -151,6 +154,9 @@ def check_cli_args(mode, src, dst, host, port, hostkey, userkey, log_file, log_l
             sys.exit(1)
         if not os.path.exists(userkey):
             print "Could not find user key, please specify!"
+            sys.exit(1)
+        if not os.path.exists(mountpath):
+            print "Could not find mount path, please specify!"
             sys.exit(1)
     if not os.path.exists(log_file):
         print "Could not find log path, please specify!"
@@ -174,7 +180,7 @@ Using log path  {5}
 Using log level {6}
 """.format(src, host, port, hostkey, userkey, log_file, log_level)
 
-    return [mode, src, dst, host, port, hostkey, userkey, log_file, log_level]
+    return [mode, src, dst, host, port, hostkey, userkey, log_file, log_level, mountpath]
 
 def start_cli(args):
     if args.config:
@@ -187,7 +193,8 @@ def start_cli(args):
         hostkey = config.get("KeyAuth", "hostkey")
         userkey = config.get("KeyAuth", "userkey")
         log_file = config.get("Logging", "log_file")
-        log_level = config.get("Logging", "log_level") 
+        log_level = config.get("Logging", "log_level")
+        mountpath = config.get("Mount", "mountpath")
     else:
         src = args.source
         dst = args.destination
@@ -197,16 +204,18 @@ def start_cli(args):
         userkey = args.userkey
         log_file = args.log
         log_level = args.loglevel
+        mountpath = args.mountpath
 
     mode = args.mode
 
-    cli.run(*check_cli_args(mode, src, dst, host, port, hostkey, userkey, log_file, log_level))
+    cli.run(*check_cli_args(mode, src, dst, host, port, hostkey,
+                            userkey, log_file, log_level,mountpath))
 
 def start_gui(args):
-    if args.config:
-        ui.run(args.config)
-    else:
-        ui.run()
+    if args:
+        if args.config:
+            ui.run(args.config)
+    ui.run()
 
 def _parseargs():
     from argparse import ArgumentParser
@@ -229,6 +238,7 @@ def _parseargs():
     cliparser.add_argument("-p", "--port", type=int, default=50007, help="host port number")
     cliparser.add_argument("-hk", "--hostkey", type=str, help="path to the server's public key")
     cliparser.add_argument("-uk", "--userkey", type=str, help="path to the user's private key")
+    cliparser.add_argument("-m", "--mountpath", type=str, help="path to mount to via sftp")
     cliparser.add_argument("-l", "--log", type=str, help="path to the log file")
     cliparser.add_argument("-ll", "--loglevel", type=str, choices=['INFO', 'DEBUG'],
                               help="log level for logging")

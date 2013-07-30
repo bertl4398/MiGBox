@@ -1,8 +1,4 @@
-ERROR: 07/29/2013 07:12:49  SYNC /home/benjamin/migsync/MiGBox/tests/remote/3 !CONFLICT! /home/benjamin/migsync/MiGBox/tests/local/3<br />
-INFO: 07/29/2013 07:12:49  SYNC /home/benjamin/migsync/MiGBox/tests/remote/3 == /home/benjamin/migsync/MiGBox/tests/local/3<br />
-ERROR: 07/29/2013 07:12:49  SYNC /home/benjamin/migsync/MiGBox/tests/local/2 !CONFLICT! /home/benjamin/migsync/MiGBox/tests/remote/2<br />
-INFO: 07/29/2013 07:12:49  SYNC /home/benjamin/migsync/MiGBox/tests/local/2 == /home/benjamin/migsync/MiGBox/tests/remote/2<br />
-ERROR: 07/29/2013 07:12:49  SYNC /home/benjamin/migsync/MiGBox/tests/local/1 !CONFLICT! /home/benjamin/migsync/MiGBox/tests/remote/1<br />
-INFO: 07/29/2013 07:12:49  SYNC /home/benjamin/migsync/MiGBox/tests/local/1 == /home/benjamin/migsync/MiGBox/tests/remote/1<br />
-ERROR: 07/29/2013 07:12:49  SYNC /home/benjamin/migsync/MiGBox/tests/remote/dir1/1 !CONFLICT! /home/benjamin/migsync/MiGBox/tests/local/dir1/1<br />
-INFO: 07/29/2013 07:12:49  SYNC /home/benjamin/migsync/MiGBox/tests/remote/dir1/1 == /home/benjamin/migsync/MiGBox/tests/local/dir1/1<br />
+INFO: 07/30/2013 07:02:56  SYNC /home/benjamin/migsync/MiGBox/tests/remote/3 == /home/benjamin/migsync/MiGBox/tests/local/3<br />
+INFO: 07/30/2013 07:02:56  SYNC /home/benjamin/migsync/MiGBox/tests/local/2 == /home/benjamin/migsync/MiGBox/tests/remote/2<br />
+INFO: 07/30/2013 07:02:56  SYNC /home/benjamin/migsync/MiGBox/tests/local/1 == /home/benjamin/migsync/MiGBox/tests/remote/1<br />
+INFO: 07/30/2013 07:02:56  SYNC /home/benjamin/migsync/MiGBox/tests/remote/dir1/1 == /home/benjamin/migsync/MiGBox/tests/local/dir1/1<br />

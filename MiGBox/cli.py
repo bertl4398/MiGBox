@@ -20,12 +20,13 @@
 MiGBox command line interface.
 """
 
-__version__ = 0.1
+__version__ = 0.2
 __author__ = 'Benjamin Ertl'
 
 import threading
 
 from MiGBox.sync import syncd
+from MiGBox.mount import mount, unmount
 
 HEADER = """\
 Command line interface for MiGBox - version {0}
@@ -34,27 +35,36 @@ Copyright (c) 2013 {1}
 MiGBox comes with ABSOLUTELY NO WARRANTY. This is free software,
 and you are welcome to redistribute it under certain conditions.
 
-type 'start' to start synchronizing
-type 'stop' to stop synchronizing
-type 'exit' to exit
+type 'start'   to start synchronizing
+type 'stop'    to stop synchronizing
+type 'mount'   to mount the configured sftp location
+type 'unmount' to unmount the configured sftp location
+type 'exit'    to exit
 """.format(__version__, __author__)
 
-def run(mode, src, dst, host, port, hostkey, userkey, log_file, log_level):
+def run(mode, src, dst, host, port, hostkey, userkey, log_file, log_level, mountpath):
 
     event = threading.Event()    
     thread = threading.Thread(target=syncd.run, args=(mode, src, dst, host, port,
                               hostkey, userkey, log_file, log_level, event))
+
     print HEADER
     running = True
 
     while running:
-        in_ = raw_input(">")
+        in_ = raw_input("> ")
         if in_ == 'start':
             event.clear()
             thread.start()
         if in_ == 'stop':
             event.set()
             thread.join()
+        if in_ == 'mount':
+            p = mount(host, port, userkey, mountpath)
+            if not p:
+                print "SFTP mount not supported."
+        if in_ == 'unmount':
+            unmount(mountpath)
         if in_ == 'exit':
             event.set()
             running = False

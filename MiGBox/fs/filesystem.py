@@ -223,7 +223,7 @@ class FileSystem(object):
         if not path in self.cache:
             m_time = str(self.stat(path).st_mtime)
             self.cache[path] = (m_time, self.checksums(path))
-            return (True, self.cache[path][1])
+            return (False, self.cache[path][1])
         else:
             m_time = str(self.stat(path).st_mtime)
             if not m_time == self.cache[path][0]:

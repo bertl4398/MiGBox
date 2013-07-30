@@ -1,3 +1,0 @@
-INF [20130729-16:07:45.426] thr=1   paramiko.transport: Connected (version 2.0, client paramiko_1.10.1)
-INF [20130729-16:07:45.556] thr=1   paramiko.transport: Auth granted (publickey).
-INF [20130729-16:07:45.566] thr=1   paramiko.transport: Secsh channel 1 (session) opened.
