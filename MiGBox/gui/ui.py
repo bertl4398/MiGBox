@@ -198,6 +198,7 @@ class AppUi(QMainWindow):
         self.configfile = configfile
         self.icons_path = icons_path
         self.isMount = False
+        self.sftp = False
 
         srcPathLabel = QLabel("Source path")
         dstPathLabel = QLabel("Destination path")
@@ -469,6 +470,7 @@ class AppUi(QMainWindow):
             self.dstPathButton.setVisible(False)
             self.dstTreeView.setModel(None)
             self.mountAction.setEnabled(True)
+            self.sftp = True
         else:
             self.dstPathEdit.setText(_vars["Sync"]["destination"])
             self.dstPathButton.setVisible(True)
@@ -476,6 +478,7 @@ class AppUi(QMainWindow):
             self.dstTreeView.setModel(self.dstFsModel)
             self.dstTreeView.setRootIndex(self.dstFsModel.index(self.dstPathEdit.text()))
             self.mountAction.setEnabled(False)
+            self.sftp = False
 
     def _setSrcPath(self):
         path = QFileDialog.getExistingDirectory(self, "MiGBox - Set Source Path",
