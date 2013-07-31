@@ -22,10 +22,10 @@ Provides a SFTP server to run on the MiG server or an other central server for
 synchronization.
 """
 
-__version__ = 0.3
+__version__ = 0.4
 __author__ = 'Benjamin Ertl'
 
-HEADER = """\
+header = """
 SFTP server for MiGBox - version {0}
 Copyright (c) 2013 {1}
 
@@ -49,7 +49,7 @@ import paramiko
 
 from MiGBox.sync.delta import blockchecksums, delta, patch
 from MiGBox.sftp.common  import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH 
-from MiGBox.common import ABOUT
+from MiGBox.common import about
 from MiGBox.sftp.server_interface import SFTPServerInterface
 
 class Server(paramiko.ServerInterface):
@@ -74,9 +74,20 @@ class Server(paramiko.ServerInterface):
         self.userkey = userkey
 
     def check_channel_request(self, kind, chanid):
+        """
+        Determine if a channel request of a given type will be granted.
+
+        This can be tighten for more security, here all requests are allowed.
+        """
+
         return paramiko.OPEN_SUCCEEDED
 
     def check_auth_publickey(self, username, key):
+        """
+        Determine if a given key supplied by the client is acceptable for use
+        in authentication.
+        """
+
         with open(self.userkey, 'rb') as f:
             key_data = f.read()
         # file format "ssh-rsa AAA.... user@somemachine" 
@@ -87,6 +98,12 @@ class Server(paramiko.ServerInterface):
         return paramiko.AUTH_FAILED
 
     def get_allowed_auths(self, username):
+        """
+        Return a list of authentication methods supported.
+
+        Here, only publickey authentication is allowed.
+        """
+
         return 'publickey'
 
 class SFTPServer(paramiko.SFTPServer):
@@ -131,6 +148,7 @@ class SFTPServer(paramiko.SFTPServer):
         else:
             return paramiko.SFTPServer._process(self, t, request_number, msg)
 
+    @classmethod
     def run_server(cls, conn, addr, hostkey, userkey, root):
         transport = paramiko.Transport(conn)
         transport.add_server_key(paramiko.RSAKey.from_private_key_file(hostkey))
@@ -142,46 +160,59 @@ class SFTPServer(paramiko.SFTPServer):
 
         transport.close()
 
-    run_server = classmethod(run_server)
-
-def run(host, port, backlog, hostkey, userkey, root_path, log_file, log_level):
+def run(host, port, hostkey, userkey, rootpath, backlog=0, logfile=None, loglevel=None):
     """
     Main entry point to run the sftp server.
+
+    @param host: server's name or ip address.
+    @type host: str
+    @param port: server's port number for listening.
+    @type port: int
+    @param hostkey: path to the server's private rsa key.
+    @type hostkey: str
+    @param userkey: path to the user's public rsa key.
+    @type userkey: str
+    @param rootpath: path to be served via SFTP.
+    @type rootpath: str
+    @param backlog: maximum number of queued connections.
+    @type backlog: int
+    @param logfile: path to the server's log file.
+    @type logfile: str
+    @param loglevel: log level, usually 'INFO' or 'DEBUG'
+    @type loglevel: str
     """
 
-    paramiko.util.log_to_file(log_file, log_level)
+    if logfile:
+        loglevel = loglevel if loglevel else 'INFO'
+        paramiko.util.log_to_file(logfile, loglevel)
 
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
-    server_socket.bind((host,port))
-    server_socket.listen(backlog)
+    server_socket.bind((host,int(port)))
+    server_socket.listen(int(backlog))
     server_socket.setblocking(0)
 
     client_threads = []
+    # might not work on windows, see python select and stdin
     input_select = [server_socket, sys.stdin]
 
-    print HEADER
-
+    print header
     running = True
     while running:
         input_ready, output_ready, except_ready = select.select(input_select, [], [])
-
         for input_ in input_ready:
             if input_ == server_socket:
                 conn, addr = server_socket.accept()
                 thread = threading.Thread(target=SFTPServer.run_server,
-                                          args=(conn, addr, hostkey, userkey, root_path))
+                                          args=(conn, addr, hostkey, userkey, rootpath))
                 client_threads.append(thread)
                 thread.start()
             elif input_ == sys.stdin:
                 in_ = sys.stdin.readline()
                 if in_.rstrip() == 'license':
-                    print ABOUT
+                    print about
                 if in_.rstrip() == 'exit':
                     running = False
 
     print 'Server is going down ...'
-
     server_socket.close()
-
-    print 'Done'

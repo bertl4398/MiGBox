@@ -65,19 +65,20 @@ class EventHandler(FileSystemEventHandler):
         sync_dst = self._get_syncpath(event.dest_path)
         sync.move_file(self.dst, sync_src, sync_dst)
 
-def run(mode, src_path, dst_path, host, port, hostkey, userkey,
-         log_file, log_level, event=threading.Event()):
+def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
+         logfile=None, loglevel='INFO', event=threading.Event(), **kargs):
 
-    logging.basicConfig(filename=log_file, filemode='w',
-                        format='%(levelname)s: %(asctime)s %(message)s',
-                        datefmt='%m/%d/%Y %I:%M:%S %p', level=getattr(logging,log_level))
+    if logfile:
+        logging.basicConfig(filename=logfile, filemode='w',
+            format='%(levelname)s: %(asctime)s %(message)s',
+            datefmt='%m/%d/%Y %I:%M:%S %p', level=getattr(logging,loglevel))
 
-    local = OSFileSystem(root=src_path)
+    local = OSFileSystem(root=source)
 
     if mode == 'local':
-        remote = OSFileSystem(root=dst_path)
+        remote = OSFileSystem(root=destination)
     elif mode == 'remote':
-        client = SFTPClient.connect(host, port, hostkey, userkey)
+        client = SFTPClient.connect(sftp_host, sftp_port, hostkey, userkey)
         remote = SFTPFileSystem(client)
 
     # copy all new files from local to remote
@@ -90,7 +91,7 @@ def run(mode, src_path, dst_path, host, port, hostkey, userkey,
 
     event_handler = EventHandler(local, remote)
     observer = Observer()
-    observer.schedule(event_handler, path=src_path, recursive=True)
+    observer.schedule(event_handler, path=source, recursive=True)
     observer.start()
 
     while not event.isSet():

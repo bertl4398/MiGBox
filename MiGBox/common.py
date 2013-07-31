@@ -21,20 +21,11 @@ MiGBox common module.
 Provides common functions and constants for all MiGBox modules.
 """
 
-import os
+import io
 
-# get MiGBox path
-if "MIGBOXPATH" in os.environ:
-    # the MIGBOXPATH environment variable
-    # should point to the MiGBox main directory.
-    migbox_path = os.environ["MIGBOXPATH"]
-else:
-    # if environment variable not set assume
-    # parent dir as valid path to config/, log/, etc.
-    migbox_path = os.path.abspath(os.pardir)
+from ConfigParser import SafeConfigParser
 
-# string to show short version of the license in gui, cli and server
-ABOUT ="""
+about ="""
 MiGBox - File Synchronization for the Minimum Intrusion Grid (MiG)
 
 Copyright (c) 2013 Benjamin Ertl
@@ -56,4 +47,106 @@ Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 Boston, MA 02110-1301 USA.
 """
 
+# default migbox.cfg configuration file
+default_migbox = """
+[Sync]
+source =
+destination =
+[Connection]
+sftp_host =
+sftp_port =
+[Logging]
+logfile =
+loglevel =
+[KeyAuth]
+userkey =
+hostkey =
+[Mount]
+mountpath =
+"""
 
+# default server.cfg configuration file
+default_server = """
+[ROOT]
+rootpath =
+[Connection]
+host =
+port =
+backlog =
+[Logging]
+logfile =
+loglevel =
+[KeyAuth]
+hostkey =
+userkey =
+"""
+
+def write_config(configfile, values, server=False):
+    """
+    Write the given values to the given configfile.
+
+    Values are expected to be in the form of
+
+    C{{'section': {'option': value}}}
+
+    Writes always the default structure.
+
+    @param configfile: path to the config file.
+    @type configfile: str
+    @param values: configuration values.
+    @type values: dict
+    """
+
+    config = SafeConfigParser()
+    if server:
+        config.readfp(io.BytesIO(default_server))
+    else:
+        config.readfp(io.BytesIO(default_migbox))
+    config.read(configfile)
+    for section, options in values.items():
+        for option, value in options.items():
+            config.set(section, option, value)
+    with open(configfile, 'wb') as f:
+        config.write(f)
+
+def read_config(configfile, server=False):
+    """
+    Read the given configfile and return a dictionary
+    with all sections, options and values in the form of
+
+    C{{'section': {'option': value}}}
+
+    A default configuration file is read first to
+    set the right structure.
+
+    @param configfile: path to the config file.
+    @type configfile: str
+    @return: dictionary of all values.
+    @rtype: dict
+    """
+
+    values = {}
+    config = SafeConfigParser()
+    if server:
+        config.readfp(io.BytesIO(default_server))
+    else:
+        config.readfp(io.BytesIO(default_migbox))
+    config.read(configfile)
+    for section in config.sections():
+        values[section] = {}
+        for option, value in config.items(section):
+            values[section][option] = value
+    return values
+
+def print_vars(_vars):
+    for section, options in _vars.items():
+        print section
+        for option, value in options.items():
+            print "    {0}: {1}".format(option,value)
+
+def get_vars(_vars):
+    var_dict = {}
+    for section, options in _vars.items():
+        for option, value in options.items():
+            var_dict[option] = value
+    return var_dict

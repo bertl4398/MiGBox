@@ -40,9 +40,12 @@ class SFTPClient(paramiko.SFTPClient):
     authentication information.
     """
 
+    @classmethod
     def connect(cls, host, port, hostkey, userkey, username='', password=None):
         """
-        Create a new SFTP client.
+        Create a new SFTP client and connect to C{host}.
+
+        Returns None if creation or connection fails.
 
         C{username} and C{password} are optional and not needed
         for the authentication, that is by default public key.
@@ -59,35 +62,38 @@ class SFTPClient(paramiko.SFTPClient):
         @type username: str
         @param password: the user's password (optional).
         @type password: str
+        @return: L{SFTPClient} or None.
+        @rtype: L{SFTPClient}
         """
 
         known_host = ''
-        # file format "ssh-rsa AAA.... user@somemachine"
-        with open(hostkey, 'rb') as f:
-            known_host = f.read()
+        try:
+            # file format "ssh-rsa AAA.... user@somemachine"
+            with open(hostkey, 'rb') as f:
+                known_host = f.read()
 
-        # get the base64 encoded data of the host's public key
-        known_host = known_host.split(' ')[1]
+            # get the base64 encoded data of the host's public key
+            known_host = known_host.split(' ')[1]
 
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect((host, port))
-        transport = paramiko.Transport(client_socket)
-        transport.start_client()
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect((host, int(port)))
+            transport = paramiko.Transport(client_socket)
+            transport.start_client()
         
-        key_data = transport.get_remote_server_key().get_base64()
+            key_data = transport.get_remote_server_key().get_base64()
 
-        if not known_host == key_data: 
-            raise paramiko.BadHostKeyException(host, key_data, known_host)
+            if not known_host == key_data: 
+                raise paramiko.BadHostKeyException(host, key_data, known_host)
 
-        transport.auth_publickey(username, paramiko.RSAKey.from_private_key_file(userkey))
+            transport.auth_publickey(username, paramiko.RSAKey.from_private_key_file(userkey))
 
-        chan = transport.open_session()
-        if chan is None:
+            chan = transport.open_session()
+            if chan is None:
+                return None
+            chan.invoke_subsystem('sftp')
+            return cls(chan)
+        except Exception:
             return None
-        chan.invoke_subsystem('sftp')
-        return cls(chan)
-
-    connect = classmethod(connect)
 
     def checksums(self, path):
         """

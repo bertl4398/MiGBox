@@ -28,7 +28,7 @@ import threading
 from MiGBox.sync import syncd
 from MiGBox.mount import mount, unmount
 
-HEADER = """\
+header = """
 Command line interface for MiGBox - version {0}
 Copyright (c) 2013 {1}
 
@@ -42,13 +42,14 @@ type 'unmount' to unmount the configured sftp location
 type 'exit'    to exit
 """.format(__version__, __author__)
 
-def run(mode, src, dst, host, port, hostkey, userkey, log_file, log_level, mountpath):
+def run(mode, source, destination, sftp_host, sftp_port,
+        hostkey, userkey, mountpath, logfile=None, loglevel='INFO'):
 
     event = threading.Event()    
-    thread = threading.Thread(target=syncd.run, args=(mode, src, dst, host, port,
-                              hostkey, userkey, log_file, log_level, event))
+    thread = threading.Thread(target=syncd.run, args=(mode, source, destination,
+                 sftp_host, sftp_port, hostkey, userkey, logfile, loglevel, event))
 
-    print HEADER
+    print header
     running = True
 
     while running:
@@ -60,7 +61,7 @@ def run(mode, src, dst, host, port, hostkey, userkey, log_file, log_level, mount
             event.set()
             thread.join()
         if in_ == 'mount':
-            p = mount(host, port, userkey, mountpath)
+            p = mount(sftp_host, sftp_port, userkey, mountpath)
             if not p:
                 print "SFTP mount not supported."
         if in_ == 'unmount':
