@@ -73,7 +73,10 @@ class SyncThread(QThread):
 
     def run(self):
         mode = "remote" if self.sftp else "local"
-        syncd.run(mode, event=self.event, **get_vars(_vars))
+        try:
+            syncd.run(mode, event=self.event, **get_vars(_vars))
+        except Exception as e:
+            self.emit(SIGNAL("threadError(QString)"), QString(e.message))
 
 class _OptionsUi(QDialog):
     """
@@ -222,7 +225,12 @@ class AppUi(QMainWindow):
 
         self.logBrowser = QTextBrowser()
         self.logBrowser.setLineWrapMode(QTextEdit.NoWrap)
-        self.logBrowser.setSource(QUrl(_vars["Logging"]["logfile"]))
+        logfile = _vars["Logging"]["logfile"]
+        if os.path.isfile(logfile):
+            logfile = QUrl.fromLocalFile(logfile)
+        else:
+            logfile = None
+        self.logBrowser.setSource(logfile)
 
         self.logPathButton = QPushButton("Path")
         self.logPathButton.setToolTip("Set path to log file")
@@ -291,14 +299,14 @@ class AppUi(QMainWindow):
         self.aboutText = QPlainTextEdit(about)
         self.aboutText.setReadOnly(True)
 
-        tabs = QTabWidget()
-        tabs.addTab(mainWidget, "&Main")
-        tabs.addTab(self.srcTreeView, "&Src Browser")
-        tabs.addTab(self.dstTreeView, "&Dst Browser")
-        tabs.addTab(logWidget, "&Log")
-        tabs.addTab(self.aboutText, "&About")
+        self.tabs = QTabWidget()
+        self.tabs.addTab(mainWidget, "&Main")
+        self.tabs.addTab(self.srcTreeView, "&Src Browser")
+        self.tabs.addTab(self.dstTreeView, "&Dst Browser")
+        self.tabs.addTab(logWidget, "&Log")
+        self.tabs.addTab(self.aboutText, "&About")
 
-        self.setCentralWidget(tabs)
+        self.setCentralWidget(self.tabs)
 
         self.setWindowTitle("MiGBox - File Synchronization")
 
@@ -345,7 +353,7 @@ class AppUi(QMainWindow):
         self.connect(self.logPathButton, SIGNAL("clicked()"), self._setLogPath)
         self.connect(self.thread, SIGNAL("finished()"), self._updateUi)
         self.connect(self.thread, SIGNAL("terminated()"), self._updateUi)
-        self.connect(self.thread, SIGNAL("sync(int)"), self._updateUi)
+        self.connect(self.thread, SIGNAL("threadError(QString)"), self._syncError)
         self.connect(self.srcPathButton, SIGNAL("clicked()"), self._setSrcPath)
         self.connect(self.dstPathButton, SIGNAL("clicked()"), self._setDstPath)
         self.connect(self.remoteCheckBox, SIGNAL("stateChanged(int)"), self._setRemote)
@@ -361,30 +369,39 @@ class AppUi(QMainWindow):
     def closeEvent(self, event):
         # other cleanup?
         del(self.trayIcon)
-
         self._stopSynchronize()
-
         while self.thread.isRunning():
             time.sleep(0.1)
-
         write_config(self.configfile, _vars)
-
         if self.isMount:
             self._mount()
-
         # event.ignore()
         event.accept()
 
+    def _syncError(self, message):
+        msgBox = QMessageBox(self)
+        msgBox.setWindowTitle("MiGBox - Sync Error")
+        msgBox.setText("Synchronization failed!")
+        msgBox.setInformativeText("""Check your settings:
+- server is up and running
+- server name/ip and port are valid
+- server public key is valid
+- user private/public key is valid
+- keys have been exchanged and configured""")
+        msgBox.setDetailedText(message)
+        msgBox.exec_() 
+
     def _mount(self):
-        settings = QSettings()
         host = _vars["Connection"]["sftp_host"] 
         port = _vars["Connection"]["sftp_port"]
         port = int(port) if port else 0
         userkey = _vars["KeyAuth"]["userkey"]
         mountpath = _vars["Mount"]["mountpath"]
-
         if not self.isMount:
-            if mount(host, port, userkey, mountpath):
+            if not os.path.isdir(mountpath):
+                msgBox = QMessageBox.warning(self, "MiGBox - Mount",
+                    "Not a valid mount path.", QMessageBox.Ok)
+            elif mount(host, port, userkey, mountpath):
                 self.dstFsModel = QFileSystemModel(self.dstTreeView)
                 self.dstFsModel.setRootPath(mountpath)
                 self.dstTreeView.setModel(self.dstFsModel)
@@ -393,14 +410,14 @@ class AppUi(QMainWindow):
                 self.mountAction.setToolTip(QString("Unmount sftp sync folder"))
                 self.isMount = True
             else:
-                msgBox = QMessageBox()
+                msgBox = QMessageBox(self)
                 msgBox.setWindowTitle("MiGBox - SFTP mount")
                 msgBox.setText("SFTP mount not supported.")
                 msgBox.setInformativeText("No external program for mounting via SFTP.")
                 msgBox.exec_()
         else:
             unmount(mountpath)
-            self.dstTreeView.setModel(None)
+            self.tabs.setTabEnabled(2, False)
             self.mountAction.setIcon(QIcon(os.path.join(self.icons_path, "mount.png")))
             self.mountAction.setToolTip(QString("Mount sftp sync folder"))
             self.isMount = False
@@ -482,15 +499,13 @@ class AppUi(QMainWindow):
         if self.remoteCheckBox.isChecked():
             self.dstPathEdit.setText(_vars["Connection"]["sftp_host"])
             self.dstPathButton.setVisible(False)
-            self.dstTreeView.setModel(None)
+            self.tabs.setTabEnabled(2, False)
             self.mountAction.setEnabled(True)
             self.sftp = True
         else:
             self.dstPathEdit.setText(_vars["Sync"]["destination"])
             self.dstPathButton.setVisible(True)
-            self.dstFsModel = QFileSystemModel(self.dstTreeView)
-            self.dstTreeView.setModel(self.dstFsModel)
-            self.dstTreeView.setRootIndex(self.dstFsModel.index(self.dstPathEdit.text()))
+            self.tabs.setTabEnabled(2, True)
             self.mountAction.setEnabled(False)
             self.sftp = False
 
@@ -499,7 +514,7 @@ class AppUi(QMainWindow):
                                            _vars["Logging"]["logfile"])
         if path:
             _vars["Logging"]["logfile"] = str(QDir.toNativeSeparators(path))
-            self.logBrowser.setSource(QUrl(_vars["Logging"]["logfile"]))
+            self.logBrowser.setSource(QUrl.fromLocalFile(_vars["Logging"]["logfile"]))
 
 
     def _setSrcPath(self):
