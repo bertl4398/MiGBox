@@ -225,12 +225,7 @@ class AppUi(QMainWindow):
 
         self.logBrowser = QTextBrowser()
         self.logBrowser.setLineWrapMode(QTextEdit.NoWrap)
-        logfile = _vars["Logging"]["logfile"]
-        if os.path.isfile(logfile):
-            logfile = QUrl.fromLocalFile(logfile)
-        else:
-            logfile = None
-        self.logBrowser.setSource(logfile)
+        self.logBrowser.setSource(QUrl.fromLocalFile(_vars["Logging"]["logfile"]))
 
         self.logPathButton = QPushButton("Path")
         self.logPathButton.setToolTip("Set path to log file")
