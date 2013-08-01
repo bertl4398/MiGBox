@@ -223,6 +223,12 @@ class AppUi(QMainWindow):
         self.remoteCheckBox.setFocusPolicy(Qt.NoFocus)
         self.remoteCheckBox.setToolTip("Connect to SFTP server")
 
+        if not os.path.isfile(_vars["Logging"]["logfile"]):
+            _vars["Logging"]["logfile"] = os.path.abspath(
+                os.path.join(os.path.split(__file__)[0], "sync.log"))
+        with open(_vars["Logging"]["logfile"], 'wb') as f:
+            f.write("New log file created ...<br />")
+ 
         self.logBrowser = QTextBrowser()
         self.logBrowser.setLineWrapMode(QTextEdit.NoWrap)
         self.logBrowser.setSource(QUrl.fromLocalFile(_vars["Logging"]["logfile"]))
@@ -454,11 +460,7 @@ class AppUi(QMainWindow):
             msgBox = QMessageBox.warning(self, "MiGBox - Sync",
                 "Not a valid destination path.", QMessageBox.Ok)
         else:
-            if not os.path.isfile(_vars["Logging"]["logfile"]):
-                _vars["Logging"]["logfile"] = os.path.abspath(
-                    os.path.join(os.path.split(__file__)[0], "sync.log"))
             _vars["Logging"]["loglevel"] = str(self.logLevel.currentText())
- 
             self.srcPathButton.setEnabled(False)
             self.dstPathButton.setEnabled(False)
             self.optionsButton.setEnabled(False)
