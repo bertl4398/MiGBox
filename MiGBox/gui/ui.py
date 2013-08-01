@@ -32,6 +32,7 @@ from MiGBox.common import about, write_config, read_config, get_vars
 from MiGBox.sync import syncd
 from MiGBox.mount import mount, unmount
 
+# global variables' dictionary
 _vars = {}
 
 class SyncThread(QThread):
@@ -223,12 +224,21 @@ class AppUi(QMainWindow):
         self.logBrowser.setLineWrapMode(QTextEdit.NoWrap)
         self.logBrowser.setSource(QUrl(_vars["Logging"]["logfile"]))
 
+        self.logPathButton = QPushButton("Path")
+        self.logPathButton.setToolTip("Set path to log file")
+        self.logLevel = QComboBox(self)
+        self.logLevel.addItem("INFO")
+        self.logLevel.addItem("DEBUG")
         self.updateLogButton = QPushButton("&Update")
         self.updateLogButton.setToolTip("Update log")
 
         logLayout = QVBoxLayout()
         logLayout.addWidget(self.logBrowser)
-        logLayout.addWidget(self.updateLogButton)
+        logOptionsLayout = QHBoxLayout()
+        logOptionsLayout.addWidget(self.logPathButton)
+        logOptionsLayout.addWidget(self.logLevel)
+        logOptionsLayout.addWidget(self.updateLogButton)
+        logLayout.addLayout(logOptionsLayout)
 
         logWidget = QWidget()
         logWidget.setLayout(logLayout)
@@ -332,6 +342,7 @@ class AppUi(QMainWindow):
 
         self.thread = SyncThread()
 
+        self.connect(self.logPathButton, SIGNAL("clicked()"), self._setLogPath)
         self.connect(self.thread, SIGNAL("finished()"), self._updateUi)
         self.connect(self.thread, SIGNAL("terminated()"), self._updateUi)
         self.connect(self.thread, SIGNAL("sync(int)"), self._updateUi)
@@ -434,14 +445,15 @@ class AppUi(QMainWindow):
             if not os.path.isfile(_vars["Logging"]["logfile"]):
                 _vars["Logging"]["logfile"] = os.path.abspath(
                     os.path.join(os.path.split(__file__)[0], "sync.log"))
-            if not _vars["Logging"]["loglevel"] == "INFO":
-                _vars["Logging"]["loglevel"] = "INFO"
+            _vars["Logging"]["loglevel"] = str(self.logLevel.currentText())
  
             self.srcPathButton.setEnabled(False)
             self.dstPathButton.setEnabled(False)
             self.optionsButton.setEnabled(False)
             self.syncButton.setEnabled(False)
             self.syncAction.setEnabled(False)
+            self.logPathButton.setEnabled(False)
+            self.logLevel.setEnabled(False)
             self.stopAction.setEnabled(True)
             self.stopButton.setEnabled(True)
             self.srcPathEdit.setReadOnly(True)
@@ -455,6 +467,8 @@ class AppUi(QMainWindow):
         self.optionsButton.setEnabled(True)
         self.syncButton.setEnabled(True)
         self.syncAction.setEnabled(True)
+        self.logPathButton.setEnabled(True)
+        self.logLevel.setEnabled(True)
         self.stopAction.setEnabled(False)
         self.stopButton.setEnabled(False)
         self.srcPathEdit.setReadOnly(False)
@@ -479,6 +493,14 @@ class AppUi(QMainWindow):
             self.dstTreeView.setRootIndex(self.dstFsModel.index(self.dstPathEdit.text()))
             self.mountAction.setEnabled(False)
             self.sftp = False
+
+    def _setLogPath(self):
+        path = QFileDialog.getOpenFileName(self, "MiGBox - Path to key file",
+                                           _vars["Logging"]["logfile"])
+        if path:
+            _vars["Logging"]["logfile"] = str(QDir.toNativeSeparators(path))
+            self.logBrowser.setSource(QUrl(_vars["Logging"]["logfile"]))
+
 
     def _setSrcPath(self):
         path = QFileDialog.getExistingDirectory(self, "MiGBox - Set Source Path",

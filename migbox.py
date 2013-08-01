@@ -36,12 +36,12 @@ from MiGBox.gui import AppUi
 from MiGBox import cli
 from MiGBox.sftp import server
 
-def start_server(args):
+def start_server(args, basedir):
     if args.config:
         _vars = read_config(args.config, server=True)
     else:
         # try to read default configuration file at default location
-        config = os.path.join(os.path.abspath(os.path.split(__file__)[0]), "config", "server.cfg")
+        config = os.path.join(basedir, "config", "server.cfg")
         _vars = read_config(config, server=True)
         # command line parameters supercede config file parameters
         _vars["Connection"]["host"] = args.host if args.host else _vars["Connection"]["host"]
@@ -62,12 +62,12 @@ def start_server(args):
     print_vars(_vars)
     server.run(**get_vars(_vars))
 
-def start_cli(args):
+def start_cli(args, basedir):
     if args.config:
         _vars = read_config(args.config)
     else:
          # try to read default configuration file at default location
-        config = os.path.join(os.path.abspath(os.path.split(__file__)[0]), "config", "migbox.cfg")
+        config = os.path.join(basedir, "config", "migbox.cfg")
         _vars = read_config(config)
         # command line parameters supercede config file parameters
         _vars["Sync"]["source"] = args.source if args.source else _vars["Sync"]["source"]
@@ -100,17 +100,19 @@ def start_cli(args):
     print_vars(_vars)
     cli.run(mode, **get_vars(_vars))
 
-def start_gui(args):
-    configfile = os.path.join(os.path.abspath(os.path.split(__file__)[0]), "config", "migbox.cfg")
-    icons_path = os.path.join(os.path.abspath(os.path.split(__file__)[0]), "icons")
+def start_gui(args, basedir):
+    configfile = os.path.join(basedir, "config", "migbox.cfg")
+    icons_path = os.path.join(basedir, "icons")
     if args:
         if args.config:
             configfile = args.config
     if not os.path.isfile(configfile):
+        # no configuration file found .. this will create a new empty
+        # configuration file in the same directory as the gui.
         configfile = ''
     AppUi.run(configfile, icons_path)
 
-def _parseargs():
+def _parseargs(basedir):
     from argparse import ArgumentParser
 
     parser = ArgumentParser(description="MiGBox file synchronization.")
@@ -152,13 +154,19 @@ def _parseargs():
     serverparser.set_defaults(func=start_server)
 
     args = parser.parse_args()
-    args.func(args)
+    args.func(args, basedir)
 
 def main():
-    if len(sys.argv) > 1:
-        _parseargs()
+    # modification for pyinstaller 2.0
+    if getattr(sys, 'frozen', None):
+        basedir = sys._MEIPASS
     else:
-        start_gui(None)
+        # get path relative to migbox.py
+        basedir = os.path.abspath(os.path.split(__file__)[0])
+    if len(sys.argv) > 1:
+        _parseargs(basedir)
+    else:
+        start_gui(None, basedir)
 
 if __name__ == '__main__':
     main()
