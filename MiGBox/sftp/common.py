@@ -24,3 +24,4 @@ Provides common constants and functions for client and server.
 CMD_BLOCKCHK = 205
 CMD_DELTA = 206
 CMD_PATCH = 207
+CMD_OTP = 208

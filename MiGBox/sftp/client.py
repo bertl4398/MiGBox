@@ -27,7 +27,7 @@ import json
 
 import paramiko
 
-from MiGBox.sftp.common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH
+from MiGBox.sftp.common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH, CMD_OTP
 
 class SFTPClient(paramiko.SFTPClient):
     """
@@ -144,3 +144,15 @@ class SFTPClient(paramiko.SFTPClient):
 
         path = self._adjust_cwd(path)
         self._request(CMD_PATCH, path, json.dumps(delta))
+
+    def onetimepass(self):
+        """
+        Request a one time password stored in a new file in the
+        directory the user uses for synchronization.
+
+        This credentials can be used to log in one time only and
+        are supposed to enable sharing and collaboration with
+        other users.
+        """
+
+        self._request(CMD_OTP)

@@ -48,7 +48,7 @@ import base64
 import paramiko
 
 from MiGBox.sync.delta import blockchecksums, delta, patch
-from MiGBox.sftp.common  import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH 
+from MiGBox.sftp.common  import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH, CMD_OTP
 from MiGBox.common import about
 from MiGBox.sftp.server_interface import SFTPServerInterface
 
@@ -145,6 +145,8 @@ class SFTPServer(paramiko.SFTPServer):
             d = json.loads(msg.get_string())
             patched = patch(self.server._get_path(path), d)
             self._send_status(request_number, self.server.rename(patched, path))
+        elif t == CMD_OTP:
+            self._send_status(request_number, self.server.onetimepass()) 
         else:
             return paramiko.SFTPServer._process(self, t, request_number, msg)
 

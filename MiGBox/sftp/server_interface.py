@@ -22,8 +22,12 @@ Provides a SFTP server interface for the MiG SFTP server.
 """
 
 import os
+import base64
 
 import paramiko
+
+from Crypto import Random
+from Crypto.Hash import MD5
 
 class SFTPHandle(paramiko.SFTPHandle):
     """
@@ -347,4 +351,24 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         except OSError as e:
             return paramiko.SFTPServer.convert_errno(e.errno)
 
+    def onetimepass(self):
+        """
+        Create a one time password stored in a new file on the
+        root path the user uses for synchronization.
+
+        This credentials can be used to log in one time only and
+        are supposed to enable sharing and collaboration with
+        other users.
+        """
+
+        rnd = Random.OSRNG.new().read(1024)
+        pas = base64.b64encode(rnd)
+        usr = MD5.new(pas).hexdigest()
+        path = self._get_path(usr)
+        try:
+            fd = os.open(path, os.O_CREAT|os.O_WRONLY, 0644)
+            os.write(fd, pas)
+            return paramiko.SFTP_OK
+        except OSError as e:
+            return paramiko.SFTPServer.convert_errno(e.errno)
 
