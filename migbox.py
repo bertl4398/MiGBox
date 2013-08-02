@@ -101,7 +101,9 @@ def start_cli(args, basedir):
     cli.run(mode, **get_vars(_vars))
 
 def start_gui(args, basedir):
+    # load configuration file at default location
     configfile = os.path.join(basedir, "config", "migbox.cfg")
+    # get path to the gui icons
     icons_path = os.path.join(basedir, "icons")
     if args:
         if args.config:
@@ -157,9 +159,13 @@ def _parseargs(basedir):
     args.func(args, basedir)
 
 def main():
-    # modification for pyinstaller 2.0
     if getattr(sys, 'frozen', None):
-        basedir = sys._MEIPASS
+        # modification for pyinstaller 2.0
+        if hasattr(sys, "_MEIPASS"):
+            basedir = sys._MEIPASS
+        elif hasattr(sys, "executable"):
+        # modification for cx_Freeze
+            basedir = sys.executable
     else:
         # get path relative to migbox.py
         basedir = os.path.abspath(os.path.split(__file__)[0])

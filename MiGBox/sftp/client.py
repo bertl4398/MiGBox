@@ -85,7 +85,10 @@ class SFTPClient(paramiko.SFTPClient):
             if not known_host == key_data: 
                 raise paramiko.BadHostKeyException(host, key_data, known_host)
 
-            transport.auth_publickey(username, paramiko.RSAKey.from_private_key_file(userkey))
+            try:
+                transport.auth_publickey(username, paramiko.RSAKey.from_private_key_file(userkey))
+            except Exception:
+                transport.auth_password(username, password)
 
             chan = transport.open_session()
             if chan is None:

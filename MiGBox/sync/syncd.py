@@ -66,12 +66,31 @@ class EventHandler(FileSystemEventHandler):
         sync.move_file(self.dst, sync_src, sync_dst)
 
 def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
-         logfile=None, loglevel='INFO', event=threading.Event(), **kargs):
+         username='', password='', logfile=None, loglevel='INFO',
+         event=threading.Event(), **kargs):
 
+    logger = logging.getLogger("sync")
+    logger.setLevel(getattr(logging, loglevel))
+    formatter = logging.Formatter('%(levelname)s: %(asctime)s %(message)s')
+    ch = logging.StreamHandler()
+    ch.setLevel(getattr(logging, loglevel))
+    ch.setFormatter(formatter)
     if logfile:
-        logging.basicConfig(filename=logfile, filemode='w',
-            format='%(levelname)s: %(asctime)s %(message)s',
-            datefmt='%m/%d/%Y %I:%M:%S %p', level=getattr(logging,loglevel))
+        fh = logging.FileHandler(logfile, mode='w')
+        fh.setLevel(getattr(logging, loglevel))
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
+    else:
+        logger.addHandler(ch)
+
+    paramiko_logger = logging.getLogger("paramiko.transport")
+    paramiko_logger.addHandler(logging.NullHandler())
+
+    logger.info("Start...<br />")
+
+        #logging.basicConfig(filename=logfile, filemode='w',
+        #    format='%(levelname)s: %(asctime)s %(message)s',
+        #    datefmt='%m/%d/%Y %I:%M:%S %p', level=getattr(logging,loglevel))
 
     local = OSFileSystem(root=source)
 
@@ -79,6 +98,8 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
         remote = OSFileSystem(root=destination)
     elif mode == 'remote':
         client = SFTPClient.connect(sftp_host, sftp_port, hostkey, userkey)
+        if not client:
+            client = SFTPClient.connect(sftp_host, sftp_port, hostkey, userkey, username, password)
         remote = SFTPFileSystem(client)
 
     # copy all new files from local to remote

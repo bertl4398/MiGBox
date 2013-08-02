@@ -24,16 +24,20 @@ Provides a GUI for the MiGBox synchronization.
 import os
 import time
 import threading
+import logging
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from MiGBox.common import about, write_config, read_config, get_vars
+from MiGBox.common import about, write_config, read_config, get_vars, print_vars
 from MiGBox.sync import syncd
 from MiGBox.mount import mount, unmount
+from MiGBox.sftp import SFTPClient
 
 # global variables' dictionary
 _vars = {}
+_otp_user = ''
+_otp_pass = ''
 
 class SyncThread(QThread):
     """
@@ -74,9 +78,26 @@ class SyncThread(QThread):
     def run(self):
         mode = "remote" if self.sftp else "local"
         try:
-            syncd.run(mode, event=self.event, **get_vars(_vars))
+            syncd.run(mode, username=_otp_user, password=_otp_pass,
+                      event=self.event, **get_vars(_vars))
         except Exception as e:
             self.emit(SIGNAL("threadError(QString)"), QString(e.message))
+
+class _OtpThread(QThread):
+    """
+    This class implements the thread that runs for generating one-time
+    passwords, triggered by the graphical user interface.
+    """
+
+    def run(self):
+        settings = get_vars(_vars)
+        try:
+            client = SFTPClient.connect(settings["sftp_host"], int(settings["sftp_port"]),
+                                        settings["hostkey"], settings["userkey"],
+                                        username=_otp_user, password=_otp_pass)
+            client.onetimepass()
+        except Exception as e:
+            self.emit(SIGNAL("otpError(QString)"), QString(e.message))
 
 class _OptionsUi(QDialog):
     """
@@ -177,7 +198,10 @@ class _OptionsUi(QDialog):
         _vars["KeyAuth"]["userkey"] = str(self.prvKeyPathEdit.text())
         _vars["KeyAuth"]["hostkey"] = str(self.pubKeyPathEdit.text())
         _vars["Mount"]["mountpath"] = str(self.mountEdit.text())
-        
+        global _otp_user
+        global _otp_pass
+        _otp_user = str(self.usernameEdit.text())
+        _otp_pass = str(self.passwordEdit.text())
         QDialog.accept(self)
 
     def _setPath(self, lineEdit):
@@ -326,6 +350,10 @@ class AppUi(QMainWindow):
                                    "Mount sftp sync folder", self)
         self.mountAction.triggered.connect(self._mount)
         self.mountAction.setEnabled(False)
+        self.otpAction = QAction(QIcon(os.path.join(icons_path, "otp.png")),
+                                 "Create one-time-password", self)
+        self.otpAction.triggered.connect(self._otp)
+        self.otpAction.setEnabled(False)
 
         self.statusBar()
         toolbar = self.addToolBar("Toolbar")
@@ -336,6 +364,7 @@ class AppUi(QMainWindow):
         toolbar.addAction(self.stopAction)
         toolbar.addSeparator()
         toolbar.addAction(self.mountAction)
+        toolbar.addAction(self.otpAction)
 
         self.trayIcon = QSystemTrayIcon(QIcon(os.path.join(icons_path, "app.png")))
         self.trayMenu = QMenu()
@@ -350,7 +379,9 @@ class AppUi(QMainWindow):
         self.trayIcon.setContextMenu(self.trayMenu)
 
         self.thread = SyncThread()
+        self.otpThread = _OtpThread()
 
+        self.connect(self.otpThread, SIGNAL("otpError(QString)"), self._otpError)
         self.connect(self.logPathButton, SIGNAL("clicked()"), self._setLogPath)
         self.connect(self.thread, SIGNAL("finished()"), self._updateUi)
         self.connect(self.thread, SIGNAL("terminated()"), self._updateUi)
@@ -361,7 +392,7 @@ class AppUi(QMainWindow):
         self.connect(self.optionsButton, SIGNAL("clicked()"), self._setOptions)
         self.connect(self.syncButton, SIGNAL("clicked()"), self._synchronize)
         self.connect(self.stopButton, SIGNAL("clicked()"), self._stopSynchronize)
-        self.connect(self.updateLogButton, SIGNAL("clicked()"), self.logBrowser.reload)
+        self.connect(self.updateLogButton, SIGNAL("clicked()"), self._refreshViews)
         self.connect(self.srcPathEdit, SIGNAL("textChanged(QString)"), self._saveSyncPaths)
         self.connect(self.dstPathEdit, SIGNAL("textChanged(QString)"), self._saveSyncPaths)
         self.connect(self.trayIcon, SIGNAL("activated(QSystemTrayIcon::ActivationReason)"),
@@ -376,13 +407,19 @@ class AppUi(QMainWindow):
         write_config(self.configfile, _vars)
         if self.isMount:
             self._mount()
-        # event.ignore()
         event.accept()
+
+    def _refreshViews(self):
+        self.logBrowser.reload()
+        self.srcTreeView.setModel(self.srcFsModel)
+        self.srcTreeView.setRootIndex(self.srcFsModel.index(_vars["Sync"]["source"]))
+        self.dstTreeView.setModel(self.dstFsModel)
+        self.dstTreeView.setRootIndex(self.dstFsModel.index(_vars["Sync"]["destination"]))
 
     def _syncError(self, message):
         msgBox = QMessageBox(self)
         msgBox.setWindowTitle("MiGBox - Sync Error")
-        msgBox.setText("Synchronization failed!")
+        msgBox.setText("Synchronization failed.")
         msgBox.setInformativeText("""Check your settings:
 - server is up and running
 - server name/ip and port are valid
@@ -391,6 +428,23 @@ class AppUi(QMainWindow):
 - keys have been exchanged and configured""")
         msgBox.setDetailedText(message)
         msgBox.exec_() 
+
+    def _otpError(self, message):
+        msgBox = QMessageBox(self)
+        msgBox.setWindowTitle("MiGBox - OTP Error")
+        msgBox.setText("Could not create the one-time-password.")
+        msgBox.setDetailedText(message)
+        msgBox.exec_()
+
+    def _otp(self):
+        msgBox = QMessageBox(self)
+        msgBox.setWindowTitle("MiGBox - One-Time-Password")
+        msgBox.setText("You are about to create a One-Time-Password.")
+        msgBox.setInformativeText("You want to proceed?")
+        msgBox.setStandardButtons(QMessageBox.Yes|QMessageBox.No)
+        ret = msgBox.exec_()
+        if ret == QMessageBox.Yes:
+            self.otpThread.start()
 
     def _mount(self):
         host = _vars["Connection"]["sftp_host"] 
@@ -402,19 +456,21 @@ class AppUi(QMainWindow):
             if not os.path.isdir(mountpath):
                 msgBox = QMessageBox.warning(self, "MiGBox - Mount",
                     "Not a valid mount path.", QMessageBox.Ok)
-            elif mount(host, port, userkey, mountpath):
+            try:
+                mount(host, port, userkey, mountpath)
                 self.dstFsModel = QFileSystemModel(self.dstTreeView)
                 self.dstFsModel.setRootPath(mountpath)
                 self.dstTreeView.setModel(self.dstFsModel)
                 self.dstTreeView.setRootIndex(self.dstFsModel.index(mountpath))
                 self.mountAction.setIcon(QIcon(os.path.join(self.icons_path, "unmount.png")))
                 self.mountAction.setToolTip(QString("Unmount sftp sync folder"))
+                self.tabs.setTabEnabled(2, True)
                 self.isMount = True
-            else:
+            except Exception as e:
                 msgBox = QMessageBox(self)
-                msgBox.setWindowTitle("MiGBox - SFTP mount")
-                msgBox.setText("SFTP mount not supported.")
-                msgBox.setInformativeText("No external program for mounting via SFTP.")
+                msgBox.setWindowTitle("MiGBox - SFTP Mount Error")
+                msgBox.setText("Could not mount via SFTP.")
+                msgBox.setDetailedText(e.message)
                 msgBox.exec_()
         else:
             unmount(mountpath)
@@ -498,12 +554,14 @@ class AppUi(QMainWindow):
             self.dstPathButton.setVisible(False)
             self.tabs.setTabEnabled(2, False)
             self.mountAction.setEnabled(True)
+            self.otpAction.setEnabled(True)
             self.sftp = True
         else:
             self.dstPathEdit.setText(_vars["Sync"]["destination"])
             self.dstPathButton.setVisible(True)
             self.tabs.setTabEnabled(2, True)
             self.mountAction.setEnabled(False)
+            self.otpAction.setEnabled(False)
             self.sftp = False
 
     def _setLogPath(self):
@@ -534,6 +592,8 @@ class AppUi(QMainWindow):
 
     @classmethod
     def run(cls, configfile='', icons_path=''):
+        paramiko_logger = logging.getLogger("paramiko.transport")
+        paramiko_logger.addHandler(logging.NullHandler())
         if not icons_path:
             # try to get icons from default location realtive to this module
             # ../../icons

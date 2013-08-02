@@ -24,6 +24,8 @@ L{MiGBox.FileSystem}.
 import os, stat
 import logging
 
+logger = logging.getLogger("sync")
+
 _log = {'create': 'CREATE {0}<br />',
         'remove': 'REMOVE {0}<br />',
         'sync_to': 'SYNC {0} ==> {1}<br />',
@@ -89,15 +91,15 @@ def sync_file(src, src_path, dst, dst_path):
         dst_mod, dst_bs = dst.cached_checksums(dst_path)
         src_mod, src_bs = src.cached_checksums(src_path)
         if dst_mod:
-            logging.info(_log['sync_conf'].format(src_path,dst_path))
+            logger.info(_log['sync_conf'].format(src_path,dst_path))
         if set(src_bs) - set(dst_bs):
             delta = src.delta(src_path, dst_bs)
             dst.patch(dst_path, delta)
-            logging.info(_log['sync_to'].format(src_path,dst_path))
+            logger.info(_log['sync_to'].format(src_path,dst_path))
         else:
-            logging.info(_log['sync_eq'].format(src_path,dst_path))
+            logger.info(_log['sync_eq'].format(src_path,dst_path))
     except:
-        logging.error(_log['sync_er'].format(src_path,dst_path))
+        logger.error(_log['sync_er'].format(src_path,dst_path))
 
 def copy_file(src, src_path, dst, dst_path):
     """
@@ -115,9 +117,9 @@ def copy_file(src, src_path, dst, dst_path):
 
     try:
         src.copy(src, src_path, dst, dst_path)
-        logging.info(_log['copy'].format(src_path,dst_path))
+        logger.info(_log['copy'].format(src_path,dst_path))
     except (OSError, IOError):
-        logging.error(_log['copy'].format(src_path,dst_path))
+        logger.error(_log['copy'].format(src_path,dst_path))
 
 def move_file(src, src_path, dst_path):
     """
@@ -134,9 +136,9 @@ def move_file(src, src_path, dst_path):
  
     try:
         src.rename(src_path, dst_path)
-        logging.info(_log['move'].format(src_path,dst_path))
+        logger.info(_log['move'].format(src_path,dst_path))
     except (OSError, IOError):
-        logging.error(_log['move'].format(src_path,dst_path))
+        logger.error(_log['move'].format(src_path,dst_path))
 
 def remove_file(src, path):
     """
@@ -150,9 +152,9 @@ def remove_file(src, path):
  
     try:
         src.remove(path)
-        logging.info(_log['remove'].format(path))
+        logger.info(_log['remove'].format(path))
     except (OSError, IOError):
-        logging.error(_log['remove'].format(path))
+        logger.error(_log['remove'].format(path))
 
 def remove_dir(src, path):
     """
@@ -166,9 +168,9 @@ def remove_dir(src, path):
  
     try:
         src.rmdir(path)
-        logging.info(_log['remove'].format(path))
+        logger.info(_log['remove'].format(path))
     except (OSError, IOError):
-        logging.error(_log['remove'].format(path))
+        logger.error(_log['remove'].format(path))
 
 def make_dir(src, path):
     """
@@ -182,6 +184,6 @@ def make_dir(src, path):
  
     try:
         src.mkdir(path)
-        logging.info(_log['create'].format(path))
+        logger.info(_log['create'].format(path))
     except (OSError, IOError):
-        logging.error(_log['create'].format(path))
+        logger.error(_log['create'].format(path))

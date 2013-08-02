@@ -27,7 +27,7 @@ MacOS X and Windows not yet supported.
 import os
 import sys
 
-from subprocess import call
+from subprocess import check_call
 
 def mount(host, port, userkey, mountpath):
     """
@@ -48,25 +48,17 @@ def mount(host, port, userkey, mountpath):
     """
 
     host = host if host != '' else 'localhost'
-
     if not os.path.exists(mountpath):
         os.mkdir(mountpath)
-
     config_str = "Host sshfsserver\n    HostName {0}\n    Port {1}\n    IdentityFile {2}".format(
         host, port, userkey)
-
     with open('.sshfs_config', 'w') as f:
         f.write(config_str)
-
     sshfs_config = os.path.abspath('.sshfs_config')
-
     if sys.platform.startswith('linux'):
-        try:
-            call(['sshfs', '-F', sshfs_config, 'sshfsserver:', mountpath])
-            return mountpath
-        except Exception as e:
-            print e
-    return None
+        check_call(['sshfs', '-F', sshfs_config, 'sshfsserver:', mountpath])
+    else:
+        raise Exception("SFTP mount not supported.")
 
 def unmount(mountpath):
     """
@@ -77,7 +69,7 @@ def unmount(mountpath):
     """
 
     if sys.platform.startswith('linux'):
-        try:
-            call(['fusermount', '-u', mountpath])
-        except Exception as e:
-            print e
+        check_call(['fusermount', '-u', mountpath])
+        os.remove('.sshfs_config')
+    else:
+        raise Exception("SFTP mount not supported.")
