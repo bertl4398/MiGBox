@@ -65,6 +65,11 @@ class EventHandler(FileSystemEventHandler):
         sync_dst = self._get_syncpath(event.dest_path)
         sync.move_file(self.dst, sync_src, sync_dst)
 
+def poll(local, remote, stop_polling):
+    sync.sync_all_files(remote, local, remote.root, modified=False)
+    if not stop_polling.isSet():
+        threading.Timer(2, poll, [local, remote, stop_polling]).start()
+
 def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
          username='', password='', logfile=None, loglevel='INFO',
          event=threading.Event(), **kargs):
@@ -86,11 +91,11 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
     paramiko_logger = logging.getLogger("paramiko.transport")
     paramiko_logger.addHandler(logging.NullHandler())
 
-    logger.info("Start...<br />")
+    logger.info("Connect source and destination ...<br />")
 
-        #logging.basicConfig(filename=logfile, filemode='w',
-        #    format='%(levelname)s: %(asctime)s %(message)s',
-        #    datefmt='%m/%d/%Y %I:%M:%S %p', level=getattr(logging,loglevel))
+    #logging.basicConfig(filename=logfile, filemode='w',
+    #    format='%(levelname)s: %(asctime)s %(message)s',
+    #    datefmt='%m/%d/%Y %I:%M:%S %p', level=getattr(logging,loglevel))
 
     local = OSFileSystem(root=source)
 
@@ -99,8 +104,13 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
     elif mode == 'remote':
         client = SFTPClient.connect(sftp_host, sftp_port, hostkey, userkey)
         if not client:
-            client = SFTPClient.connect(sftp_host, sftp_port, hostkey, userkey, username, password)
+            client = SFTPClient.connect(sftp_host, sftp_port, hostkey, userkey,
+                                        username, password)
         remote = SFTPFileSystem(client)
+        try:
+            remote.remove(os.path.join(remote.root, username))
+        except:
+            pass
 
     # copy all new files from local to remote
     # sync all modifications from local/remote to local/remote
@@ -115,8 +125,13 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
     observer.schedule(event_handler, path=source, recursive=True)
     observer.start()
 
+    stop_polling = threading.Event()
+    threading.Timer(2, poll, [local, remote, stop_polling]).start()
+    
     while not event.isSet():
         time.sleep(1)
+
+    stop_polling.set()
 
     observer.stop()
     observer.join()

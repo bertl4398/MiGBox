@@ -83,6 +83,7 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         """
         super(paramiko.SFTPServerInterface, self).__init__(*largs, **kwargs)
         self.root = os.path.normpath(server.root)
+        self.salt = server.salt
 
     def session_started(self):
         """
@@ -363,8 +364,9 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
 
         rnd = Random.OSRNG.new().read(1024)
         pas = base64.b64encode(rnd)
-        usr = MD5.new(pas).hexdigest()
-        path = self._get_path(usr)
+        usr = MD5.new(self.salt)
+        usr.update(pas)
+        path = self._get_path(usr.hexdigest())
         try:
             fd = os.open(path, os.O_CREAT|os.O_WRONLY, 0644)
             os.write(fd, pas)
