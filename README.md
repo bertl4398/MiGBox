@@ -19,21 +19,47 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+Getting started
+---------------
+
+MiGBox was build with pyinstaller 2.0 for Linux and MacOS X and
+cx_Freeze 4.3.1 for Windows, so you dont have to install it as a python
+package.
+
+You can just download the packed standalone version for your OS,
+unpack it and run migbox(.exe).
+
+If you want to run/install/build it from source, e.g. the standalone version
+does not work for you, you need to have the required python libraries installed first.
+
+You can also run MiGBox from the console, see the `--help` option for additional arguments.
+
+  `migbox`         runs the graphical user interface, same as
+  `migbox gui`
+  `migbox cli`     runs the command line interface
+  `migbox server`  runs the MiGBox SFTP server
+
 Requirements
 ------------
 
-  - python    <http://www.python.org/>
-  - paramiko  <https://github.com/paramiko/paramiko>
-  - watchdog  <https://pypi.python.org/pypi/watchdog>
+  - python 2.7          <http://www.python.org/>
+  - pycrypto >= 2.6     <https://www.dlitz.net/software/pycrypto/>
+  - paramiko >= 1.11.0  <https://github.com/paramiko/paramiko>
+  - watchdog >= 0.6.0   <https://pypi.python.org/pypi/watchdog>
 
-For the graphical user interface also
+For the graphical user interface
 
-  - PyQt4     <http://pyqt.sourceforge.net/Docs/PyQt4/installation.html>
+  - PyQt4 >= 4.8.4      <http://pyqt.sourceforge.net/Docs/PyQt4/installation.html>
 
 Installation
 ------------
 
-To build and install with easy_install run following command in the MiGBox
-directory (as root):
+If you have all required packages installed, you dont have to install MiGBox as a
+python package and can just run following command in the MiGBox directory:
 
-  easy_install .
+ `python migbox.py`
+
+To actually build and install MiGBox, e.g. with easy_install, run following command
+in the MiGBox directory (as root):
+
+  `easy_install .`
