@@ -66,7 +66,10 @@ class EventHandler(FileSystemEventHandler):
         sync.move_file(self.dst, sync_src, sync_dst)
 
 def poll(local, remote, stop_polling):
-    sync.sync_all_files(remote, local, remote.root, modified=False)
+    # get all new remote files
+    sync.sync_all_files(remote, local, remote.root, modified=True)
+    # delete all files deleted on remote
+    sync.sync_all_files(local, remote, local.root, modified=False, deleted=True)
     if not stop_polling.isSet():
         threading.Timer(2, poll, [local, remote, stop_polling]).start()
 

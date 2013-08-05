@@ -35,7 +35,7 @@ _log = {'create': 'CREATE {0}<br />',
         'move': 'MOVE {0} ==> {1}<br />',
         'copy': 'COPY {0} ==> {1}<br />'}
 
-def sync_all_files(src, dst, path, modified=True):
+def sync_all_files(src, dst, path, modified=True, deleted=False):
     """
     Synchronize all files from C{src} file system abstraction to C{dst}
     file system abstraction starting at C{path} and continuing recursively.
@@ -57,7 +57,10 @@ def sync_all_files(src, dst, path, modified=True):
             try:
                 mtime = dst.stat(sync_path).st_mtime
             except (OSError, IOError):
-                make_dir(dst, sync_path)
+                if deleted:
+                    remove_dir(src, pathname)
+                else:
+                    make_dir(dst, sync_path)
         else:
             try:
                remote_mtime = dst.stat(sync_path).st_mtime
@@ -67,7 +70,10 @@ def sync_all_files(src, dst, path, modified=True):
                elif remote_mtime < local_mtime and modified:
                    sync_file(src, pathname, dst, sync_path)
             except (OSError, IOError):
-                copy_file(src, pathname, dst, sync_path)
+                if deleted:
+                    remove_file(src, pathname)
+                else:
+                    copy_file(src, pathname, dst, sync_path)
 
 def sync_file(src, src_path, dst, dst_path):
     """
@@ -95,6 +101,7 @@ def sync_file(src, src_path, dst, dst_path):
         if set(src_bs) - set(dst_bs):
             delta = src.delta(src_path, dst_bs)
             dst.patch(dst_path, delta)
+            dst.cached_checksums(dst_path)
             logger.info(_log['sync_to'].format(src_path,dst_path))
         else:
             logger.info(_log['sync_eq'].format(src_path,dst_path))

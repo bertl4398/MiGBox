@@ -1,3 +1,11 @@
 # Compiled source #
 ###################
 *.pyc
+# Configuration #
+#################
+config/migbox.cfg
+config/server.cfg
+# Logging #
+###########
+log/server.log
+log/sync.log

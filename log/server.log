@@ -1,9 +1,0 @@
-INF [20130804-14:53:51.801] thr=1   paramiko.transport: Connected (version 2.0, client paramiko_1.10.1)
-INF [20130804-14:53:52.020] thr=1   paramiko.transport: Auth granted (publickey).
-INF [20130804-14:53:52.025] thr=1   paramiko.transport: Secsh channel 1 (session) opened.
-INF [20130804-14:54:11.970] thr=2   paramiko.transport: Connected (version 2.0, client paramiko_1.10.1)
-INF [20130804-14:54:12.191] thr=2   paramiko.transport: Auth granted (publickey).
-INF [20130804-14:54:12.193] thr=2   paramiko.transport: Secsh channel 1 (session) opened.
-INF [20130804-14:55:07.764] thr=3   paramiko.transport: Connected (version 2.0, client paramiko_1.10.1)
-INF [20130804-14:55:08.027] thr=3   paramiko.transport: Auth granted (publickey).
-INF [20130804-14:55:08.029] thr=3   paramiko.transport: Secsh channel 1 (session) opened.
