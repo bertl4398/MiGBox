@@ -63,3 +63,12 @@ To actually build and install MiGBox, e.g. with easy_install, run following comm
 in the MiGBox directory (as root):
 
   `easy_install .`
+
+Bugs, Issues, Questions
+-----------------------
+
+You can either post your requests here on GitHub or use the MiGBox Google group
+
+https://groups.google.com/forum/embed/?place=forum/migbox#!forum/migbox
+
+
