@@ -288,6 +288,7 @@ class OSFileSystem(FileSystem):
 
     def patch(self, path, delta):
         patched = patch(path, delta)
+        self.instance.remove(path)
         return self.instance.rename(patched, path)
     
 class SFTPFileSystem(FileSystem):
