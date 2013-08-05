@@ -105,6 +105,8 @@ def start_gui(args, basedir):
     configfile = os.path.join(basedir, "config", "migbox.cfg")
     # get path to the gui icons
     icons_path = os.path.join(basedir, "icons")
+    # set log file to default location
+    logfile = os.path.join(basedir, "log", "sync.log")
     if args:
         if args.config:
             configfile = args.config
@@ -112,7 +114,11 @@ def start_gui(args, basedir):
         # no configuration file found .. this will create a new empty
         # configuration file in the same directory as the gui.
         configfile = ''
-    AppUi.run(configfile, icons_path)
+    if not os.path.isfile(logfile):
+        # no log file found .. this will create a new empty
+        # log file in the same directory as the gui.
+        logfile = ''
+    AppUi.run(configfile, logfile, icons_path)
 
 def _parseargs(basedir):
     from argparse import ArgumentParser

@@ -220,13 +220,15 @@ class AppUi(QMainWindow):
     """
     MiGBox graphical user interface main window.
     """
-    def __init__(self, configfile, icons_path, parent=None):
+    def __init__(self, configfile, logfile, icons_path, parent=None):
         super(AppUi, self).__init__(parent)
 
         self.configfile = configfile
         self.icons_path = icons_path
         self.isMount = False
         self.sftp = False
+
+        global _vars
 
         srcPathLabel = QLabel("Source path")
         dstPathLabel = QLabel("Destination path")
@@ -248,10 +250,9 @@ class AppUi(QMainWindow):
         self.remoteCheckBox.setToolTip("Connect to SFTP server")
 
         if not os.path.isfile(_vars["Logging"]["logfile"]):
-            _vars["Logging"]["logfile"] = os.path.abspath(
-                os.path.join(os.path.split(__file__)[0], "sync.log"))
+            _vars["Logging"]["logfile"] = logfile
         with open(_vars["Logging"]["logfile"], 'wb') as f:
-            f.write("New log file created ...<br />")
+            f.write("New log file ...<br />")
  
         self.logBrowser = QTextBrowser()
         self.logBrowser.setLineWrapMode(QTextEdit.NoWrap)
@@ -591,11 +592,11 @@ class AppUi(QMainWindow):
             self._saveSyncPaths()
 
     @classmethod
-    def run(cls, configfile='', icons_path=''):
+    def run(cls, configfile='', logfile='', icons_path=''):
         paramiko_logger = logging.getLogger("paramiko.transport")
         paramiko_logger.addHandler(logging.NullHandler())
         if not icons_path:
-            # try to get icons from default location realtive to this module
+            # try to get icons from default location relative to this module
             # ../../icons
             icons_path = os.path.split(
                              os.path.split(
@@ -603,15 +604,18 @@ class AppUi(QMainWindow):
             icons_path = os.path.join(icons_path, "icons")
 
         if not configfile:
-            # write config in directory realtive to this module
+            # write config in directory relative to this module
             configfile = os.path.join(os.path.split(os.path.abspath(__file__))[0], "migbox.cfg")
+        if not logfile:
+            # write log in directory relative to this module
+            logfile = os.path.join(os.path.split(os.path.abspath(__file__))[0], "sync.log")
 
         app = QApplication([])
         app.setApplicationName("MiGBox")
         app.setWindowIcon(QIcon(os.path.join(icons_path, "app.png")))
         global _vars
         _vars = read_config(configfile)
-        appUi = cls(configfile, icons_path)
+        appUi = cls(configfile, logfile, icons_path)
         appUi.show()
 
         app.exec_()
