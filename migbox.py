@@ -171,7 +171,7 @@ def main():
             basedir = sys._MEIPASS
         elif hasattr(sys, "executable"):
         # modification for cx_Freeze
-            basedir = sys.executable
+            basedir = os.path.abspath(os.path.split(sys.executable)[0])
     else:
         # get path relative to migbox.py
         basedir = os.path.abspath(os.path.split(__file__)[0])
