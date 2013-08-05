@@ -104,7 +104,7 @@ def sync_file(src, src_path, dst, dst_path):
             dst.cached_checksums(dst_path)
             logger.info(_log['sync_to'].format(src_path,dst_path))
         else:
-            logger.info(_log['sync_eq'].format(src_path,dst_path))
+            logger.debug(_log['sync_eq'].format(src_path,dst_path))
     except:
         logger.error(_log['sync_er'].format(src_path,dst_path))
 
