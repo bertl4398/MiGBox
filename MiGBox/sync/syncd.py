@@ -66,7 +66,7 @@ class EventHandler(FileSystemEventHandler):
         sync.move_file(self.dst, sync_src, sync_dst)
 
 def poll(local, remote, stop_polling):
-    # get all new remote files
+    # get all new/modified remote files
     sync.sync_all_files(remote, local, remote.root, modified=True)
     # delete all files deleted on remote
     sync.sync_all_files(local, remote, local.root, modified=False, deleted=True)

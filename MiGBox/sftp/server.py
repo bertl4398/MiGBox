@@ -219,8 +219,11 @@ def run(host, port, hostkey, userkey, rootpath, backlog=0, logfile=None, logleve
     salt = os.urandom(16)
 
     client_threads = []
-    # might not work on windows, see python select and stdin
+    # select from stdin does not work on windows, see python select and stdin
+    # therefor, stdin is deactivated on windows
     input_select = [server_socket, sys.stdin]
+    if sys.platform.startswith("win"):
+        input_select = [server_socket]
 
     print header
     running = True
