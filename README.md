@@ -34,10 +34,10 @@ does not work for you, you need to have the required python libraries installed 
 
 You can also run MiGBox from the console, see the `--help` option for additional arguments.
 
-  `migbox`         runs the graphical user interface, same as
-  `migbox gui`
-  `migbox cli`     runs the command line interface
-  `migbox server`  runs the MiGBox SFTP server
+  -`migbox`         runs the graphical user interface, same as
+  -`migbox gui`
+  -`migbox cli`     runs the command line interface
+  -`migbox server`  runs the MiGBox SFTP server
 
 Requirements
 ------------
