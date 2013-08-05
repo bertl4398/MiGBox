@@ -138,15 +138,36 @@ def read_config(configfile, server=False):
             values[section][option] = value
     return values
 
-def print_vars(_vars):
-    for section, options in _vars.items():
+def print_vars(vars_):
+    """
+    Print the given variables in the form of
+    C{{'section': {'option': value}}} as:
+    section
+        option value
+
+    @param vars_: dictionary of dictionaries.
+    @type vars_: dict
+    """
+
+    for section, options in vars_.items():
         print section
         for option, value in options.items():
             print "    {0}: {1}".format(option,value)
 
-def get_vars(_vars):
+def get_vars(vars_):
+    """
+    Return the given variables in the from of
+    C{{'section': {'option': value}}} as a dictionary
+    of C{{'option': value}}.
+
+    @param vars_: dictionary of dictionaries.
+    @type vars_: dict
+    @return: dictionary of named values.
+    @rtype: dict
+    """
+
     var_dict = {}
-    for section, options in _vars.items():
+    for section, options in vars_.items():
         for option, value in options.items():
             var_dict[option] = value
     return var_dict

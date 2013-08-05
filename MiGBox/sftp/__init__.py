@@ -16,13 +16,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-__version__ = 0.3
+__version__ = 0.5
 __author__ = 'Benjamin Ertl'
 
 from client import SFTPClient
 from server import Server, SFTPServer
 from server_interface import SFTPServerInterface
-from common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH
+from common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH, CMD_OTP
 
 __all__ = [ 'SFTPClient',
             'Server',

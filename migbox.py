@@ -25,7 +25,7 @@ Runs by default the graphical user interface.
 Can also run the command line interface or the sftp server.
 """
 
-__version__ = 0.4
+__version__ = 0.5
 __author__ = 'Benjamin Ertl'
 
 import os
