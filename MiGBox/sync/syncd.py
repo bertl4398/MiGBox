@@ -65,13 +65,24 @@ class EventHandler(FileSystemEventHandler):
         sync_dst = self._get_syncpath(event.dest_path)
         sync.move_file(self.dst, sync_src, sync_dst)
 
-def poll(local, remote, stop_polling):
+def push(observer, local, remote, pause=False):
+    if pause:
+        observer.unschedule_all()
+    else:
+        event_handler = EventHandler(local, remote)
+        observer.schedule(event_handler, path=local.root, recursive=True)
+    
+def poll(observer, local, remote, stop_polling):
+    # pause pushing
+    push(observer, local, remote, True)
     # get all new/modified remote files
     sync.sync_all_files(remote, local, remote.root, modified=True)
     # delete all files deleted on remote
     sync.sync_all_files(local, remote, local.root, modified=False, deleted=True)
+    # continue pushin
+    push(observer, local, remote, False)
     if not stop_polling.isSet():
-        threading.Timer(2, poll, [local, remote, stop_polling]).start()
+        threading.Timer(2, poll, [observer, local, remote, stop_polling]).start()
 
 def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
          username='', password='', logfile=None, loglevel='INFO',
@@ -96,12 +107,7 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
 
     logger.info("Connect source and destination ...<br />")
 
-    #logging.basicConfig(filename=logfile, filemode='w',
-    #    format='%(levelname)s: %(asctime)s %(message)s',
-    #    datefmt='%m/%d/%Y %I:%M:%S %p', level=getattr(logging,loglevel))
-
     local = OSFileSystem(root=source)
-
     if mode == 'local':
         remote = OSFileSystem(root=destination)
     elif mode == 'remote':
@@ -129,12 +135,13 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
     observer.start()
 
     stop_polling = threading.Event()
-    threading.Timer(2, poll, [local, remote, stop_polling]).start()
+    threading.Timer(2, poll, [observer, local, remote, stop_polling]).start()
     
     while not event.isSet():
         time.sleep(1)
 
     stop_polling.set()
+    time.sleep(2)
 
     observer.stop()
     observer.join()
