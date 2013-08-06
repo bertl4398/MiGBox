@@ -42,11 +42,11 @@ except ImportError:
 
 # for cx_Freeze build on windows
 # build with 'python setup.py build'
-# from cx_Freeze import setup, Executable
-##build_exe_options = {"packages": ["Crypto", "paramiko", "watchdog", "PyQt4"]}
-# base = None
-# if sys.platform.startswith("win")
-#     base = "Win32GUI"
+from cx_Freeze import setup, Executable
+build_exe_options = {"packages": ["Crypto", "paramiko", "watchdog", "PyQt4"]}
+base = None
+if sys.platform.startswith("win"):
+    base = "Win32GUI"
 
 setup(name='MiGBox',
       version='0.5',
@@ -59,7 +59,7 @@ setup(name='MiGBox',
       #package_dir={'MiGBox': ''},
       packages=['MiGBox'],
       long_description = description,
-      #options = {"build_exe": build_exe_options},
-      #executables = [Executable("migbox.py", base=base)]
+      options = {"build_exe": build_exe_options},
+      executables = [Executable("migbox.py", base=base)],
       **d
      )
