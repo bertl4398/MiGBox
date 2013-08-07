@@ -41,12 +41,21 @@ except ImportError:
     d = {}
 
 # for cx_Freeze build on windows
-# build with 'python setup.py build'
-from cx_Freeze import setup, Executable
-build_exe_options = {"packages": ["Crypto", "paramiko", "watchdog", "PyQt4"]}
-base = None
-if sys.platform.startswith("win"):
-    base = "Win32GUI"
+# build with 'python setup.py freeze'
+try:
+    if sys.argv[1] == "freeze":
+        sys.argv[1] = "build"
+        from cx_Freeze import setup, Executable
+        build_exe_options = {"packages": ["Crypto", "paramiko",
+                                          "watchdog", "PyQt4"]}
+        base = None
+        if sys.platform.startswith("win"):
+            base = "Win32GUI"
+
+    d = {"options": {"build_exe": build_exe_options},
+         "executables": [Executable("migbox.py", base=base)]}
+except (IndexError, ImportError):
+    pass
 
 setup(name='MiGBox',
       version='0.5',
@@ -59,7 +68,7 @@ setup(name='MiGBox',
       #package_dir={'MiGBox': ''},
       packages=['MiGBox'],
       long_description = description,
-      options = {"build_exe": build_exe_options},
-      executables = [Executable("migbox.py", base=base)],
+      #options = {"build_exe": build_exe_options},
+      #executables = [Executable("migbox.py", base=base)],
       **d
      )
