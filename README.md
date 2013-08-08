@@ -22,9 +22,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 Getting started
 ---------------
 
-MiGBox was build with pyinstaller 2.0 for Linux and MacOS X and
-cx_Freeze 4.3.1 for Windows, so you dont have to install it as a python
-package.
+MiGBox was build with cx_Freeze 4.3.1 for Linux, MacOS X and Windows, so you dont
+have to install it as a python package.
 
 You can just download the packed standalone version for your OS,
 unpack it and run migbox(.exe).
