@@ -24,6 +24,7 @@ Provides a wrapper for uniform file system access with os and sftp via paramiko.
 import os
 import stat
 import shutil
+import posixpath
 
 from MiGBox.sync.delta import blockchecksums, delta, patch, weakchecksum, strongchecksum
 
@@ -50,6 +51,20 @@ class FileSystem(object):
         self.root = os.path.normpath(root)
         self.cache = {}
 
+    def join_path(self, path, *largs):
+        """
+        Return the joint path of the given parts.
+
+        @param path: path.
+        @type path: str
+        @param *largs: no or more path parts.
+        @type *largs: str
+        @return: joint path.
+        @rtype: str
+        """
+
+        raise NotImplementedError
+
     def get_relative_path(self, path):
         """
         Return the relative path to a given path, path - root.
@@ -60,7 +75,7 @@ class FileSystem(object):
         @rtype: str
         """
 
-        return path.replace(self.root + os.path.sep, '')
+        raise NotImplementedError
 
     def listdir(self, path):
         """
@@ -91,7 +106,7 @@ class FileSystem(object):
         while dirs:
             dir_ = dirs.pop()
             for name in self.instance.listdir(dir_):
-                abs_path = os.path.join(dir_, name)
+                abs_path = self.join_path(dir_, name)
                 if stat.S_ISDIR(self.instance.stat(abs_path).st_mode):
                     dirs.append(abs_path)
                 yield abs_path
@@ -277,6 +292,12 @@ class OSFileSystem(FileSystem):
     def __init__(self, instance=os, root='.'):
         FileSystem.__init__(self, instance, root)
 
+    def join_path(self, path, *largs):
+        return os.path.join(path, *largs)
+
+    def get_relative_path(self, path):
+        return path.replace(self.root + os.path.sep, '')
+
     def open(self, path, mode='rb', buffering=None):
         return open(path, mode)
 
@@ -298,6 +319,12 @@ class SFTPFileSystem(FileSystem):
 
     def __init__(self, instance, root='.'):
         FileSystem.__init__(self, instance, root)
+
+    def join_path(self, path, *largs):
+        return posixpath.join(path, *largs)
+
+    def get_relative_path(self, path):
+        return path.replace(self.root + posixpath.sep, '')
 
     def open(self, path, mode='rb', buffering=None):
         return self.instance.open(path, mode)
