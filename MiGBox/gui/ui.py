@@ -548,6 +548,8 @@ class AppUi(QMainWindow):
     def _setOptions(self):
         dialog = _OptionsUi(self)
         dialog.exec_()
+        if self.remoteCheckBox.isChecked():
+            self.dstPathEdit.setText(_vars["Connection"]["sftp_host"])
 
     def _setRemote(self, value):
         if self.remoteCheckBox.isChecked():
