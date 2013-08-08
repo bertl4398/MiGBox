@@ -105,11 +105,14 @@ class FileSystem(object):
         dirs = [path]
         while dirs:
             dir_ = dirs.pop()
-            for name in self.instance.listdir(dir_):
-                abs_path = self.join_path(dir_, name)
-                if stat.S_ISDIR(self.instance.stat(abs_path).st_mode):
-                    dirs.append(abs_path)
-                yield abs_path
+            try:
+                for name in self.instance.listdir(dir_):
+                    abs_path = self.join_path(dir_, name)
+                    if stat.S_ISDIR(self.instance.stat(abs_path).st_mode):
+                        dirs.append(abs_path)
+                    yield abs_path
+            except (IOError, OSError):
+                continue
 
     def stat(self, path):
         """

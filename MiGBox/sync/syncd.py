@@ -33,10 +33,11 @@ from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
 class EventHandler(FileSystemEventHandler):
-    def __init__(self, src, dst):
+    def __init__(self, src, dst, lock):
         FileSystemEventHandler.__init__(self)
         self.src = src
         self.dst = dst
+        self.lock = lock
 
     def _get_syncpath(self, path):
         rel_path = self.src.get_relative_path(path)
@@ -44,45 +45,44 @@ class EventHandler(FileSystemEventHandler):
 
     def on_created(self, event):
         sync_path = self._get_syncpath(event.src_path)
+        self.lock.acquire()
         if event.is_directory:
             sync.make_dir(self.dst, sync_path)
         else:
             sync.copy_file(self.src, event.src_path, self.dst, sync_path)
+        self.lock.release()
 
     def on_deleted(self, event):
         sync_path = self._get_syncpath(event.src_path)
+        self.lock.acquire()
         if event.is_directory:
             sync.remove_dir(self.dst, sync_path)
         else:
             sync.remove_file(self.dst, sync_path)
+        self.lock.release()
 
     def on_modified(self, event):
         sync_path = self._get_syncpath(event.src_path)
+        self.lock.acquire()
         sync.sync_file(self.src, event.src_path, self.dst, sync_path)
+        self.lock.release()
 
     def on_moved(self, event):
         sync_src = self._get_syncpath(event.src_path)
         sync_dst = self._get_syncpath(event.dest_path)
+        self.lock.acquire()
         sync.move_file(self.dst, sync_src, sync_dst)
+        self.lock.release()
 
-def push(observer, local, remote, pause=False):
-    if pause:
-        observer.unschedule_all()
-    else:
-        event_handler = EventHandler(local, remote)
-        observer.schedule(event_handler, path=local.root, recursive=True)
-    
-def poll(observer, local, remote, stop_polling):
-    # pause pushing
-    push(observer, local, remote, True)
+def poll(local, remote, lock, stop_polling):
+    lock.acquire()
     # get all new/modified remote files
     sync.sync_all_files(remote, local, remote.root, modified=True)
     # delete all files deleted on remote
     sync.sync_all_files(local, remote, local.root, modified=False, deleted=True)
-    # continue pushin
-    push(observer, local, remote, False)
     if not stop_polling.isSet():
-        threading.Timer(2, poll, [observer, local, remote, stop_polling]).start()
+        threading.Timer(2, poll, [local, remote, lock, stop_polling]).start()
+    lock.release()
 
 def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
          username='', password='', logfile=None, loglevel='INFO',
@@ -129,13 +129,14 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
     # sync no modifications, already synced
     sync.sync_all_files(remote, local, remote.root, modified=False)
 
-    event_handler = EventHandler(local, remote)
+    lock = threading.Lock()
+    event_handler = EventHandler(local, remote, lock)
     observer = Observer()
     observer.schedule(event_handler, path=source, recursive=True)
     observer.start()
 
     stop_polling = threading.Event()
-    threading.Timer(2, poll, [observer, local, remote, stop_polling]).start()
+    threading.Timer(2, poll, [local, remote, lock, stop_polling]).start()
     
     while not event.isSet():
         time.sleep(1)
