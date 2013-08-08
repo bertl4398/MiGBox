@@ -412,6 +412,8 @@ class AppUi(QMainWindow):
 
     def _refreshViews(self):
         self.logBrowser.reload()
+        self.logBrowser.moveCursor(QTextCursor.End)
+        self.logBrowser.ensureCursorVisible() 
         self.srcTreeView.setModel(self.srcFsModel)
         self.srcTreeView.setRootIndex(self.srcFsModel.index(_vars["Sync"]["source"]))
         self.dstTreeView.setModel(self.dstFsModel)
