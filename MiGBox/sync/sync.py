@@ -53,7 +53,8 @@ def sync_all_files(src, dst, path, modified=True, deleted=False):
 
     for pathname in src.walk(path):
         rel_path = src.get_relative_path(pathname)
-        sync_path = dst.join_path(dst.root,rel_path)
+        # windos path fix -- there might be a better solution
+        sync_path = dst.join_path(dst.root, *rel_path.split("\\"))
         if stat.S_ISDIR(src.stat(pathname).st_mode):
             try:
                 mtime = dst.stat(sync_path).st_mtime
