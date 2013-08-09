@@ -20,7 +20,9 @@
 Sync daemon for MiGBox.
 """
 
-import os, sys, time
+import os
+import sys
+import time
 import threading
 import logging
 import paramiko
@@ -43,45 +45,43 @@ class EventHandler(FileSystemEventHandler):
         rel_path = self.src.get_relative_path(path)
         return os.path.join(self.dst.root, rel_path)
 
+    def on_any_event(self, event):
+        self.lock.acquire()
+        super(EventHandler, self).on_any_event(event)
+        self.lock.release()
+
     def on_created(self, event):
         sync_path = self._get_syncpath(event.src_path)
-        self.lock.acquire()
         if event.is_directory:
             sync.make_dir(self.dst, sync_path)
         else:
             sync.copy_file(self.src, event.src_path, self.dst, sync_path)
-        self.lock.release()
 
     def on_deleted(self, event):
         sync_path = self._get_syncpath(event.src_path)
-        self.lock.acquire()
         if event.is_directory:
             sync.remove_dir(self.dst, sync_path)
         else:
             sync.remove_file(self.dst, sync_path)
-        self.lock.release()
 
     def on_modified(self, event):
         sync_path = self._get_syncpath(event.src_path)
-        self.lock.acquire()
         sync.sync_file(self.src, event.src_path, self.dst, sync_path)
-        self.lock.release()
 
     def on_moved(self, event):
         sync_src = self._get_syncpath(event.src_path)
         sync_dst = self._get_syncpath(event.dest_path)
-        self.lock.acquire()
         sync.move_file(self.dst, sync_src, sync_dst)
-        self.lock.release()
 
-def poll(local, remote, lock, stop_polling):
+def poll(local, remote, observer, lock, stop_polling):
+    observer.event_queue.join()
     lock.acquire()
     # get all new/modified remote files
     sync.sync_all_files(remote, local, remote.root, modified=True)
     # delete all files deleted on remote
     sync.sync_all_files(local, remote, local.root, modified=False, deleted=True)
     if not stop_polling.isSet():
-        threading.Timer(2, poll, [local, remote, lock, stop_polling]).start()
+        threading.Timer(2, poll, [local, remote, observer, lock, stop_polling]).start()
     lock.release()
 
 def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
@@ -136,7 +136,7 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
     observer.start()
 
     stop_polling = threading.Event()
-    threading.Timer(2, poll, [local, remote, lock, stop_polling]).start()
+#    threading.Timer(2, poll, [local, remote, observer, lock, stop_polling]).start()
     
     while not event.isSet():
         time.sleep(1)
