@@ -5,13 +5,12 @@ import copy
 import threading
 import logging
 import shutil
+import filecmp
 
 from Queue import Queue
 
 from watchdog.events import *
 from watchdog.observers import Observer
-
-#logging.basicConfig(filename="synclog", filemode="w", level=logging.DEBUG)
 
 events_logger = logging.getLogger("events")
 events_logger.setLevel(logging.INFO)
@@ -31,51 +30,74 @@ def sync_path(src, dst, path):
 def sync(src, dst, queue, stop):
     while not stop.isSet():
         event = queue.get()
-        try:
-            if isinstance(event, DirCreatedEvent):
-                path = sync_path(src, dst, event.src_path)
-                if not os.path.exists(path):
-                    os.mkdir(path)
-            elif isinstance(event, FileCreatedEvent):
-                path = sync_path(src, dst, event.src_path)
+        path = sync_path(src, dst, event.src_path)
+        if isinstance(event, DirCreatedEvent):
+            try:
+                os.mkdir(path)
+            except OSError:
+                pass
+        elif isinstance(event, FileCreatedEvent):
+            try:
                 shutil.copy(event.src_path, path)
-            elif isinstance(event, DirDeletedEvent):
-                path = sync_path(src, dst, event.src_path)
+            except (OSError, IOError):
+                pass
+        elif isinstance(event, DirDeletedEvent):
+            try:
                 os.rmdir(path)
-            elif isinstance(event, FileDeletedEvent):
-                path = sync_path(src, dst, event.src_path)
+            except OSError:
+                pass
+        elif isinstance(event, FileDeletedEvent):
+            try:
                 os.remove(path)
-            elif isinstance(event, FileModifiedEvent):
-                path = sync_path(src, dst, event.src_path)
-            elif isinstance(event, DirMovedEvent) or isinstance(event, FileMovedEvent):
-                srcpath = sync_path(src, dst, event.src_path)
-                dstpath = sync_path(src, dst, event.dest_path)
-                shutil.move(srcpath, dstpath)
-            else:
-                sync_all(src, dst)
-        except(shutil.Error, OSError, IOError):
-            queue.add(FileSystemEvent("SyncAllEvent", event.src_path))
+            except OSError:
+                pass
+        elif isinstance(event, FileModifiedEvent):
+            try:
+                shutil.copy(event.src_path, path)
+            except (OSError, IOError):
+                pass
+        elif isinstance(event, DirMovedEvent):
+            dstpath = sync_path(src, dst, event.dest_path)
+            try:
+                os.rename(path, dstpath)
+            except OSError:
+                pass
+        elif isinstance(event, FileMovedEvent):
+            dstpath = sync_path(src, dst, event.dest_path)
+            try:
+                os.rename(path, dstpath)
+            except OSError:
+                pass
 
         cached_logger.info(event)
         queue.task_done()
 
-def sync_all(src, dst):
+def sync_all(src, dst, eventQueue, stop):
+    if eventQueue.empty():
         for root, dirs, files in os.walk(src):
             for dir_ in dirs:
-                 path = os.path.join(root, dir_)
-                 syncpath = sync_path(src, dst, path)
-                 if not os.path.exists(syncpath):
-                     os.mkdir(syncpath)
+                path = os.path.join(root, dir_)
+                syncpath = sync_path(src, dst, path)
+                if not os.path.exists(syncpath):
+                    os.mkdir(syncpath)
             for file_ in files:
                 path = os.path.join(root, file_)
-                shutil.copyfile(path, sync_path(src, dst, path))
-
+                syncpath =  sync_path(src, dst, path)
+                if not os.path.exists(syncpath):
+                    try:
+                        shutil.copyfile(path, syncpath)
+                    except (OSError, IOError):
+                        pass
+                elif not filecmp.cmp(path, syncpath, True):
+                    try:
+                        shutil.copyfile(path, syncpath)
+                    except (OSError, IOError):
+                        pass
+    if not stop.isSet():
+        threading.Timer(3, sync_all, [src, dst, eventQueue, stop]).start()
+ 
 class EventQueue(Queue):
-
-    def add(self, item, block=True, timeout=None):
-        tmp = copy.copy(self.queue)
-        if not item in tmp:
-            self.put(item, block, timeout)
+    pass
 
 class EventHandler(FileSystemEventHandler):
 
@@ -86,23 +108,25 @@ class EventHandler(FileSystemEventHandler):
     def on_any_event(self, event):
         super(EventHandler, self).on_any_event(event)
         events_logger.info(event)
-        eventQueue.add(event)
+        eventQueue.put(event)
 
 eventQueue = EventQueue()
 stop_sync = threading.Event()
 observer = Observer()
 
-source = "/home/benjamin/migsync/MiGBox/tests/local"
-destination = "/home/benjamin/migsync/MiGBox/tests/remote"
+source = "/home/benjamin/MiGBox/tests/local"
+destination = "/home/benjamin/MiGBox/tests/remote"
 
 event_handler = EventHandler(eventQueue)
 observer.schedule(event_handler, path=source, recursive=True)
 
 observer_thread = threading.Thread(target=observer.start, args=[])
 sync_thread = threading.Thread(target=sync, args=[source, destination, eventQueue, stop_sync])
+sync_all_thread = threading.Timer(3, sync_all, [source, destination, eventQueue, stop_sync])
 
 observer_thread.start()
 sync_thread.start()
+sync_all_thread.start()
 
 try:
     while True:
@@ -110,6 +134,7 @@ try:
 except KeyboardInterrupt:
     pass
 
+observer.stop()
 stop_sync.set()
-eventQueue.add(FileSystemEvent("SyncStopEvent", ""))
+eventQueue.put(FileSystemEvent("SyncStopEvent", ""))
 sync_thread.join()
