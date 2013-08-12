@@ -36,7 +36,26 @@ _log = {'create': 'CREATE {0}<br />',
         'move': 'MOVE {0} ==> {1}<br />',
         'copy': 'COPY {0} ==> {1}<br />'}
 
-def sync_all_files(src, dst, path, modified=True, deleted=False):
+def get_sync_path(src, dst, path):
+    """
+    Get the synchronization path for C{dst} from the C{path} on C{src}.
+
+    @param src: source file system abstraction.
+    @type src: L{MiGBox.FileSystem}
+    @param dst: destination file system abstraction.
+    @type dst: L{MiGBox.FileSystem}
+    @param path: the path.
+    @type path: str
+    @return: synchronization path.
+    @rtype: str
+    """
+
+    rel_path = src.get_relative_path(path)
+    # windos path fix -- there might be a better solution
+    sync_path = dst.join_path(dst.root, *rel_path.split("\\"))
+    return sync_path
+ 
+def sync_all_files(src, dst, path):
     """
     Synchronize all files from C{src} file system abstraction to C{dst}
     file system abstraction starting at C{path} and continuing recursively.
@@ -47,35 +66,25 @@ def sync_all_files(src, dst, path, modified=True, deleted=False):
     @type dst: L{MiGBox.FileSystem}
     @param path: root path
     @type path: str
-    @param modified: two-way synchronize modified files.
-    @type modified: bool
     """
 
     for pathname in src.walk(path):
-        rel_path = src.get_relative_path(pathname)
-        # windos path fix -- there might be a better solution
-        sync_path = dst.join_path(dst.root, *rel_path.split("\\"))
+        sync_path = get_sync_path(src, dst, pathname)
         if stat.S_ISDIR(src.stat(pathname).st_mode):
             try:
                 mtime = dst.stat(sync_path).st_mtime
             except (OSError, IOError):
-                if deleted:
-                    remove_dir(src, pathname)
-                else:
-                    make_dir(dst, sync_path)
+                make_dir(dst, sync_path)
         else:
             try:
-               remote_mtime = dst.stat(sync_path).st_mtime
-               local_mtime = src.stat(pathname).st_mtime
-               if remote_mtime > local_mtime and modified:
-                   sync_file(dst, sync_path, src, pathname)
-               elif remote_mtime < local_mtime and modified:
-                   sync_file(src, pathname, dst, sync_path)
+                remote_mtime = dst.stat(sync_path).st_mtime
+                local_mtime = src.stat(pathname).st_mtime
+#                if remote_mtime > local_mtime and modified:
+#                    sync_file(dst, sync_path, src, pathname)
+#                elif remote_mtime < local_mtime and modified:
+                sync_file(src, pathname, dst, sync_path)
             except (OSError, IOError):
-                if deleted:
-                    remove_file(src, pathname)
-                else:
-                    copy_file(src, pathname, dst, sync_path)
+                copy_file(src, pathname, dst, sync_path)
 
 def sync_file(src, src_path, dst, dst_path):
     """
@@ -130,10 +139,10 @@ def copy_file(src, src_path, dst, dst_path):
     except (OSError, IOError):
         logger.error(_log['copy'].format(src_path,dst_path))
 
-def move_file(src, src_path, dst_path):
+def move(src, src_path, dst_path):
     """
-    Move a file from C{src} C{src_path} to C{dst_path} on the same
-    file system.
+    Move a file/directory from C{src} C{src_path} to C{dst_path}
+    on the same file system.
 
     @param src: source file system abstraction.
     @type src: L{MiGBox.FileSystem}
@@ -180,7 +189,7 @@ def remove_dir(src, path):
         logger.info(_log['remove'].format(path))
     except (OSError, IOError):
         logger.error(_log['remove'].format(path))
-
+ 
 def make_dir(src, path):
     """
     Make a new directory at C{src} given by C{path}.

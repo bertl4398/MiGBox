@@ -26,6 +26,8 @@ import time
 import threading
 import logging
 
+import paramiko
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -36,6 +38,7 @@ from MiGBox.sftp import SFTPClient
 
 # global variables' dictionary
 _vars = {}
+_key_pass = ''
 _otp_user = ''
 _otp_pass = ''
 
@@ -49,8 +52,8 @@ class SyncThread(QThread):
         """
         Create a new C{QThread}.
         """
-        super(SyncThread, self).__init__(parent)
 
+        super(SyncThread, self).__init__(parent)
         self.event = threading.Event()
 
     def sync(self, sftp):
@@ -62,6 +65,7 @@ class SyncThread(QThread):
         @param sftp: SFTP synchronization enabled or not
         @type sftp: bool
         """
+
         self.sftp = sftp
         self.start()
 
@@ -72,16 +76,50 @@ class SyncThread(QThread):
         Sets the event that the synchronization routine checks
         to terminate.
         """
+
         self.event.set()
 
 
     def run(self):
         mode = "remote" if self.sftp else "local"
         try:
-            syncd.run(mode, username=_otp_user, password=_otp_pass,
-                      event=self.event, **get_vars(_vars))
+            key = paramiko.RSAKey.from_private_key_file(_vars["KeyAuth"]["userkey"])
+        except paramiko.PasswordRequiredException:
+            dialog = _KeyPassUi(self)
+            dialog.exec_()
+        try:
+            syncd.run(mode, username=_otp_user, password=_otp_pass, keypass=_key_pass,
+                      stopsync=self.event, **get_vars(_vars))
         except Exception as e:
             self.emit(SIGNAL("threadError(QString)"), QString(e.message))
+
+class _KeyPassUi(QDialog):
+    """
+    Class for the user's key password input dialog.
+    """
+
+    def __init__(self, parent=None):
+        super(_KeyPassUi, self).__init__(parent)
+
+        passLabel = QLabel("Password")
+        self.passEdit = QLineEdit()
+        self.passEdit.setEchoMode(QLineEdit.Password)
+
+        buttonBox = QDialogButtonBox(QDialogButtonBox.Ok|QDialogButtonBox.Cancel)
+
+        layout = QVBoxLayout()
+        layout.addWidget(passLabel)
+        layout.addWidget(passEdit)
+        self.setLayout(layout)
+        self.setWindowTitle("MiGBox - User key password")
+
+        self.connect(buttonBox, SIGNAL("accepted()"), self.accept)
+        self.connect(buttonBox, SIGNAL("rejected()"), self.reject)
+
+    def accept(self):
+        global _key_pass
+        _key_pass = str(self.passEdit.text())
+        QDialog.accept(self)
 
 class _OtpThread(QThread):
     """
@@ -92,8 +130,13 @@ class _OtpThread(QThread):
     def run(self):
         settings = get_vars(_vars)
         try:
+            key = paramiko.RSAKey.from_private_key_file(_vars["KeyAuth"]["userkey"])
+        except paramiko.PasswordRequiredException:
+            dialog = _KeyPassUi(self)
+            dialog.exec_()
+        try:
             client = SFTPClient.connect(settings["sftp_host"], int(settings["sftp_port"]),
-                                        settings["hostkey"], settings["userkey"],
+                                        settings["hostkey"], settings["userkey"], _key_pass,
                                         username=_otp_user, password=_otp_pass)
             client.onetimepass()
         except Exception as e:

@@ -26,67 +26,96 @@ import time
 import threading
 import logging
 import paramiko
+import shutil
+from Queue import Queue
 
 from MiGBox.sync import sync
 from MiGBox.fs import OSFileSystem, SFTPFileSystem
 from MiGBox.sftp import SFTPClient
 
-from watchdog.events import FileSystemEventHandler
-from watchdog.observers import Observer
+from watchdog.events import * 
+from watchdog.observers.polling import PollingObserver as Observer
+
+events_logger = logging.getLogger("events")
+events_logger.setLevel(logging.INFO)
+cached_logger = logging.getLogger("cached")
+cached_logger.setLevel(logging.INFO)
+events_fh = logging.FileHandler("events", mode="w")
+cached_fh = logging.FileHandler("cached", mode="w")
+events_fh.setLevel(logging.INFO)
+cached_fh.setLevel(logging.INFO)
+events_logger.addHandler(events_fh)
+cached_logger.addHandler(cached_fh)
+
+class EventQueue(Queue):
+    """
+    This class is used to keep track of the file system
+    events and is as for now the default python queue.
+    """
+
+    pass
 
 class EventHandler(FileSystemEventHandler):
-    def __init__(self, src, dst, lock):
-        FileSystemEventHandler.__init__(self)
-        self.src = src
-        self.dst = dst
-        self.lock = lock
+    """
+    This class handles all events observed from the watchdog
+    observer by putting them into an event queue, that will be 
+    processed by the synchronization thread.
+    """
 
-    def _get_syncpath(self, path):
-        rel_path = self.src.get_relative_path(path)
-        return os.path.join(self.dst.root, rel_path)
+    def __init__(self, eventQueue):
+        super(EventHandler, self).__init__()
+        self.eventQueue = eventQueue
 
     def on_any_event(self, event):
-        self.lock.acquire()
         super(EventHandler, self).on_any_event(event)
-        self.lock.release()
+        self.eventQueue.put(event)
+        events_logger.info(event)
 
-    def on_created(self, event):
-        sync_path = self._get_syncpath(event.src_path)
-        if event.is_directory:
-            sync.make_dir(self.dst, sync_path)
-        else:
-            sync.copy_file(self.src, event.src_path, self.dst, sync_path)
+def sync_thread(local, remote, eventQueue, stopsync):
+    while not stopsync.isSet():
+        event = eventQueue.get()
+        local_path = event.src_path
+        remote_path = sync.get_sync_path(local, remote, event.src_path)
+        cached_logger.info(event)
+        if isinstance(event, DirCreatedEvent):
+            sync.make_dir(remote, remote_path)
+        elif isinstance(event, FileCreatedEvent):
+            sync.copy_file(local, local_path, remote, remote_path)
+        elif isinstance(event, DirDeletedEvent):
+            sync.remove_dir(remote, remote_path)
+        elif isinstance(event, FileDeletedEvent):
+            sync.remove_file(remote, remote_path)
+        elif isinstance(event, FileModifiedEvent):
+            pass
+        elif isinstance(event, DirMovedEvent):
+            eventQueue.put(DirCreatedEvent(event.dest_path))
+            eventQueue.put(DirDeletedEvent(event.src_path))
+        elif isinstance(event, FileMovedEvent):
+            eventQueue.put(FileCreatedEvent(event.dest_path))
+            eventQueue.put(FileDeletedEvent(event.src_path))
+        eventQueue.task_done()
 
-    def on_deleted(self, event):
-        sync_path = self._get_syncpath(event.src_path)
-        if event.is_directory:
-            sync.remove_dir(self.dst, sync_path)
-        else:
-            sync.remove_file(self.dst, sync_path)
+def sync_all_thread(local, remote, eventQueue, stopsync):
+    if eventQueue.empty():
+        sync.sync_all_files(local, remote, local.root)
+    if not stopsync.isSet():
+        threading.Timer(1, sync_all_thread, [local, remote, eventQueue, stopsync]).start()
 
-    def on_modified(self, event):
-        sync_path = self._get_syncpath(event.src_path)
-        sync.sync_file(self.src, event.src_path, self.dst, sync_path)
-
-    def on_moved(self, event):
-        sync_src = self._get_syncpath(event.src_path)
-        sync_dst = self._get_syncpath(event.dest_path)
-        sync.move_file(self.dst, sync_src, sync_dst)
-
-def poll(local, remote, observer, lock, stop_polling):
-    observer.event_queue.join()
-    lock.acquire()
-    # get all new/modified remote files
-    sync.sync_all_files(remote, local, remote.root, modified=True)
-    # delete all files deleted on remote
-    sync.sync_all_files(local, remote, local.root, modified=False, deleted=True)
-    if not stop_polling.isSet():
-        threading.Timer(2, poll, [local, remote, observer, lock, stop_polling]).start()
-    lock.release()
-
+def observer_thread(source, eventHandler):
+   while True:
+        try:
+            print "observer start"
+            observer = Observer()
+            observer.schedule(eventHandler, path=source, recursive=True)
+            observer.start()
+            observer.join()
+        except Exception:
+            print "observer failed .. restart"
+            continue
+        
 def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
-         username='', password='', logfile=None, loglevel='INFO',
-         event=threading.Event(), **kargs):
+        keypass=None, username=None, password=None, logfile=None, loglevel='INFO',
+        stopsync=threading.Event(), **kargs):
 
     logger = logging.getLogger("sync")
     logger.setLevel(getattr(logging, loglevel))
@@ -108,41 +137,34 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
     logger.info("Connect source and destination ...<br />")
 
     local = OSFileSystem(root=source)
+    remote = None
     if mode == 'local':
         remote = OSFileSystem(root=destination)
     elif mode == 'remote':
-        client = SFTPClient.connect(sftp_host, sftp_port, hostkey, userkey)
-        if not client:
-            client = SFTPClient.connect(sftp_host, sftp_port, hostkey, userkey,
-                                        username, password)
+        client = SFTPClient.connect(sftp_host, sftp_port, hostkey, userkey, keypass,
+                                    username, password)
         remote = SFTPFileSystem(client)
-        try:
-            remote.remove(os.path.join(remote.root, username))
-        except:
-            pass
+    if not remote:
+        logger.error("Connection failed!<br />")
+        raise Exception("Connection failed.")
 
-    # copy all new files from local to remote
-    # sync all modifications from local/remote to local/remote
-    # modifications are compared by modification time, the latest wins
-    sync.sync_all_files(local, remote, local.root)
-    # copy all new files from remote to local
-    # sync no modifications, already synced
-    sync.sync_all_files(remote, local, remote.root, modified=False)
+    eventQueue = EventQueue()
+    eventHandler = EventHandler(eventQueue)
 
-    lock = threading.Lock()
-    event_handler = EventHandler(local, remote, lock)
-    observer = Observer()
-    observer.schedule(event_handler, path=source, recursive=True)
+    observer = threading.Thread(target=observer_thread, args=[source, eventHandler])
+    observer.name = "Observer"
+    sync_all = threading.Thread(target=sync_all_thread, args=[local, remote, eventQueue, stopsync])
+    sync_all.name = "SyncAll"
+    sync_events = threading.Thread(target=sync_thread, args=[local, remote, eventQueue, stopsync])
+    sync_events.name = "SyncEvents"
+
+    sync_all.start()
     observer.start()
+    sync_events.start()
 
-    stop_polling = threading.Event()
-#    threading.Timer(2, poll, [local, remote, observer, lock, stop_polling]).start()
-    
-    while not event.isSet():
+    print threading.enumerate()
+    while not stopsync.isSet():
         time.sleep(1)
 
-    stop_polling.set()
-    time.sleep(2)
-
-    observer.stop()
-    observer.join()
+    eventQueue.put(FileSystemEvent("SyncStopEvent", ""))
+    sync_events.join()

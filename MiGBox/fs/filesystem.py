@@ -152,6 +152,20 @@ class FileSystem(object):
             raise NotImplementedError
         return self.instance.rmdir(path)
 
+    def rmdirtree(self, path):
+        """
+        Remove a directory tree.
+
+        @param path: path to the directory tree to remove.
+        @type path: str
+        """
+
+        if not self.instance:
+            raise NotImplementedError
+        if isinstance(self.instance, SFTPFileSystem):
+            return self.rmdir(path)
+        return shutil.rmtree(path)
+       
     def remove(self, path):
         """
         Delete a file, if possible.
@@ -243,11 +257,16 @@ class FileSystem(object):
             self.cache[path] = (m_time, self.checksums(path))
             return (False, self.cache[path][1])
         else:
-            m_time = str(self.stat(path).st_mtime)
-            if not m_time == self.cache[path][0]:
-                self.cache[path] = (m_time, self.checksums(path))
-                return (True, self.cache[path][1])
-        return (False, self.cache[path][1])
+            try:
+                m_time = str(self.stat(path).st_mtime)
+            except (IOError, OSError):
+                del self.cache[path]
+                raise
+            else:
+                if not m_time == self.cache[path][0]:
+                    self.cache[path] = (m_time, self.checksums(path))
+                    return (True, self.cache[path][1])
+                return (False, self.cache[path][1])
 
     def checksums(self, path):
         """

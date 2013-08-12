@@ -114,8 +114,8 @@ eventQueue = EventQueue()
 stop_sync = threading.Event()
 observer = Observer()
 
-source = "/home/benjamin/MiGBox/tests/local"
-destination = "/home/benjamin/MiGBox/tests/remote"
+source = "/home/benjamin/migsync/MiGBox/tests/local"
+destination = "/home/benjamin/migsync/MiGBox/tests/remote"
 
 event_handler = EventHandler(eventQueue)
 observer.schedule(event_handler, path=source, recursive=True)
@@ -132,7 +132,7 @@ try:
     while True:
         time.sleep(1)
 except KeyboardInterrupt:
-    pass
+    print threading.enumerate()
 
 observer.stop()
 stop_sync.set()
