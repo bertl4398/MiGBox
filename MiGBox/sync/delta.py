@@ -127,10 +127,10 @@ def delta(filename, checksums, size=BLOCKSIZE):
                 f.seek(offset)
             match = False
             data = f.read(size)
-        if not diff:
-            # no matching checksums, diff is whole file
-            f.seek(0)
-            diff.append((0, base64.b64encode(f.read())))
+        if last != offset:
+            f.seek(last)
+            data = f.read(offset - last)
+            diff.append((last, base64.b64encode(data)))
     return diff
 
 def patch(filename, delta, size=BLOCKSIZE):
