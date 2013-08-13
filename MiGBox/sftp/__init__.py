@@ -22,7 +22,7 @@ __author__ = 'Benjamin Ertl'
 from client import SFTPClient
 from server import Server, SFTPServer
 from server_interface import SFTPServerInterface
-from common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH, CMD_OTP
+from common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH, CMD_OTP, CMD_POLL
 
 __all__ = [ 'SFTPClient',
             'Server',

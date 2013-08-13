@@ -23,11 +23,16 @@ Provides a SFTP server interface for the MiG SFTP server.
 
 import os
 import base64
+import json
 
 import paramiko
 
+from Queue import Empty
 from Crypto import Random
 from Crypto.Hash import MD5
+from watchdog.events import DirMovedEvent, FileMovedEvent 
+
+from MiGBox.sync.delta import blockchecksums, delta, patch
 
 class SFTPHandle(paramiko.SFTPHandle):
     """
@@ -84,6 +89,7 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         super(paramiko.SFTPServerInterface, self).__init__(*largs, **kwargs)
         self.root = os.path.normpath(server.root)
         self.salt = server.salt
+        self.eventQueue = server.eventQueue
 
     def session_started(self):
         """
@@ -374,3 +380,80 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         except OSError as e:
             return paramiko.SFTPServer.convert_errno(e.errno)
 
+    def blockchecksums(self, path):
+        """
+        Get blockchecksums for the given file.
+
+        @param path: path.
+        @type path: str
+        @return: blockchecksums.
+        @rtype: str (json dict)
+        """
+
+        path = self._get_path(path)
+        bs = blockchecksums(path)
+        return json.dumps(bs)
+
+    def delta(self, path, checksums):
+        """
+        Get a delta for the given file to the given checksums.
+
+        @param path: path.
+        @type path: str
+        @param checksums: blockchecksums.
+        @type checksums: str (json dict)
+        @return: delta.
+        @rtype: str (json list)
+        """
+
+        path = self._get_path(path)
+        bs = json.loads(checksums)
+        d = delta(path, bs)
+        return json.dumps(d)
+
+    def patch(self, path, patch):
+        """
+        Patch the given path with patch.
+
+        @param path: path.
+        @type path: str
+        @param patch: patch data.
+        @type patch: str (json list)
+        @return: return code.
+        @rtype: int
+        """
+
+        path = self._get_path(path)
+        d = json.loads(patch)
+        patched = patch(path, d)
+        try:
+            os.rename(patched, path)
+            return paramiko.SFTP_OK
+        except OSError as e:
+            return paramiko.SFTPServer.convert_errno(e.errno)
+
+    def poll(self):
+        """
+        Poll for events observed by the watchdog file system observer.
+
+        @return: list of events.
+        @rtype: str (json list)
+        """
+
+        r = []
+        while True:
+            try:
+                r.append(self.eventQueue.get_nowait())
+            except Empty:
+                break
+        r = map(self._serialize_event, r)
+        return json.dumps(r)
+
+    def _serialize_event(self, event):
+        src_path = event.src_path.replace(self.root, "").lstrip(os.sep)
+        dst_path = ""
+        if isinstance(event, DirMovedEvent) or isinstance(event, FileMovedEvent):
+            dst_path = event.dest_path.replace(self.root).lstrip(os.sep)
+        return {"event_type": event.event_type, "src_path": src_path,
+                "dst_path": dst_path, "is_dir": event.is_directory}
+         

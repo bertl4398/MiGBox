@@ -24,10 +24,10 @@ Provides a SFTP client to use as an abstract file system.
 import os
 import socket
 import json
-
 import paramiko
 
-from MiGBox.sftp.common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH, CMD_OTP
+from watchdog.events import *
+from MiGBox.sftp.common import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH, CMD_OTP, CMD_POLL
 
 class SFTPClient(paramiko.SFTPClient):
     """
@@ -84,8 +84,10 @@ class SFTPClient(paramiko.SFTPClient):
         if not known_host == key_data: 
             raise paramiko.BadHostKeyException(host, key_data, known_host)
 
+        key = paramiko.RSAKey.from_private_key_file(userkey, keypass)
+        username = username if username else ''
         try:
-            transport.auth_publickey(username, paramiko.RSAKey.from_private_key_file(userkey, keypass))
+            transport.auth_publickey(username, key)
         except Exception:
             transport.auth_password(username, password)
 
@@ -156,3 +158,40 @@ class SFTPClient(paramiko.SFTPClient):
         """
 
         self._request(CMD_OTP)
+
+    def poll(self):
+        """
+        Request file system events on the server.
+        """
+
+        t, msg = self._request(CMD_POLL)
+        j = msg.get_string()
+        events = json.loads(j)
+        events = map(self._deserialize_event, events)
+        return events
+
+    def _deserialize_event(self, event):
+        type_ = event["event_type"]
+        dir_ = event["is_dir"]
+        if type_ == "deleted":
+            if dir_:
+                return DirDeletedEvent(event["src_path"])
+            else:
+                return FileDeletedEvent(event["src_path"])
+        elif type_ == "modified":
+            if dir_:
+                return DirModifiedEvent(event["src_path"])
+            else:
+                return FileModifiedEvent(event["src_path"])
+        elif type_ == "created":
+            if dir_:
+                return DirCreatedEvent(event["src_path"])
+            else:
+                return FileCreatedEvent(event["src_path"])
+        elif type_ == "moved":
+            if dir_:
+                return DirMovedEvent(event["src_path"], event["dst_path"])
+            else:
+                return FileMovedEvent(event["src_path"], event["dst_path"])
+        else:
+            return None

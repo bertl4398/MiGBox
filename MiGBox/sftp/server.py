@@ -42,14 +42,13 @@ import time
 import threading
 import socket
 import select
-import json
 import base64
 import paramiko
 
 from Crypto.Hash import MD5
-
-from MiGBox.sync.delta import blockchecksums, delta, patch
-from MiGBox.sftp.common  import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH, CMD_OTP
+from watchdog.observers.polling import PollingObserver as Observer
+from MiGBox.sync import EventQueue, EventHandler
+from MiGBox.sftp.common  import CMD_BLOCKCHK, CMD_DELTA, CMD_PATCH, CMD_OTP, CMD_POLL
 from MiGBox.common import about
 from MiGBox.sftp.server_interface import SFTPServerInterface
 
@@ -74,6 +73,11 @@ class Server(paramiko.ServerInterface):
         self.root = root
         self.userkey = userkey
         self.salt = salt
+        self.eventQueue = EventQueue()
+        self.eventHandler = EventHandler(self.eventQueue)
+        self.observer = Observer()
+        self.observer.schedule(self.eventHandler, path=self.root, recursive=True)
+        self.observer.start()
 
     def check_channel_request(self, kind, chanid):
         """
@@ -144,29 +148,23 @@ class SFTPServer(paramiko.SFTPServer):
         """
         if t == CMD_BLOCKCHK:
             path = msg.get_string()
-            bs = blockchecksums(self.server._get_path(path))
-            j = json.dumps(bs)
-            message = paramiko.Message()
-            message.add_int(request_number)
-            message.add_string(j)
-            self._send_packet(t, str(message))
+            resp = self.server.blockchecksums(path)
+            self._response(request_number, t, resp)
             return
         elif t == CMD_DELTA:
             path = msg.get_string()
-            bs = json.loads(msg.get_string())
-            d = delta(self.server._get_path(path), bs)
-            j = json.dumps(d)
-            message = paramiko.Message()
-            message.add_int(request_number)
-            message.add_string(j)
-            self._send_packet(t, str(message))
+            bs = msg.get_string()
+            resp = self.server.delta(path, bs)
+            self._response(request_number, t, resp)
         elif t == CMD_PATCH:
             path = msg.get_string()
-            d = json.loads(msg.get_string())
-            patched = patch(self.server._get_path(path), d)
-            self._send_status(request_number, self.server.rename(patched, path))
+            d = msg.get_string()
+            self._send_status(request_number, self.server.patch(path, d))
         elif t == CMD_OTP:
             self._send_status(request_number, self.server.onetimepass()) 
+        elif t == CMD_POLL:
+            resp = self.server.poll()
+            self._response(request_number, t, resp)
         else:
             return paramiko.SFTPServer._process(self, t, request_number, msg)
 
@@ -175,11 +173,14 @@ class SFTPServer(paramiko.SFTPServer):
         transport = paramiko.Transport(conn)
         transport.add_server_key(paramiko.RSAKey.from_private_key_file(hostkey))
         transport.set_subsystem_handler('sftp', cls, SFTPServerInterface)
-        transport.start_server(threading.Event(), Server(root, userkey, salt))
+        server = Server(root, userkey, salt)
+        transport.start_server(threading.Event(), server)
 
         while transport.is_active():
             time.sleep(1)
 
+        server.observer.stop()
+        server.observer.join()
         transport.close()
 
 def run(host, port, hostkey, userkey, rootpath, backlog=0, logfile=None, loglevel=None):
@@ -242,6 +243,5 @@ def run(host, port, hostkey, userkey, rootpath, backlog=0, logfile=None, logleve
                     print about
                 if in_.rstrip() == 'exit':
                     running = False
-
     print 'Server is going down ...'
     server_socket.close()

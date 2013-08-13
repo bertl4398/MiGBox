@@ -19,4 +19,6 @@
 __version__ = 0.5
 __author__ = 'Benjamin Ertl'
 
+from sync import EventQueue, EventHandler, sync_events, sync_file, sync_all_files, poll_events
+
 __all__ = [ 'delta', 'rsync', 'sync', 'syncd' ]

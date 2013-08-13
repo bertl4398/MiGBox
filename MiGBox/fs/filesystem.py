@@ -26,6 +26,9 @@ import stat
 import shutil
 import posixpath
 
+from Queue import Empty
+from watchdog.observers.polling import PollingObserver as Observer
+from MiGBox.sync import EventQueue, EventHandler
 from MiGBox.sync.delta import blockchecksums, delta, patch, weakchecksum, strongchecksum
 
 class FileSystem(object):
@@ -152,20 +155,6 @@ class FileSystem(object):
             raise NotImplementedError
         return self.instance.rmdir(path)
 
-    def rmdirtree(self, path):
-        """
-        Remove a directory tree.
-
-        @param path: path to the directory tree to remove.
-        @type path: str
-        """
-
-        if not self.instance:
-            raise NotImplementedError
-        if isinstance(self.instance, SFTPFileSystem):
-            return self.rmdir(path)
-        return shutil.rmtree(path)
-       
     def remove(self, path):
         """
         Delete a file, if possible.
@@ -306,6 +295,13 @@ class FileSystem(object):
 
         raise NotImplementedError
 
+    def poll(self):
+        """
+        Poll for changes on the file system.
+        """
+
+        raise NotImplementedError
+
 class OSFileSystem(FileSystem):
     """
     This class represents a file system implemented by the python os module.
@@ -313,6 +309,11 @@ class OSFileSystem(FileSystem):
 
     def __init__(self, instance=os, root='.'):
         FileSystem.__init__(self, instance, root)
+        self.eventQueue = EventQueue()
+        self.eventHandler = EventHandler(self.eventQueue)
+        self.observer = Observer()
+        self.observer.schedule(self.eventHandler, path=self.root, recursive=True)
+        self.observer.start()
 
     def join_path(self, path, *largs):
         return os.path.join(path, *largs)
@@ -333,6 +334,15 @@ class OSFileSystem(FileSystem):
         patched = patch(path, delta)
         self.instance.remove(path)
         return self.instance.rename(patched, path)
+
+    def poll(self):
+        r = []
+        while True:
+            try:
+                r.append(self.eventQueue.get_nowait())
+            except Empty:
+                break
+        return r 
     
 class SFTPFileSystem(FileSystem):
     """
@@ -366,3 +376,5 @@ class SFTPFileSystem(FileSystem):
     def put(self, src, dst):
         return self.instance.put(src, dst)
 
+    def poll(self):
+        return self.instance.poll()
