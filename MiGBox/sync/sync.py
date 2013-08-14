@@ -65,17 +65,6 @@ class EventHandler(FileSystemEventHandler):
         self.eventQueue.put(event)
         event_logger.info(event)
 
-def poll_events(localQueue, remoteQueue):
-    while True:
-        try:
-            event = remoteQueue.get_nowait()
-        except Empty:
-            print "poll non"
-            break
-        else:
-            print "put " + str(event)
-            localQueue.put(event)
-
 def sync_events(src, dst, eventQueue, stop):
     """
     Sync events from the C{eventQueue} between C{src} and C{dst}.
@@ -112,6 +101,7 @@ def sync_events(src, dst, eventQueue, stop):
         elif isinstance(event, DirMovedEvent):
             new_path = get_sync_path(src, dst, event.dest_path)
             move(dst, dst_path, new_path)
+            eventQueue.put(DirDeletedEvent(src_path))
         elif isinstance(event, FileMovedEvent):
             new_path = get_sync_path(src, dst, event.dest_path)
             move(dst, dst_path, new_path)
@@ -160,10 +150,10 @@ def sync_all_files(src, dst, path):
             try:
                 remote_mtime = dst.stat(sync_path).st_mtime
                 local_mtime = src.stat(pathname).st_mtime
-#                if remote_mtime > local_mtime and modified:
-#                    sync_file(dst, sync_path, src, pathname)
-#                elif remote_mtime < local_mtime and modified:
-                sync_file(src, pathname, dst, sync_path)
+                if remote_mtime > local_mtime:
+                    sync_file(dst, sync_path, src, pathname)
+                elif remote_mtime < local_mtime:
+                    sync_file(src, pathname, dst, sync_path)
             except (OSError, IOError):
                 copy_file(src, pathname, dst, sync_path)
 
@@ -285,11 +275,11 @@ def remove_dirs(src, path):
     try:
         src.rmdir(path)
     except (OSError, IOError):
-        for pathname in src.listdir(path):
-            pathname = src.join_path(path, pathname)
-            if stat.S_ISDIR(src.stat(pathname).st_mode):
-                remove_dirs(src, pathname)
         try:
+            for pathname in src.listdir(path):
+                pathname = src.join_path(path, pathname)
+                if stat.S_ISDIR(src.stat(pathname).st_mode):
+                    remove_dirs(src, pathname)
             src.rmdir(path)
         except (OSError, IOError):
             pass
