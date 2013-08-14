@@ -83,11 +83,6 @@ class SyncThread(QThread):
     def run(self):
         mode = "remote" if self.sftp else "local"
         try:
-            key = paramiko.RSAKey.from_private_key_file(_vars["KeyAuth"]["userkey"])
-        except paramiko.PasswordRequiredException:
-            dialog = _KeyPassUi(self)
-            dialog.exec_()
-        try:
             syncd.run(mode, username=_otp_user, password=_otp_pass, keypass=_key_pass,
                       stopsync=self.event, **get_vars(_vars))
         except Exception as e:
@@ -101,7 +96,7 @@ class _KeyPassUi(QDialog):
     def __init__(self, parent=None):
         super(_KeyPassUi, self).__init__(parent)
 
-        passLabel = QLabel("Password")
+        passLabel = QLabel("Your key is protected by a password.<br />Please enter the password to proceed.")
         self.passEdit = QLineEdit()
         self.passEdit.setEchoMode(QLineEdit.Password)
 
@@ -109,7 +104,8 @@ class _KeyPassUi(QDialog):
 
         layout = QVBoxLayout()
         layout.addWidget(passLabel)
-        layout.addWidget(passEdit)
+        layout.addWidget(self.passEdit)
+        layout.addWidget(buttonBox)
         self.setLayout(layout)
         self.setWindowTitle("MiGBox - User key password")
 
@@ -562,6 +558,13 @@ class AppUi(QMainWindow):
             msgBox = QMessageBox.warning(self, "MiGBox - Sync",
                 "Not a valid destination path.", QMessageBox.Ok)
         else:
+            try:
+                key = paramiko.RSAKey.from_private_key_file(_vars["KeyAuth"]["userkey"])
+            except paramiko.PasswordRequiredException:
+                dialog = _KeyPassUi(self)
+                r = dialog.exec_()
+                if not r:
+                    return
             _vars["Logging"]["loglevel"] = str(self.logLevel.currentText())
             self.srcPathButton.setEnabled(False)
             self.dstPathButton.setEnabled(False)

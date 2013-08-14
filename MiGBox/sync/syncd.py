@@ -85,13 +85,18 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
     if mode == 'local':
         remote = OSFileSystem(root=destination)
     elif mode == 'remote':
-        client = SFTPClient.connect(sftp_host, sftp_port, hostkey, userkey, keypass,
-                                    username, password)
+        try:
+            client = SFTPClient.connect(sftp_host, sftp_port, hostkey, userkey, keypass,
+                                        username, password)
+        except:
+            sync_logger.error("Connection failed!<br />")
+            local.observer.stop()
+            local.observer.join()
+            raise
         remote = SFTPFileSystem(client)
     if not remote:
         sync_logger.error("Connection failed!<br />")
         raise Exception("Connection failed.")
-
 
     sync_events_thread = threading.Thread(target=sync_events,
                                           args=[local, remote, local.eventQueue, stopsync])
