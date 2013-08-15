@@ -82,11 +82,11 @@ class SyncThread(QThread):
 
     def run(self):
         mode = "remote" if self.sftp else "local"
-        try:
-            syncd.run(mode, username=_otp_user, password=_otp_pass, keypass=_key_pass,
+#        try:
+        syncd.run(mode, username=_otp_user, password=_otp_pass, keypass=_key_pass,
                       stopsync=self.event, **get_vars(_vars))
-        except Exception as e:
-            self.emit(SIGNAL("threadError(QString)"), QString(e.message))
+#        except Exception as e:
+#            self.emit(SIGNAL("threadError(QString)"), QString(e.message))
 
 class _KeyPassUi(QDialog):
     """

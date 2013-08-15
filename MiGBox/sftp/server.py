@@ -163,7 +163,9 @@ class SFTPServer(paramiko.SFTPServer):
         elif t == CMD_OTP:
             self._send_status(request_number, self.server.onetimepass()) 
         elif t == CMD_POLL:
+            print "received poll"
             resp = self.server.poll()
+            print "send poll"
             self._response(request_number, t, resp)
         else:
             return paramiko.SFTPServer._process(self, t, request_number, msg)

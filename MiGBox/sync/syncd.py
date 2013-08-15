@@ -33,24 +33,36 @@ from MiGBox.sftp import SFTPClient
 
 from watchdog.events import FileSystemEvent
 
+thread_lock = threading.Lock()
 sync_all_thread = None
 poll_thread = None
 
 def poll_events(local, remote, stop):
+    thread_lock.acquire()
     print "poll"
     events = remote.poll()
+    print "poll done"
     for event in events:
         print event
         local.eventQueue.put(event)
+    thread_lock.release()
     if not stop.isSet():
         poll_thread = threading.Timer(3, poll_events, [local, remote, stop])
         poll_thread.start()
  
 def sync_all(local, remote, stop):
     logger = logging.getLogger("sync")
-    logger.debug("Sync all files.<br />")
+    local.eventQueue.join()
+    thread_lock.acquire()
     print "sync all"
-    sync_all_files(local, remote, local.root)
+    logger.debug("Sync all files.<br />")
+    try:
+        sync_all_files(local, remote, local.root)
+    except Exception as e:
+        print e
+    finally:
+        print "sync all done"
+        thread_lock.release()
     if not stop.isSet():
         sync_all_thread = threading.Timer(5, sync_all, [local, remote, stop])
         sync_all_thread.start()
@@ -61,7 +73,7 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
 
     sync_logger = logging.getLogger("sync")
     event_logger = logging.getLogger("event")
-    sync_logger.setLevel(getattr(logging, loglevel))
+    sync_logger.setLevel(getattr(logging, "DEBUG"))#loglevel))
     event_logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(levelname)s: %(asctime)s %(message)s')
     ch = logging.StreamHandler()
@@ -98,17 +110,13 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
         sync_logger.error("Connection failed!<br />")
         raise Exception("Connection failed.")
 
-    sync_events_thread = threading.Thread(target=sync_events,
-                                          args=[local, remote, local.eventQueue, stopsync])
+    sync_events_thread = threading.Thread(target=sync_events, args=[local, remote,
+                                          local.eventQueue, stopsync, thread_lock])
     sync_events_thread.name = "SyncEvents"
 
-    once = threading.Event()
-    once.set()
 
-    sync_all(local, remote, stopsync)
-    sync_all(remote, local, once)
-
-    time.sleep(10)
+    sync_all_files(local, remote, local.root)
+    sync_all_files(remote, local, remote.root)
 
     poll_events(local, remote, stopsync)
 
@@ -118,7 +126,8 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
     while not stopsync.isSet():
         time.sleep(1)
 
-    remote.observer.stop()
+    if mode == 'local':
+        remote.observer.stop()
     local.observer.stop()
     local.eventQueue.put(FileSystemEvent("SyncStopEvent", ""))
     sync_events_thread.join()

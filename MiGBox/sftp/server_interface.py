@@ -441,11 +441,12 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         """
 
         r = []
-        while True:
-            try:
-                r.append(self.eventQueue.get_nowait())
-            except Empty:
-                break
+        try:
+            while True:
+                event = self.eventQueue.get_nowait()
+                r.append(event)
+        except Empty:
+            pass
         r = map(self._serialize_event, r)
         return json.dumps(r)
 

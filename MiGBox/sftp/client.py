@@ -164,11 +164,17 @@ class SFTPClient(paramiko.SFTPClient):
         Request file system events on the server.
         """
 
-        t, msg = self._request(CMD_POLL)
-        j = msg.get_string()
-        events = json.loads(j)
-        events = map(self._deserialize_event, events)
-        return events
+        try:
+            print "send poll"
+            t, msg = self._request(CMD_POLL)
+            print "received poll"
+            j = msg.get_string()
+            events = json.loads(j)
+            events = map(self._deserialize_event, events)
+            return events
+        except Exception as e:
+            print e.args
+            return []
 
     def _deserialize_event(self, event):
         type_ = event["event_type"]

@@ -24,6 +24,7 @@ L{MiGBox.FileSystem}.
 import os
 import stat
 import logging
+import threading
 
 from Queue import Queue, Empty
 
@@ -65,7 +66,7 @@ class EventHandler(FileSystemEventHandler):
         self.eventQueue.put(event)
         event_logger.info(event)
 
-def sync_events(src, dst, eventQueue, stop):
+def sync_events(src, dst, eventQueue, stop, lock=threading.Lock()):
     """
     Sync events from the C{eventQueue} between C{src} and C{dst}.
 
@@ -81,16 +82,20 @@ def sync_events(src, dst, eventQueue, stop):
 
     while not stop.isSet():
         event = eventQueue.get()
+        lock.acquire()
+        print "sync event"
+        print event
         src_path = event.src_path
-        if src_path.startswith(dst.root):
+        if not src_path.startswith(src.root):
             swp = src
             src = dst
             dst = swp
         dst_path = get_sync_path(src, dst, src_path)
+        print src_path +  " to " + dst_path
         if isinstance(event, DirCreatedEvent):
             make_dir(dst, dst_path)
         elif isinstance(event, FileCreatedEvent):
-            copy_file(src, src_path, dst, dst_path)
+            sync_file(src, src_path, dst, dst_path)
         elif isinstance(event, DirDeletedEvent):
             remove_dir(dst, dst_path)
             remove_dirs(dst, dst_path)
@@ -105,6 +110,7 @@ def sync_events(src, dst, eventQueue, stop):
         elif isinstance(event, FileMovedEvent):
             new_path = get_sync_path(src, dst, event.dest_path)
             move(dst, dst_path, new_path)
+        lock.release()
         eventQueue.task_done()
 
 def get_sync_path(src, dst, path):
@@ -126,7 +132,7 @@ def get_sync_path(src, dst, path):
     sync_path = dst.join_path(dst.root, *rel_path.split("\\"))
     return sync_path
  
-def sync_all_files(src, dst, path):
+def sync_all_files(src, dst, path=None):
     """
     Synchronize all files from C{src} file system abstraction to C{dst}
     file system abstraction starting at C{path} and continuing recursively.
@@ -139,23 +145,25 @@ def sync_all_files(src, dst, path):
     @type path: str
     """
 
-    for pathname in src.walk(path):
-        sync_path = get_sync_path(src, dst, pathname)
-        if stat.S_ISDIR(src.stat(pathname).st_mode):
+    if not path:
+        path = src.root
+    dirs = [path]
+    while dirs:
+        dir_ = dirs.pop()
+        for pathname in src.listdir(dir_):
+            abs_path = src.join_path(dir_, pathname)
+            sync_path = get_sync_path(src, dst, abs_path)
             try:
-                mtime = dst.stat(sync_path).st_mtime
-            except (OSError, IOError):
-                make_dir(dst, sync_path)
-        else:
-            try:
-                remote_mtime = dst.stat(sync_path).st_mtime
-                local_mtime = src.stat(pathname).st_mtime
-                if remote_mtime > local_mtime:
-                    sync_file(dst, sync_path, src, pathname)
-                elif remote_mtime < local_mtime:
-                    sync_file(src, pathname, dst, sync_path)
-            except (OSError, IOError):
-                copy_file(src, pathname, dst, sync_path)
+                if stat.S_ISDIR(src.stat(abs_path).st_mode):
+                    dirs.append(abs_path)
+                    try:
+                        dst_mtime = dst.stat(sync_path).st_mtime
+                    except (OSError, IOError):
+                        make_dir(dst, sync_path)
+                else:
+                    sync_file(src, abs_path, dst, sync_path)
+            except (IOError, OSError):
+                continue
 
 def sync_file(src, src_path, dst, dst_path):
     """
@@ -176,19 +184,43 @@ def sync_file(src, src_path, dst, dst_path):
     """
 
     try:
-        dst_mod, dst_bs = dst.cached_checksums(dst_path)
-        src_mod, src_bs = src.cached_checksums(src_path)
-        if dst_mod:
-            sync_logger.info(_log['sync_conf'].format(src_path,dst_path))
-        if set(src_bs) - set(dst_bs):
-            delta = src.delta(src_path, dst_bs)
-            dst.patch(dst_path, delta)
-            dst.cached_checksums(dst_path)
-            sync_logger.info(_log['sync_to'].format(src_path,dst_path))
+        dst_mtime = dst.stat(dst_path).st_mtime
+    except (OSError, IOError):
+        copy_file(src, src_path, dst, dst_path)
+    else:
+        try:
+            src_mtime = src.stat(src_path).st_mtime
+        except (OSError, IOError): # src doesnt exist?
+            if src_path in src.cache:
+                del src.cache[src_path]
+            remove_file(dst, dst_path)
         else:
-            sync_logger.debug(_log['sync_eq'].format(src_path,dst_path))
-    except:
-        sync_logger.debug(_log['sync_er'].format(src_path,dst_path))
+            if not dst_path in dst.cache:
+                dst.cache[dst_path] = (dst_mtime, dst.blockchecksums(dst_path))
+            if not src_path in src.cache:
+                src.cache[src_path] = (src_mtime, src.blockchecksums(src_path))
+            cached_dst_mtime, cached_dst_bs = dst.cache[dst_path]
+            cached_src_mtime, cached_src_bs = src.cache[src_path]
+            if dst_mtime > cached_dst_mtime: # modification has not yet been seen
+                sync_logger.info(_log['sync_conf'].format(src_path,dst_path))
+                dst.cache[dst_path] = (dst_mtime, dst.blockchecksums(dst_path))
+                cached_dst_mtime, cached_dst_bs = dst.cache[dst_path]
+            if src_mtime > cached_src_mtime: # modification has not yet been seen
+                sync_logger.info(_log['sync_conf'].format(src_path,dst_path))
+                src.cache[src_path] = (src_mtime, src.blockchecksums(src_path))
+                cached_src_mtime, cached_src_bs = src.cache[dst_path]
+            if set(cached_src_bs) - set(cached_dst_bs): # files differ
+                if cached_src_mtime >= cached_dst_mtime: # src newer
+                    delta = src.delta(src_path, cached_dst_bs)
+                    dst.patch(dst_path, delta)
+                    dst.cache[dst_path] = (dst.stat(dst_path).st_mtime, dst.blockchecksums(dst_path))
+                else:
+                    delta = dst.delta(dst_path, cached_src_bs)
+                    src.patch(src_path, delta)
+                    src.cache[src_path] = (src.stat(src_path).st_mtime, src.blockchecksums(src_path))
+                sync_logger.info(_log['sync_to'].format(src_path,dst_path))
+            else:
+                sync_logger.debug(_log['sync_eq'].format(src_path,dst_path))
 
 def copy_file(src, src_path, dst, dst_path):
     """
@@ -207,7 +239,7 @@ def copy_file(src, src_path, dst, dst_path):
     try:
         src.copy(src, src_path, dst, dst_path)
         sync_logger.info(_log['copy'].format(src_path,dst_path))
-    except (OSError, IOError):
+    except:
         sync_logger.debug(_log['copy'].format(src_path,dst_path))
 
 def move(src, src_path, dst_path):
@@ -240,6 +272,8 @@ def remove_file(src, path):
     """
  
     try:
+        if path in src.cache:
+            del src.cache[path]
         src.remove(path)
         sync_logger.info(_log['remove'].format(path))
     except (OSError, IOError):

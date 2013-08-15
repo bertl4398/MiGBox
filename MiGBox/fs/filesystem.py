@@ -29,7 +29,7 @@ import posixpath
 from Queue import Empty
 from watchdog.observers.polling import PollingObserver as Observer
 from MiGBox.sync import EventQueue, EventHandler
-from MiGBox.sync.delta import blockchecksums, delta, patch, weakchecksum, strongchecksum
+from MiGBox.sync.delta import blockchecksums, delta, patch
 
 class FileSystem(object):
     """
@@ -93,29 +93,6 @@ class FileSystem(object):
         if not self.instance:
             raise NotImplementedError
         return self.instance.listdir(path)
-
-    def walk(self, path):
-        """
-        Generator for all paths to all directories and files
-        recursively, starting at C{path}.
-
-        @param path: path to start walking.
-        @type path: str
-        """
-
-        if not self.instance:
-            raise NotImplementedError
-        dirs = [path]
-        while dirs:
-            dir_ = dirs.pop()
-            try:
-                for name in self.instance.listdir(dir_):
-                    abs_path = self.join_path(dir_, name)
-                    if stat.S_ISDIR(self.instance.stat(abs_path).st_mode):
-                        dirs.append(abs_path)
-                    yield abs_path
-            except (IOError, OSError):
-                continue
 
     def stat(self, path):
         """
@@ -224,40 +201,7 @@ class FileSystem(object):
 
         raise NotImplementedError
 
-    def cached_checksums(self, path):
-        """
-        Compute block checksums for a given file.
-
-        If the checksums are not already cached, compute new
-        block checksums.
-
-        @param path: path to the file.
-        @type path: str
-        @return: tuple of boolean value, True if file was modified, and
-                 hashtable of block checksums, see L{MiGBox.sync.delta}
-        @rtype: tuple
-        """
-
-        if not self.instance:
-            raise NotImplementedError
-
-        if not path in self.cache:
-            m_time = str(self.stat(path).st_mtime)
-            self.cache[path] = (m_time, self.checksums(path))
-            return (False, self.cache[path][1])
-        else:
-            try:
-                m_time = str(self.stat(path).st_mtime)
-            except (IOError, OSError):
-                del self.cache[path]
-                raise
-            else:
-                if not m_time == self.cache[path][0]:
-                    self.cache[path] = (m_time, self.checksums(path))
-                    return (True, self.cache[path][1])
-                return (False, self.cache[path][1])
-
-    def checksums(self, path):
+    def blockchecksums(self, path):
         """
         Compute block checksums for a given file.
 
@@ -319,12 +263,12 @@ class OSFileSystem(FileSystem):
         return os.path.join(path, *largs)
 
     def get_relative_path(self, path):
-        return path.replace(self.root + os.path.sep, '')
+        return path.replace(self.root, '').lstrip(os.path.sep)
 
     def open(self, path, mode='rb', buffering=None):
         return open(path, mode)
 
-    def checksums(self, path):
+    def blockchecksums(self, path):
         return blockchecksums(path) 
 
     def delta(self, path, checksums):
@@ -356,12 +300,12 @@ class SFTPFileSystem(FileSystem):
         return posixpath.join(path, *largs)
 
     def get_relative_path(self, path):
-        return path.replace(self.root + posixpath.sep, '')
+        return path.replace(self.root, '').lstrip(posixpath.sep)
 
     def open(self, path, mode='rb', buffering=None):
         return self.instance.open(path, mode)
 
-    def checksums(self, path):
+    def blockchecksums(self, path):
         return self.instance.checksums(path)
 
     def delta(self, path, chksums):
