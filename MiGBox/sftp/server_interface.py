@@ -391,7 +391,10 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
         """
 
         path = self._get_path(path)
-        bs = blockchecksums(path)
+        try:
+            bs = blockchecksums(path)
+        except OSError as e:
+            bs = {}
         return json.dumps(bs)
 
     def delta(self, path, checksums):
@@ -408,7 +411,10 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
 
         path = self._get_path(path)
         bs = json.loads(checksums)
-        d = delta(path, bs)
+        try:
+            d = delta(path, bs)
+        except OSError as e:
+            d = []
         return json.dumps(d)
 
     def patch(self, path, patch):
@@ -447,14 +453,19 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
                 r.append(event)
         except Empty:
             pass
-        r = map(self._serialize_event, r)
+            #print "empty"
+        r = filter(lambda x: isinstance(x, dict), map(self._serialize_event, r))
         return json.dumps(r)
 
     def _serialize_event(self, event):
-        src_path = event.src_path.replace(self.root, "").lstrip(os.sep)
         dst_path = ""
-        if isinstance(event, DirMovedEvent) or isinstance(event, FileMovedEvent):
-            dst_path = event.dest_path.replace(self.root).lstrip(os.sep)
-        return {"event_type": event.event_type, "src_path": src_path,
-                "dst_path": dst_path, "is_dir": event.is_directory}
+        try:
+            src_path = event.src_path.split(self.root + os.path.sep, 1)[1]
+            if isinstance(event, DirMovedEvent) or isinstance(event, FileMovedEvent):
+                dst_path = event.dest_path.split(self.root + os.sep, 1)[1]
+        except IndexError:
+            return
+        else:
+            return {"event_type": event.event_type, "src_path": src_path,
+                    "dst_path": dst_path, "is_dir": event.is_directory}
          

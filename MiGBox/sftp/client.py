@@ -165,9 +165,9 @@ class SFTPClient(paramiko.SFTPClient):
         """
 
         try:
-            print "send poll"
+            #print "send poll"
             t, msg = self._request(CMD_POLL)
-            print "received poll"
+            #print "received poll"
             j = msg.get_string()
             events = json.loads(j)
             events = map(self._deserialize_event, events)
@@ -199,5 +199,3 @@ class SFTPClient(paramiko.SFTPClient):
                 return DirMovedEvent(event["src_path"], event["dst_path"])
             else:
                 return FileMovedEvent(event["src_path"], event["dst_path"])
-        else:
-            return None

@@ -39,11 +39,11 @@ poll_thread = None
 
 def poll_events(local, remote, stop):
     thread_lock.acquire()
-    print "poll"
+    #print "poll"
     events = remote.poll()
-    print "poll done"
+    #print "poll done"
     for event in events:
-        print event
+        #print event
         local.eventQueue.put(event)
     thread_lock.release()
     if not stop.isSet():
@@ -54,14 +54,14 @@ def sync_all(local, remote, stop):
     logger = logging.getLogger("sync")
     local.eventQueue.join()
     thread_lock.acquire()
-    print "sync all"
+    #print "sync all"
     logger.debug("Sync all files.<br />")
     try:
         sync_all_files(local, remote, local.root)
     except Exception as e:
         print e
     finally:
-        print "sync all done"
+        #print "sync all done"
         thread_lock.release()
     if not stop.isSet():
         sync_all_thread = threading.Timer(5, sync_all, [local, remote, stop])
@@ -70,7 +70,7 @@ def sync_all(local, remote, stop):
 def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
         keypass=None, username=None, password=None, logfile=None, loglevel='INFO',
         stopsync=threading.Event(), **kargs):
-
+    loglevel="DEBUG"
     sync_logger = logging.getLogger("sync")
     event_logger = logging.getLogger("event")
     sync_logger.setLevel(getattr(logging, "DEBUG"))#loglevel))
@@ -122,7 +122,7 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
 
     sync_events_thread.start()
 
-    print threading.enumerate()
+    #print threading.enumerate()
     while not stopsync.isSet():
         time.sleep(1)
 
@@ -137,3 +137,4 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
     if poll_thread:
         poll_thread.cancel()
         poll_thread.join()
+    local.observer.join()

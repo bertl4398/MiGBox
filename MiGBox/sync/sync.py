@@ -81,35 +81,41 @@ def sync_events(src, dst, eventQueue, stop, lock=threading.Lock()):
     """
 
     while not stop.isSet():
+        from_, to = src, dst
         event = eventQueue.get()
         lock.acquire()
-        print "sync event"
-        print event
-        src_path = event.src_path
-        if not src_path.startswith(src.root):
-            swp = src
-            src = dst
-            dst = swp
-        dst_path = get_sync_path(src, dst, src_path)
-        print src_path +  " to " + dst_path
+        #print "sync event"
+        #print event
+        from_path = event.src_path
+        if not from_path.startswith(src.root):
+            from_, to = dst, src
         if isinstance(event, DirCreatedEvent):
-            make_dir(dst, dst_path)
+            to_path = get_sync_path(from_, to, from_path)
+            make_dir(to, to_path)
         elif isinstance(event, FileCreatedEvent):
-            sync_file(src, src_path, dst, dst_path)
+            to_path = get_sync_path(from_, to, from_path)
+            sync_file(from_, from_path, to, to_path)
         elif isinstance(event, DirDeletedEvent):
-            remove_dir(dst, dst_path)
-            remove_dirs(dst, dst_path)
+            to_path = get_sync_path(from_, to, from_path)
+            remove_dir(to, to_path)
+            remove_dirs(to, to_path)
         elif isinstance(event, FileDeletedEvent):
-            remove_file(dst, dst_path)
+            to_path = get_sync_path(from_, to, from_path)
+            remove_file(to, to_path)
         elif isinstance(event, FileModifiedEvent):
-            sync_file(src, src_path, dst, dst_path)
+            to_path = get_sync_path(from_, to, from_path)
+            sync_file(from_, from_path, to, to_path)
         elif isinstance(event, DirMovedEvent):
-            new_path = get_sync_path(src, dst, event.dest_path)
-            move(dst, dst_path, new_path)
-            eventQueue.put(DirDeletedEvent(src_path))
+            to_path = get_sync_path(from_, to, from_path)
+            new_path = get_sync_path(from_, to, event.dest_path)
+            move(to, to_path, new_path)
+            eventQueue.put(DirDeletedEvent(from_path))
         elif isinstance(event, FileMovedEvent):
-            new_path = get_sync_path(src, dst, event.dest_path)
-            move(dst, dst_path, new_path)
+            to_path = get_sync_path(from_, to, from_path)
+            new_path = get_sync_path(from_, to, event.dest_path)
+            move(to, to_path, new_path)
+            sync_file(from_, event.dest_path, to, new_path)
+            remove_file(to, to_path)
         lock.release()
         eventQueue.task_done()
 
@@ -208,16 +214,24 @@ def sync_file(src, src_path, dst, dst_path):
             if src_mtime > cached_src_mtime: # modification has not yet been seen
                 sync_logger.info(_log['sync_conf'].format(src_path,dst_path))
                 src.cache[src_path] = (src_mtime, src.blockchecksums(src_path))
-                cached_src_mtime, cached_src_bs = src.cache[dst_path]
+                cached_src_mtime, cached_src_bs = src.cache[src_path]
             if set(cached_src_bs) - set(cached_dst_bs): # files differ
                 if cached_src_mtime >= cached_dst_mtime: # src newer
-                    delta = src.delta(src_path, cached_dst_bs)
-                    dst.patch(dst_path, delta)
-                    dst.cache[dst_path] = (dst.stat(dst_path).st_mtime, dst.blockchecksums(dst_path))
+                    try:
+                        delta = src.delta(src_path, cached_dst_bs)
+                        dst.patch(dst_path, delta)
+                        dst.cache[dst_path] = (dst.stat(dst_path).st_mtime,
+                                               dst.blockchecksums(dst_path))
+                    except:
+                        copy_file(src, src_path, dst, dst_path)
                 else:
-                    delta = dst.delta(dst_path, cached_src_bs)
-                    src.patch(src_path, delta)
-                    src.cache[src_path] = (src.stat(src_path).st_mtime, src.blockchecksums(src_path))
+                    try:
+                        delta = dst.delta(dst_path, cached_src_bs)
+                        src.patch(src_path, delta)
+                        src.cache[src_path] = (src.stat(src_path).st_mtime,
+                                               src.blockchecksums(src_path))
+                    except:
+                        copy_file(dst, dst_path, src, src_path)
                 sync_logger.info(_log['sync_to'].format(src_path,dst_path))
             else:
                 sync_logger.debug(_log['sync_eq'].format(src_path,dst_path))

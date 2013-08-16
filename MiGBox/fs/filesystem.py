@@ -37,7 +37,7 @@ class FileSystem(object):
     for a number of specified methods.
     """
 
-    def __init__(self, instance, root):
+    def __init__(self, instance):
         """
         Create a new FileSystem object for uniform access.
 
@@ -46,12 +46,9 @@ class FileSystem(object):
 
         @param instance: instance representing the file system.
         @type instance: module or class
-        @param root: root path of the file system.
-        @type root: str
         """
 
         self.instance = instance
-        self.root = os.path.normpath(root)
         self.cache = {}
 
     def join_path(self, path, *largs):
@@ -120,6 +117,18 @@ class FileSystem(object):
             raise NotImplementedError
         return self.instance.mkdir(path, mode)
 
+    def mkdirs(self, path, mode=511):
+        """
+        Create the directory tree for C{path}.
+
+        @param path: path of the directory tree.
+        @type path: str
+        @param mode: requested attributes of the new folders.
+        @type mode: int
+        """
+
+        raise NotImplementedError
+
     def rmdir(self, path):
         """
         Remove an empty directory if it exists.
@@ -178,11 +187,25 @@ class FileSystem(object):
 
         if not self.instance:
             raise NotImplementedError
+
         if isinstance(src, SFTPFileSystem):
-            return src.get(src_path, dst_path)
+            try:
+                src.get(src_path, dst_path)
+            except IOError:
+                dst.mkdirs(os.path.dirname(dst_path))
+                src.get(src_path, dst_path)
         elif isinstance(dst, SFTPFileSystem):
-            return dst.put(src_path, dst_path)
-        return shutil.copy(src_path, dst_path)
+            try:
+                dst.put(src_path, dst_path)
+            except IOError:
+                dst.mkdirs(posixpath.dirname(dst_path))
+                dst.put(src_path, dst_path)
+        else:
+            try:
+                shutil.copy(src_path, dst_path)
+            except IOError:
+                dst.mkdirs(os.path.dirname(dst_path))
+                shutil.copy(src_path, dst_path)
 
     def open(self, path, mode='rb', buffering=None):
         """
@@ -252,7 +275,8 @@ class OSFileSystem(FileSystem):
     """
 
     def __init__(self, instance=os, root='.'):
-        FileSystem.__init__(self, instance, root)
+        FileSystem.__init__(self, instance)
+        self.root = os.path.normpath(root)
         self.eventQueue = EventQueue()
         self.eventHandler = EventHandler(self.eventQueue)
         self.observer = Observer()
@@ -263,10 +287,16 @@ class OSFileSystem(FileSystem):
         return os.path.join(path, *largs)
 
     def get_relative_path(self, path):
-        return path.replace(self.root, '').lstrip(os.path.sep)
+        if path.startswith(self.root):
+            return path.split(self.root + os.path.sep, 1)[1]
+        else:
+            return path
 
     def open(self, path, mode='rb', buffering=None):
         return open(path, mode)
+
+    def mkdirs(self, path, mode=511):
+        return os.makedirs(path, mode)
 
     def blockchecksums(self, path):
         return blockchecksums(path) 
@@ -294,16 +324,30 @@ class SFTPFileSystem(FileSystem):
     """
 
     def __init__(self, instance, root='.'):
-        FileSystem.__init__(self, instance, root)
+        FileSystem.__init__(self, instance)
+        self.root = posixpath.normpath(root)
 
     def join_path(self, path, *largs):
         return posixpath.join(path, *largs)
 
     def get_relative_path(self, path):
-        return path.replace(self.root, '').lstrip(posixpath.sep)
+        if path.startswith(self.root):
+            return path.split(self.root + posixpath.sep, 1)[1]
+        else:
+            return path
 
     def open(self, path, mode='rb', buffering=None):
         return self.instance.open(path, mode)
+
+    def mkdirs(self, path, mode=511):
+        paths = self.get_relative_path(path).split(posixpath.sep)
+        path = self.root
+        for p in paths:
+            path = self.join_path(path, p)
+            try:
+                self.mkdir(path)
+            except IOError:
+                continue
 
     def blockchecksums(self, path):
         return self.instance.checksums(path)
