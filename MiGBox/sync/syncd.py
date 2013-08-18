@@ -73,7 +73,7 @@ def run(mode, source, destination, sftp_host, sftp_port, hostkey, userkey,
     loglevel="DEBUG"
     sync_logger = logging.getLogger("sync")
     event_logger = logging.getLogger("event")
-    sync_logger.setLevel(getattr(logging, "DEBUG"))#loglevel))
+    sync_logger.setLevel(getattr(logging, loglevel))
     event_logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(levelname)s: %(asctime)s %(message)s')
     ch = logging.StreamHandler()

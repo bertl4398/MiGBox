@@ -58,7 +58,7 @@ except (IndexError, ImportError):
     pass
 
 setup(name='MiGBox',
-      version='0.5',
+      version='0.6',
       description='MiGBox file synchronization',
       author='Benjamin Ertl',
       author_email='bertl4398@gmail.com',

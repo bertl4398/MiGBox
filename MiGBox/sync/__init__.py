@@ -16,9 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-__version__ = 0.5
+__version__ = 0.6
 __author__ = 'Benjamin Ertl'
 
 from sync import EventQueue, EventHandler, sync_events, sync_file, sync_all_files
 
-__all__ = [ 'delta', 'rsync', 'sync', 'syncd' ]
+__all__ = [ 'EventQueue', 'EventHandler', 'sync_events', 'sync_file',
+            'sync_all_files', 'delta', 'rsync', 'sync', 'syncd' ]

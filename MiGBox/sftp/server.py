@@ -22,7 +22,7 @@ Provides a SFTP server to run on the MiG server or an other central server for
 synchronization.
 """
 
-__version__ = 0.5
+__version__ = 0.6
 __author__ = 'Benjamin Ertl'
 
 header = """
