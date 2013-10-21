@@ -30,12 +30,7 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table width="100%" cellpadding="0" cellspacing="0">
@@ -63,16 +58,35 @@
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class SFTPClient</h1><p class="nomargin-top"><span class="codelink"><a href="MiGBox.sftp.client-pysrc.html#SFTPClient">source&nbsp;code</a></span></p>
-<pre class="base-tree">
-       object --+        
-                |        
-paramiko.BaseSFTP --+    
-                    |    
-  paramiko.SFTPClient --+
-                        |
-                       <strong class="uidshort">SFTPClient</strong>
-</pre>
-
+<center>
+<center>  <map id="uml_class_diagram_for_migbox_s" name="uml_class_diagram_for_migbox_s">
+<area shape="rect" id="node38" href="MiGBox.sftp.client.SFTPClient-class.html#connect" title="Create a new SFTP client and connect to host." alt="" coords="17,441,569,460"/>
+<area shape="rect" id="node38" href="MiGBox.sftp.client.SFTPClient-class.html#checksums" title="Send a request to the server to compute block checksums of a given file." alt="" coords="17,460,569,479"/>
+<area shape="rect" id="node38" href="MiGBox.sftp.client.SFTPClient-class.html#delta" title="Send a request to the server to compute a delta for a given file, according to the block checksums." alt="" coords="17,479,569,497"/>
+<area shape="rect" id="node38" href="MiGBox.sftp.client.SFTPClient-class.html#patch" title="Send a request to the server to patch a given file, according to the delta &#160;of the file to an old/other file." alt="" coords="17,497,569,516"/>
+<area shape="rect" id="node38" href="MiGBox.sftp.client.SFTPClient-class.html#onetimepass" title="Request a one time password stored in a new file in the directory the user &#160;uses for synchronization." alt="" coords="17,516,569,535"/>
+<area shape="rect" id="node38" href="MiGBox.sftp.client.SFTPClient-class.html#poll" title="Request file system events on the server." alt="" coords="17,535,569,553"/>
+<area shape="rect" id="node1" href="MiGBox.sftp.client.SFTPClient-class.html" title="SFTP client to connect to the MiGBox SFTP server." alt="" coords="5,409,581,559"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Create an SFTP client from an existing Channel." alt="" coords="152,103,435,121"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Change the &quot;current directory&quot; of this SFTP session." alt="" coords="152,121,435,140"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Change the mode (permissions) of a file." alt="" coords="152,140,435,159"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Change the owner (uid) and group (gid) of a file." alt="" coords="152,159,435,177"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Close the SFTP session and its underlying channel." alt="" coords="152,177,435,196"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Open a file on the remote server." alt="" coords="152,196,435,215"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Create an SFTP client channel from an open Transport." alt="" coords="152,215,435,233"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Copy a remote file (remotepath) from the SFTP server to the local host as &#160;localpath." alt="" coords="152,233,435,252"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Return the underlying Channel object for this SFTP session." alt="" coords="152,252,435,271"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Return the &quot;current working directory&quot; for this SFTP session, as emulated &#160;by paramiko." alt="" coords="152,271,435,289"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Copy a remote file (remotepath) from the SFTP server and write to an open &#160;file or file&#45;like object, fl." alt="" coords="152,289,435,308"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Return a list containing the names of the entries in the given path." alt="" coords="152,308,435,327"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Return a list containing SFTPAttributes objects corresponding to files in &#160;the given path." alt="" coords="152,327,435,345"/>
+<area shape="rect" id="node39" href="javascript:void(0);" title="Set the access and modified times of the file specified by path." alt="" coords="152,364,435,383"/>
+<area shape="rect" id="node2" href="javascript:void(0);" title="SFTP client object." alt="" coords="140,70,447,389"/>
+<area shape="rect" id="node3" href="javascript:void(0);" title="paramiko.BaseSFTP" alt="" coords="220,6,367,50"/>
+</map>
+  <img src="uml_class_diagram_for_migbox_s.gif" alt='' usemap="#uml_class_diagram_for_migbox_s" ismap="ismap" class="graph-without-title" />
+</center>
+</center>
 <hr />
 <p>SFTP client to connect to the MiGBox SFTP server.</p>
   <p>Provides methods for basic SFTP requests and extended MiGBox requests 
@@ -151,6 +165,58 @@ paramiko.BaseSFTP --+
       delta of the file to an old/other file.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="MiGBox.sftp.client-pysrc.html#SFTPClient.patch">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.sftp.client.SFTPClient-class.html#onetimepass" class="summary-sig-name">onetimepass</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Request a one time password stored in a new file in the directory the
+      user uses for synchronization.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sftp.client-pysrc.html#SFTPClient.onetimepass">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="poll"></a><span class="summary-sig-name">poll</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Request file system events on the server.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sftp.client-pysrc.html#SFTPClient.poll">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_deserialize_event"></a><span class="summary-sig-name">_deserialize_event</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">event</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sftp.client-pysrc.html#SFTPClient._deserialize_event">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -242,7 +308,8 @@ paramiko.BaseSFTP --+
 </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type"><a href="MiGBox.sftp.client.SFTPClient-class.html" 
+      class="link">SFTPClient</a></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -251,9 +318,10 @@ paramiko.BaseSFTP --+
         <span class="summary-sig-arg">port</span>,
         <span class="summary-sig-arg">hostkey</span>,
         <span class="summary-sig-arg">userkey</span>,
-        <span class="summary-sig-arg">username</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">keypass</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">username</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">password</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Create a new SFTP client.</td>
+      Create a new SFTP client and connect to <code>host</code>.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="MiGBox.sftp.client-pysrc.html#SFTPClient.connect">source&nbsp;code</a></span>
             
@@ -326,7 +394,8 @@ paramiko.BaseSFTP --+
         <span class="sig-arg">port</span>,
         <span class="sig-arg">hostkey</span>,
         <span class="sig-arg">userkey</span>,
-        <span class="sig-arg">username</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">keypass</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">username</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">password</span>=<span class="sig-default">None</span>)</span>
     <br /><em class="fname">Class Method</em>
   </h3>
@@ -335,7 +404,8 @@ paramiko.BaseSFTP --+
     </td>
   </tr></table>
   
-  <p>Create a new SFTP client.</p>
+  <p>Create a new SFTP client and connect to <code>host</code>.</p>
+  <p>Returns None if creation or connection fails.</p>
   <p><code>username</code> and <code>password</code> are optional and not 
   needed for the authentication, that is by default public key.</p>
   <dl class="fields">
@@ -345,9 +415,14 @@ paramiko.BaseSFTP --+
         <li><strong class="pname"><code>port</code></strong> (int) - the host port.</li>
         <li><strong class="pname"><code>hostkey</code></strong> (str) - the path to the host's public key.</li>
         <li><strong class="pname"><code>userkey</code></strong> (str) - the path to the user's private key.</li>
+        <li><strong class="pname"><code>keypass</code></strong> (str) - password for encrypted key.</li>
         <li><strong class="pname"><code>username</code></strong> (str) - the user's name (optional).</li>
         <li><strong class="pname"><code>password</code></strong> (str) - the user's password (optional).</li>
     </ul></dd>
+    <dt>Returns: <a href="MiGBox.sftp.client.SFTPClient-class.html" 
+      class="link">SFTPClient</a></dt>
+        <dd><a href="MiGBox.sftp.client.SFTPClient-class.html" 
+          class="link">SFTPClient</a> or None.</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -436,6 +511,28 @@ paramiko.BaseSFTP --+
   </dl>
 </td></tr></table>
 </div>
+<a name="onetimepass"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">onetimepass</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.sftp.client-pysrc.html#SFTPClient.onetimepass">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Request a one time password stored in a new file in the directory the 
+  user uses for synchronization.</p>
+  <p>This credentials can be used to log in one time only and are supposed 
+  to enable sharing and collaboration with other users.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
@@ -457,18 +554,13 @@ paramiko.BaseSFTP --+
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Tue Jul 30 19:27:28 2013
+    Generated by Epydoc 3.0.1 on Fri Sep 27 11:13:05 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

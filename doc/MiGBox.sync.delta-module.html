@@ -30,12 +30,7 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table width="100%" cellpadding="0" cellspacing="0">
@@ -123,7 +118,7 @@
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="MiGBox.sync.delta-module.html#blockchecksums" class="summary-sig-name">blockchecksums</a>(<span class="summary-sig-arg">filename</span>,
-        <span class="summary-sig-arg">size</span>=<span class="summary-sig-default">65536</span>)</span><br />
+        <span class="summary-sig-arg">size</span>=<span class="summary-sig-default">64</span>)</span><br />
       Compute block checksums for file filename with size size.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="MiGBox.sync.delta-pysrc.html#blockchecksums">source&nbsp;code</a></span>
@@ -142,7 +137,8 @@
         <tr>
           <td><span class="summary-sig"><a href="MiGBox.sync.delta-module.html#delta" class="summary-sig-name">delta</a>(<span class="summary-sig-arg">filename</span>,
         <span class="summary-sig-arg">checksums</span>,
-        <span class="summary-sig-arg">size</span>=<span class="summary-sig-default">65536</span>)</span><br />
+        <span class="summary-sig-arg">size</span>=<span class="summary-sig-default">64</span>,
+        <span class="summary-sig-arg">step</span>=<span class="summary-sig-default">1</span>)</span><br />
       Compute delta for file filename with size size.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="MiGBox.sync.delta-pysrc.html#delta">source&nbsp;code</a></span>
@@ -161,7 +157,7 @@
         <tr>
           <td><span class="summary-sig"><a href="MiGBox.sync.delta-module.html#patch" class="summary-sig-name">patch</a>(<span class="summary-sig-arg">filename</span>,
         <span class="summary-sig-arg">delta</span>,
-        <span class="summary-sig-arg">size</span>=<span class="summary-sig-default">65536</span>)</span><br />
+        <span class="summary-sig-arg">size</span>=<span class="summary-sig-default">64</span>)</span><br />
       Patch file filename.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="MiGBox.sync.delta-pysrc.html#patch">source&nbsp;code</a></span>
@@ -194,7 +190,7 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="BLOCKSIZE"></a><span class="summary-name">BLOCKSIZE</span> = <code title="65536">65536</code>
+        <a name="BLOCKSIZE"></a><span class="summary-name">BLOCKSIZE</span> = <code title="64">64</code>
     </td>
   </tr>
 <tr>
@@ -281,7 +277,7 @@
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">blockchecksums</span>(<span class="sig-arg">filename</span>,
-        <span class="sig-arg">size</span>=<span class="sig-default">65536</span>)</span>
+        <span class="sig-arg">size</span>=<span class="sig-default">64</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="MiGBox.sync.delta-pysrc.html#blockchecksums">source&nbsp;code</a></span>&nbsp;
@@ -296,7 +292,7 @@
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>filename</code></strong> (str) - filename.</li>
-        <li><strong class="pname"><code>size</code></strong> (int) - block size, default 65536.</li>
+        <li><strong class="pname"><code>size</code></strong> (int) - block size.</li>
     </ul></dd>
     <dt>Returns: dict</dt>
         <dd>dict as hashtable of tuples as (block offset, weak checksum, 
@@ -313,7 +309,8 @@
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">delta</span>(<span class="sig-arg">filename</span>,
         <span class="sig-arg">checksums</span>,
-        <span class="sig-arg">size</span>=<span class="sig-default">65536</span>)</span>
+        <span class="sig-arg">size</span>=<span class="sig-default">64</span>,
+        <span class="sig-arg">step</span>=<span class="sig-default">1</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="MiGBox.sync.delta-pysrc.html#delta">source&nbsp;code</a></span>&nbsp;
@@ -328,7 +325,7 @@
         <li><strong class="pname"><code>checksums</code></strong> (dict) - checksums from <a 
           href="MiGBox.sync.delta-module.html#blockchecksums" 
           class="link">blockchecksums</a></li>
-        <li><strong class="pname"><code>size</code></strong> (int) - block size, default 65536.</li>
+        <li><strong class="pname"><code>size</code></strong> (int) - block size.</li>
     </ul></dd>
     <dt>Returns: list</dt>
         <dd>list of tuples as (offset, data).</dd>
@@ -344,7 +341,7 @@
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">patch</span>(<span class="sig-arg">filename</span>,
         <span class="sig-arg">delta</span>,
-        <span class="sig-arg">size</span>=<span class="sig-default">65536</span>)</span>
+        <span class="sig-arg">size</span>=<span class="sig-default">64</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="MiGBox.sync.delta-pysrc.html#patch">source&nbsp;code</a></span>&nbsp;
@@ -358,7 +355,7 @@
         <li><strong class="pname"><code>filename</code></strong> (str) - filename.</li>
         <li><strong class="pname"><code>delta</code></strong> (list of tuples) - list of tuples from <a href="MiGBox.sync.delta-module.html#delta"
           class="link">delta</a>.</li>
-        <li><strong class="pname"><code>size</code></strong> (int) - block size, default 65536.</li>
+        <li><strong class="pname"><code>size</code></strong> (int) - block size.</li>
     </ul></dd>
     <dt>Returns: str</dt>
         <dd>name of patched file.</dd>
@@ -386,18 +383,13 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Tue Jul 30 19:27:28 2013
+    Generated by Epydoc 3.0.1 on Fri Sep 27 11:13:04 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

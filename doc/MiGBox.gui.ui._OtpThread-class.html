@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>MiGBox.gui.ui._OtpThread</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="MiGBox-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="MiGBox-module.html">Package&nbsp;MiGBox</a> ::
+        <a href="MiGBox.gui-module.html">Package&nbsp;gui</a> ::
+        <a href="MiGBox.gui.ui-module.html" onclick="show_private();">Module&nbsp;ui</a> ::
+        Class&nbsp;_OtpThread
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="MiGBox.gui.ui._OtpThread-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class _OtpThread</h1><p class="nomargin-top"><span class="codelink"><a href="MiGBox.gui.ui-pysrc.html#_OtpThread">source&nbsp;code</a></span></p>
+<center>
+<center>  <map id="uml_class_diagram_for_migbox_g_5" name="uml_class_diagram_for_migbox_g_5">
+<area shape="rect" id="node33" href="MiGBox.gui.ui._OtpThread-class.html#run" title="MiGBox.gui.ui._OtpThread.run" alt="" coords="51,1052,121,1071"/>
+<area shape="rect" id="node1" href="MiGBox.gui.ui._OtpThread-class.html" title="This class implements the thread that runs for generating one&#45;time passwords, triggered by the graphical user interface." alt="" coords="39,1019,132,1077"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.HighPriority" alt="" coords="17,543,156,561"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.HighestPriority" alt="" coords="17,561,156,580"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.IdlePriority" alt="" coords="17,580,156,599"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.InheritPriority" alt="" coords="17,599,156,617"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.LowPriority" alt="" coords="17,617,156,636"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.LowestPriority" alt="" coords="17,636,156,655"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.NormalPriority" alt="" coords="17,655,156,673"/>
+<area shape="rect" id="node34" href="PyQt4.QtCore.QThread.Priority-class.html" title="PyQt4.QtCore.QThread.Priority" alt="" coords="17,673,156,692"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.TimeCriticalPriority" alt="" coords="17,692,156,711"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.currentThread" alt="" coords="17,713,156,732"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.currentThreadId" alt="" coords="17,732,156,751"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.exec_" alt="" coords="17,751,156,769"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.exit" alt="" coords="17,769,156,788"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="QThread.finished [signal]" alt="" coords="17,788,156,807"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.idealThreadCount" alt="" coords="17,807,156,825"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.isFinished" alt="" coords="17,825,156,844"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.isRunning" alt="" coords="17,844,156,863"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.msleep" alt="" coords="17,863,156,881"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.priority" alt="" coords="17,881,156,900"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.quit" alt="" coords="17,900,156,919"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.setPriority" alt="" coords="17,919,156,937"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.setStackSize" alt="" coords="17,937,156,956"/>
+<area shape="rect" id="node34" href="javascript:void(0);" title="PyQt4.QtCore.QThread.yieldCurrentThread" alt="" coords="17,975,156,993"/>
+<area shape="rect" id="node2" href="javascript:void(0);" title="QThread(QObject parent=None)" alt="" coords="5,518,168,999"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.staticMetaObject" alt="" coords="17,191,155,209"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.__getattr__" alt="" coords="17,212,155,231"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.blockSignals" alt="" coords="17,231,155,249"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.childEvent" alt="" coords="17,249,155,268"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.children" alt="" coords="17,268,155,287"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.connect" alt="" coords="17,287,155,305"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.connectNotify" alt="" coords="17,305,155,324"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.customEvent" alt="" coords="17,324,155,343"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.deleteLater" alt="" coords="17,343,155,361"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="QObject.destroyed[QObject] [signal] QObject.destroyed [signal]" alt="" coords="17,361,155,380"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.disconnect" alt="" coords="17,380,155,399"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.disconnectNotify" alt="" coords="17,399,155,417"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.dumpObjectInfo" alt="" coords="17,417,155,436"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.dumpObjectTree" alt="" coords="17,436,155,455"/>
+<area shape="rect" id="node35" href="javascript:void(0);" title="PyQt4.QtCore.QObject.trUtf8" alt="" coords="17,473,155,492"/>
+<area shape="rect" id="node3" href="javascript:void(0);" title="QObject(QObject parent=None)" alt="" coords="5,166,165,498"/>
+<area shape="rect" id="node37" href="javascript:void(0);" title="x.__init__(...) initializes x; see help(type(x)) for signature" alt="" coords="28,39,145,57"/>
+<area shape="rect" id="node37" href="javascript:void(0);" title="sip.simplewrapper.__new__" alt="" coords="28,57,145,76"/>
+<area shape="rect" id="node4" href="javascript:void(0);" title="sip.simplewrapper" alt="" coords="16,6,157,82"/>
+<area shape="rect" id="node5" href="javascript:void(0);" title="sip.wrapper" alt="" coords="40,102,133,146"/>
+</map>
+  <img src="uml_class_diagram_for_migbox_g_5.gif" alt='' usemap="#uml_class_diagram_for_migbox_g_5" ismap="ismap" class="graph-without-title" />
+</center>
+</center>
+<hr />
+<p>This class implements the thread that runs for generating one-time 
+  passwords, triggered by the graphical user interface.</p>
+
+<!-- ==================== NESTED CLASSES ==================== -->
+<a name="section-NestedClasses"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Nested Classes</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-NestedClasses"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>PyQt4.QtCore.QThread</code></b>:
+      <code><a href="PyQt4.QtCore.QThread.Priority-class.html">Priority</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.gui.ui._OtpThread-class.html#run" class="summary-sig-name">run</a>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.gui.ui-pysrc.html#_OtpThread.run">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>PyQt4.QtCore.QThread</code></b>:
+      <code>currentThread</code>,
+      <code>currentThreadId</code>,
+      <code>exec_</code>,
+      <code>exit</code>,
+      <code>finished</code>,
+      <code>idealThreadCount</code>,
+      <code>isFinished</code>,
+      <code>isRunning</code>,
+      <code>msleep</code>,
+      <code>priority</code>,
+      <code>quit</code>,
+      <code>setPriority</code>,
+      <code>setStackSize</code>,
+      <code>setTerminationEnabled</code>,
+      <code>sleep</code>,
+      <code>stackSize</code>,
+      <code>start</code>,
+      <code>started</code>,
+      <code>terminate</code>,
+      <code>terminated</code>,
+      <code>usleep</code>,
+      <code>wait</code>,
+      <code>yieldCurrentThread</code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>PyQt4.QtCore.QObject</code></b>:
+      <code>__getattr__</code>,
+      <code>blockSignals</code>,
+      <code>childEvent</code>,
+      <code>children</code>,
+      <code>connect</code>,
+      <code>connectNotify</code>,
+      <code>customEvent</code>,
+      <code>deleteLater</code>,
+      <code>destroyed</code>,
+      <code>disconnect</code>,
+      <code>disconnectNotify</code>,
+      <code>dumpObjectInfo</code>,
+      <code>dumpObjectTree</code>,
+      <code>dynamicPropertyNames</code>,
+      <code>emit</code>,
+      <code>event</code>,
+      <code>eventFilter</code>,
+      <code>findChild</code>,
+      <code>findChildren</code>,
+      <code>inherits</code>,
+      <code>installEventFilter</code>,
+      <code>isWidgetType</code>,
+      <code>killTimer</code>,
+      <code>metaObject</code>,
+      <code>moveToThread</code>,
+      <code>objectName</code>,
+      <code>parent</code>,
+      <code>property</code>,
+      <code>pyqtConfigure</code>,
+      <code>receivers</code>,
+      <code>removeEventFilter</code>,
+      <code>sender</code>,
+      <code>senderSignalIndex</code>,
+      <code>setObjectName</code>,
+      <code>setParent</code>,
+      <code>setProperty</code>,
+      <code>signalsBlocked</code>,
+      <code>startTimer</code>,
+      <code>thread</code>,
+      <code>timerEvent</code>,
+      <code>tr</code>,
+      <code>trUtf8</code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>sip.simplewrapper</code></b>:
+      <code>__init__</code>,
+      <code>__new__</code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>PyQt4.QtCore.QThread</code></b>:
+      <code>HighPriority</code>,
+      <code>HighestPriority</code>,
+      <code>IdlePriority</code>,
+      <code>InheritPriority</code>,
+      <code>LowPriority</code>,
+      <code>LowestPriority</code>,
+      <code>NormalPriority</code>,
+      <code>TimeCriticalPriority</code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>PyQt4.QtCore.QObject</code></b>:
+      <code>staticMetaObject</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="run"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">run</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.gui.ui-pysrc.html#_OtpThread.run">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  
+  <dl class="fields">
+    <dt>Overrides:
+        PyQt4.QtCore.QThread.run
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="MiGBox-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Fri Sep 27 11:13:05 2013
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

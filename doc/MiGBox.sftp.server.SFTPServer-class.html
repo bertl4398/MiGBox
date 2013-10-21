@@ -30,12 +30,7 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table width="100%" cellpadding="0" cellspacing="0">
@@ -63,24 +58,38 @@
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class SFTPServer</h1><p class="nomargin-top"><span class="codelink"><a href="MiGBox.sftp.server-pysrc.html#SFTPServer">source&nbsp;code</a></span></p>
-<pre class="base-tree">
-                object --+        
-                         |        
-         paramiko.BaseSFTP --+    
-                             |    
-        object --+           |    
-                 |           |    
-threading._Verbose --+       |    
-                     |       |    
-      threading.Thread --+   |    
-                         |   |    
- paramiko.SubsystemHandler --+    
-                             |    
-           paramiko.SFTPServer --+
-                                 |
-                                <strong class="uidshort">SFTPServer</strong>
-</pre>
-
+<center>
+<center>  <map id="uml_class_diagram_for_migbox_s_2" name="uml_class_diagram_for_migbox_s_2">
+<area shape="rect" id="node1" href="javascript:void(0);" title="threading._Verbose" alt="" coords="155,6,293,50"/>
+<area shape="rect" id="node45" href="javascript:void(0);" title="A boolean value indicating whether this thread is a daemon thread (True) or not (False)." alt="" coords="140,95,308,113"/>
+<area shape="rect" id="node45" href="javascript:void(0);" title="Thread identifier of this thread or None if it has not been started." alt="" coords="140,113,308,132"/>
+<area shape="rect" id="node45" href="javascript:void(0);" title="A string used for identification purposes only." alt="" coords="140,132,308,151"/>
+<area shape="rect" id="node45" href="javascript:void(0);" title="repr(x)" alt="" coords="140,153,308,172"/>
+<area shape="rect" id="node45" href="javascript:void(0);" title="threading.Thread.getName" alt="" coords="140,172,308,191"/>
+<area shape="rect" id="node45" href="javascript:void(0);" title="Return whether the thread is alive." alt="" coords="140,191,308,209"/>
+<area shape="rect" id="node45" href="javascript:void(0);" title="threading.Thread.isDaemon" alt="" coords="140,209,308,228"/>
+<area shape="rect" id="node45" href="javascript:void(0);" title="Return whether the thread is alive." alt="" coords="140,228,308,247"/>
+<area shape="rect" id="node45" href="javascript:void(0);" title="Wait until the thread terminates." alt="" coords="140,247,308,265"/>
+<area shape="rect" id="node45" href="javascript:void(0);" title="Method representing the thread&#39;s activity." alt="" coords="140,265,308,284"/>
+<area shape="rect" id="node45" href="javascript:void(0);" title="threading.Thread.setDaemon" alt="" coords="140,284,308,303"/>
+<area shape="rect" id="node45" href="javascript:void(0);" title="threading.Thread.setName" alt="" coords="140,303,308,321"/>
+<area shape="rect" id="node45" href="javascript:void(0);" title="Start the thread&#39;s activity." alt="" coords="140,321,308,340"/>
+<area shape="rect" id="node4" href="javascript:void(0);" title="A class that represents a thread of control." alt="" coords="128,70,320,346"/>
+<area shape="rect" id="node42" href="javascript:void(0);" title="The constructor for SFTPServer is meant to be called from within the &#160;Transport as a subsystem handler." alt="" coords="17,476,629,495"/>
+<area shape="rect" id="node42" href="javascript:void(0);" title="Convert an errno value (as from an OSError or IOError) into a standard SFTP result code." alt="" coords="17,495,629,513"/>
+<area shape="rect" id="node42" href="javascript:void(0);" title="Perform any cleanup at the end of a subsystem." alt="" coords="17,513,629,532"/>
+<area shape="rect" id="node42" href="javascript:void(0);" title="Change a file&#39;s attributes on the local filesystem." alt="" coords="17,532,629,551"/>
+<area shape="rect" id="node42" href="javascript:void(0);" title="Process an ssh subsystem in server mode." alt="" coords="17,551,629,569"/>
+<area shape="rect" id="node2" href="javascript:void(0);" title="Server&#45;side SFTP subsystem support." alt="" coords="5,443,640,575"/>
+<area shape="rect" id="node41" href="MiGBox.sftp.server.SFTPServer-class.html#run_server" title="MiGBox.sftp.server.SFTPServer.run_server" alt="" coords="159,628,488,647"/>
+<area shape="rect" id="node3" href="MiGBox.sftp.server.SFTPServer-class.html" title="This class inherits from paramiko.SFTPServer." alt="" coords="147,595,499,653"/>
+<area shape="rect" id="node44" href="javascript:void(0);" title="Return the ServerInterface object associated with this channel and &#160;subsystem." alt="" coords="139,399,309,417"/>
+<area shape="rect" id="node6" href="javascript:void(0);" title="Handler for a subsytem in server mode." alt="" coords="127,366,321,423"/>
+<area shape="rect" id="node5" href="javascript:void(0);" title="paramiko.BaseSFTP" alt="" coords="351,373,497,417"/>
+</map>
+  <img src="uml_class_diagram_for_migbox_s_2.gif" alt='' usemap="#uml_class_diagram_for_migbox_s_2" ismap="ismap" class="graph-without-title" />
+</center>
+</center>
 <hr />
 <p>This class inherits from <a 
   href="MiGBox.sftp.server.SFTPServer-class.html" 
@@ -220,7 +229,8 @@ threading._Verbose --+       |
         <span class="summary-sig-arg">addr</span>,
         <span class="summary-sig-arg">hostkey</span>,
         <span class="summary-sig-arg">userkey</span>,
-        <span class="summary-sig-arg">root</span>)</span></td>
+        <span class="summary-sig-arg">root</span>,
+        <span class="summary-sig-arg">salt</span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="MiGBox.sftp.server-pysrc.html#SFTPServer.run_server">source&nbsp;code</a></span>
             
@@ -357,18 +367,13 @@ threading._Verbose --+       |
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Tue Jul 30 19:27:28 2013
+    Generated by Epydoc 3.0.1 on Fri Sep 27 11:13:05 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

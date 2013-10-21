@@ -24,7 +24,7 @@ Provides methods for checksum and delta computation and application.
 import zlib, hashlib
 import base64
 
-BLOCKSIZE = 65536
+BLOCKSIZE = 64
 
 def weakchecksum(data):
     """
@@ -58,7 +58,7 @@ def blockchecksums(filename, size=BLOCKSIZE):
 
     @param filename: filename.
     @type filename: str
-    @param size: block size, default 65536.
+    @param size: block size.
     @type size: int
     @return: dict as hashtable of tuples as
             (block offset, weak checksum, strong checksum).
@@ -80,7 +80,7 @@ def blockchecksums(filename, size=BLOCKSIZE):
             data = f.read(size)
     return results
 
-def delta(filename, checksums, size=BLOCKSIZE):
+def delta(filename, checksums, size=BLOCKSIZE, step=1):
     """
     Compute delta for file filename with size size.
         
@@ -88,7 +88,7 @@ def delta(filename, checksums, size=BLOCKSIZE):
     @type filename: str
     @param checksums: checksums from L{blockchecksums}
     @type checksums: dict
-    @param size: block size, default 65536.
+    @param size: block size.
     @type size: int
     @return: list of tuples as (offset, data).
     @rtype: list
@@ -123,7 +123,7 @@ def delta(filename, checksums, size=BLOCKSIZE):
                             last = offset
             if not match:
                 # no match, search for matching blocks by moving one byte forward
-                offset += 1
+                offset += step
                 f.seek(offset)
             match = False
             data = f.read(size)
@@ -142,7 +142,7 @@ def patch(filename, delta, size=BLOCKSIZE):
     @type filename: str
     @param delta: list of tuples from L{delta}.
     @type delta: list of tuples
-    @param size: block size, default 65536.
+    @param size: block size.
     @type size: int
     @return: name of patched file.
     @rtype: str

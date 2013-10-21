@@ -30,12 +30,7 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table width="100%" cellpadding="0" cellspacing="0">
@@ -63,18 +58,29 @@
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class FileSystem</h1><p class="nomargin-top"><span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem">source&nbsp;code</a></span></p>
-<pre class="base-tree">
-object --+
-         |
-        <strong class="uidshort">FileSystem</strong>
-</pre>
-
-<dl><dt>Known Subclasses:</dt>
-<dd>
-      <ul class="subclass-list">
-<li><a href="MiGBox.fs.filesystem.OSFileSystem-class.html">OSFileSystem</a></li><li>, <a href="MiGBox.fs.filesystem.SFTPFileSystem-class.html">SFTPFileSystem</a></li>  </ul>
-</dd></dl>
-
+<center>
+<center>  <map id="uml_class_diagram_for_migbox_f" name="uml_class_diagram_for_migbox_f">
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#__init__" title="Create a new FileSystem object for uniform access." alt="" coords="17,39,277,57"/>
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#join_path" title="Return the joint path of the given parts." alt="" coords="17,57,277,76"/>
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#get_relative_path" title="Return the relative path to a given path, path &#45; root." alt="" coords="17,76,277,95"/>
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#listdir" title="Return a list of files within a given folder." alt="" coords="17,95,277,113"/>
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#stat" title="Return a stat object for a path." alt="" coords="17,113,277,132"/>
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#mkdir" title="Create a new directory with the given attributes." alt="" coords="17,132,277,151"/>
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#mkdirs" title="Create the directory tree for path." alt="" coords="17,151,277,169"/>
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#rmdir" title="Remove an empty directory if it exists." alt="" coords="17,169,277,188"/>
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#remove" title="Delete a file, if possible." alt="" coords="17,188,277,207"/>
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#rename" title="Rename (or move) a file." alt="" coords="17,207,277,225"/>
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#copy" title="Copy a file from FileSystem to FileSystem, from src_path to dst_path." alt="" coords="17,225,277,244"/>
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#open" title="Open a file and create a handle for future operations on that file." alt="" coords="17,244,277,263"/>
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#blockchecksums" title="Compute block checksums for a given file." alt="" coords="17,263,277,281"/>
+<area shape="rect" id="node0" href="MiGBox.fs.filesystem.FileSystem-class.html#poll" title="Poll for changes on the file system." alt="" coords="17,300,277,319"/>
+<area shape="rect" id="node1" href="MiGBox.fs.filesystem.FileSystem-class.html" title="This class provides uniform access to a local or remote file system for a number of specified methods." alt="" coords="5,6,288,325"/>
+<area shape="rect" id="node2" href="MiGBox.fs.filesystem.OSFileSystem-class.html" title="This class represents a file system implemented by the python os module." alt="" coords="9,345,129,383"/>
+<area shape="rect" id="node3" href="MiGBox.fs.filesystem.SFTPFileSystem-class.html" title="This class represents a file system implemented by the MiGBox.sftp.SFTPClient." alt="" coords="159,345,295,383"/>
+</map>
+  <img src="uml_class_diagram_for_migbox_f.gif" alt='' usemap="#uml_class_diagram_for_migbox_f" ismap="ismap" class="graph-without-title" />
+</center>
+</center>
 <hr />
 <p>This class provides uniform access to a local or remote file system 
   for a number of specified methods.</p>
@@ -103,11 +109,29 @@ object --+
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="MiGBox.fs.filesystem.FileSystem-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">instance</span>,
-        <span class="summary-sig-arg">root</span>)</span><br />
+        <span class="summary-sig-arg">instance</span>)</span><br />
       Create a new FileSystem object for uniform access.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">str</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.fs.filesystem.FileSystem-class.html#join_path" class="summary-sig-name">join_path</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">path</span>,
+        <span class="summary-sig-arg">*largs</span>)</span><br />
+      Return the joint path of the given parts.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.join_path">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -157,25 +181,6 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="MiGBox.fs.filesystem.FileSystem-class.html#walk" class="summary-sig-name">walk</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">path</span>)</span><br />
-      Generator for all paths to all directories and files recursively, 
-      starting at <code>path</code>.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.walk">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
           <td><span class="summary-sig"><a href="MiGBox.fs.filesystem.FileSystem-class.html#stat" class="summary-sig-name">stat</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">path</span>)</span><br />
       Return a stat object for a path.</td>
@@ -200,6 +205,25 @@ object --+
       Create a new directory with the given attributes.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.mkdir">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.fs.filesystem.FileSystem-class.html#mkdirs" class="summary-sig-name">mkdirs</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">path</span>,
+        <span class="summary-sig-arg">mode</span>=<span class="summary-sig-default">511</span>)</span><br />
+      Create the directory tree for <code>path</code>.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.mkdirs">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -309,33 +333,15 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">tuple</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="MiGBox.fs.filesystem.FileSystem-class.html#cached_checksums" class="summary-sig-name">cached_checksums</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">path</span>)</span><br />
-      Compute block checksums for a given file.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.cached_checksums">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">dict</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="MiGBox.fs.filesystem.FileSystem-class.html#checksums" class="summary-sig-name">checksums</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="MiGBox.fs.filesystem.FileSystem-class.html#blockchecksums" class="summary-sig-name">blockchecksums</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">path</span>)</span><br />
       Compute block checksums for a given file.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.checksums">source&nbsp;code</a></span>
+            <span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.blockchecksums">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -375,6 +381,23 @@ object --+
       file.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.patch">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="poll"></a><span class="summary-sig-name">poll</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Poll for changes on the file system.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.poll">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -452,8 +475,7 @@ object --+
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">instance</span>,
-        <span class="sig-arg">root</span>)</span>
+        <span class="sig-arg">instance</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -468,11 +490,38 @@ object --+
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>instance</code></strong> (module or class) - instance representing the file system.</li>
-        <li><strong class="pname"><code>root</code></strong> (str) - root path of the file system.</li>
     </ul></dd>
     <dt>Overrides:
         object.__init__
     </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="join_path"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">join_path</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">path</span>,
+        <span class="sig-arg">*largs</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.join_path">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return the joint path of the given parts.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>path</code></strong> (str) - path.</li>
+        <li><strong class="pname"><code>largs</code></strong> (str) - no or more path parts.</li>
+    </ul></dd>
+    <dt>Returns: str</dt>
+        <dd>joint path.</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -528,31 +577,6 @@ object --+
   </dl>
 </td></tr></table>
 </div>
-<a name="walk"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">walk</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">path</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.walk">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Generator for all paths to all directories and files recursively, 
-  starting at <code>path</code>.</p>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>path</code></strong> (str) - path to start walking.</li>
-    </ul></dd>
-  </dl>
-</td></tr></table>
-</div>
 <a name="stat"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -599,6 +623,32 @@ object --+
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>path</code></strong> (str) - path to the new directory.</li>
         <li><strong class="pname"><code>mode</code></strong> (int) - requested attributes of the new folder.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="mkdirs"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">mkdirs</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">path</span>,
+        <span class="sig-arg">mode</span>=<span class="sig-default">511</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.mkdirs">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Create the directory tree for <code>path</code>.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>path</code></strong> (str) - path of the directory tree.</li>
+        <li><strong class="pname"><code>mode</code></strong> (int) - requested attributes of the new folders.</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -749,48 +799,18 @@ object --+
   </dl>
 </td></tr></table>
 </div>
-<a name="cached_checksums"></a>
+<a name="blockchecksums"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">cached_checksums</span>(<span class="sig-arg">self</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">blockchecksums</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">path</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.cached_checksums">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Compute block checksums for a given file.</p>
-  <p>If the checksums are not already cached, compute new block 
-  checksums.</p>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>path</code></strong> (str) - path to the file.</li>
-    </ul></dd>
-    <dt>Returns: tuple</dt>
-        <dd>tuple of boolean value, True if file was modified, and hashtable 
-          of block checksums, see <a href="MiGBox.sync.delta-module.html" 
-          class="link">MiGBox.sync.delta</a></dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="checksums"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">checksums</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">path</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.checksums">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="MiGBox.fs.filesystem-pysrc.html#FileSystem.blockchecksums">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -886,18 +906,13 @@ object --+
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Tue Jul 30 19:27:28 2013
+    Generated by Epydoc 3.0.1 on Fri Sep 27 11:13:04 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

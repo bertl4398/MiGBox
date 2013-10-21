@@ -30,12 +30,7 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table width="100%" cellpadding="0" cellspacing="0">
@@ -63,14 +58,29 @@
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class SFTPServerInterface</h1><p class="nomargin-top"><span class="codelink"><a href="MiGBox.sftp.server_interface-pysrc.html#SFTPServerInterface">source&nbsp;code</a></span></p>
-<pre class="base-tree">
-                  object --+    
-                           |    
-paramiko.SFTPServerInterface --+
-                               |
-                              <strong class="uidshort">SFTPServerInterface</strong>
-</pre>
-
+<center>
+<center>  <map id="uml_class_diagram_for_migbox_s_5" name="uml_class_diagram_for_migbox_s_5">
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#__init__" title="Create a new SFTP server interface that handles SFTP operations." alt="" coords="17,116,244,135"/>
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#session_started" title="The SFTP server session has just started." alt="" coords="17,135,244,153"/>
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#session_ended" title="The SFTP server session has just ended, either cleanly or via an exception." alt="" coords="17,153,244,172"/>
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#open" title="Open a file on the server and create a handle for future operations on that file." alt="" coords="17,172,244,191"/>
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#list_folder" title="Return a list of files within a given folder." alt="" coords="17,191,244,209"/>
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#stat" title="Return an paramiko.SFTPAttributes object for a path on the server, or an &#160;error code." alt="" coords="17,209,244,228"/>
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#lstat" title="Return an paramiko.SFTPAttributes object for a path on the server, or an &#160;error code." alt="" coords="17,228,244,247"/>
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#remove" title="Delete a file, if possible." alt="" coords="17,247,244,265"/>
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#rename" title="Rename (or move) a file." alt="" coords="17,265,244,284"/>
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#mkdir" title="Create a new directory with the given attributes." alt="" coords="17,284,244,303"/>
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#rmdir" title="Remove an empty directory if it exists." alt="" coords="17,303,244,321"/>
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#chattr" title="Change the attributes of a file." alt="" coords="17,321,244,340"/>
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#readlink" title="Return the target of a symbolic link (or shortcut) on the server." alt="" coords="17,340,244,359"/>
+<area shape="rect" id="node51" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#poll" title="Poll for events observed by the watchdog file system observer." alt="" coords="17,377,244,396"/>
+<area shape="rect" id="node1" href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html" title="This class inherits from paramiko.SFTPServerInterface." alt="" coords="5,83,256,402"/>
+<area shape="rect" id="node52" href="javascript:void(0);" title="Return the canonical form of a path on the server." alt="" coords="39,39,221,57"/>
+<area shape="rect" id="node2" href="javascript:void(0);" title="This class defines an interface for controlling the behavior of paramiko when using the SFTPServer subsystem to provide an SFTP server." alt="" coords="27,6,232,63"/>
+</map>
+  <img src="uml_class_diagram_for_migbox_s_5.gif" alt='' usemap="#uml_class_diagram_for_migbox_s_5" ismap="ismap" class="graph-without-title" />
+</center>
+</center>
 <hr />
 <p>This class inherits from <a 
   href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html" 
@@ -377,6 +387,114 @@ paramiko.SFTPServerInterface --+
       
     </td>
   </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#onetimepass" class="summary-sig-name">onetimepass</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Create a one time password stored in a new file on the root path the 
+      user uses for synchronization.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sftp.server_interface-pysrc.html#SFTPServerInterface.onetimepass">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">str (json dict)</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#blockchecksums" class="summary-sig-name">blockchecksums</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">path</span>)</span><br />
+      Get blockchecksums for the given file.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sftp.server_interface-pysrc.html#SFTPServerInterface.blockchecksums">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">str (json list)</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#delta" class="summary-sig-name">delta</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">path</span>,
+        <span class="summary-sig-arg">checksums</span>)</span><br />
+      Get a delta for the given file to the given checksums.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sftp.server_interface-pysrc.html#SFTPServerInterface.delta">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">int</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#patch" class="summary-sig-name">patch</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">path</span>,
+        <span class="summary-sig-arg">patch</span>)</span><br />
+      Patch the given path with patch.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sftp.server_interface-pysrc.html#SFTPServerInterface.patch">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">str (json list)</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.sftp.server_interface.SFTPServerInterface-class.html#poll" class="summary-sig-name">poll</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Poll for events observed by the watchdog file system observer.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sftp.server_interface-pysrc.html#SFTPServerInterface.poll">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_serialize_event"></a><span class="summary-sig-name">_serialize_event</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">event</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sftp.server_interface-pysrc.html#SFTPServerInterface._serialize_event">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>paramiko.SFTPServerInterface</code></b>:
@@ -465,7 +583,6 @@ paramiko.SFTPServerInterface --+
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>server</code></strong> (ServerInterface) - SFTP server associated with this interface.</li>
-        <li><strong class="pname"><code>root</code></strong> (str) - local root path for SFTP operations on this interface.</li>
     </ul></dd>
     <dt>Overrides:
         object.__init__
@@ -865,6 +982,131 @@ paramiko.SFTPServerInterface --+
   </dl>
 </td></tr></table>
 </div>
+<a name="onetimepass"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">onetimepass</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.sftp.server_interface-pysrc.html#SFTPServerInterface.onetimepass">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Create a one time password stored in a new file on the root path the 
+  user uses for synchronization.</p>
+  <p>This credentials can be used to log in one time only and are supposed 
+  to enable sharing and collaboration with other users.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="blockchecksums"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">blockchecksums</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">path</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.sftp.server_interface-pysrc.html#SFTPServerInterface.blockchecksums">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Get blockchecksums for the given file.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>path</code></strong> (str) - path.</li>
+    </ul></dd>
+    <dt>Returns: str (json dict)</dt>
+        <dd>blockchecksums.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="delta"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">delta</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">path</span>,
+        <span class="sig-arg">checksums</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.sftp.server_interface-pysrc.html#SFTPServerInterface.delta">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Get a delta for the given file to the given checksums.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>path</code></strong> (str) - path.</li>
+        <li><strong class="pname"><code>checksums</code></strong> (str (json dict)) - blockchecksums.</li>
+    </ul></dd>
+    <dt>Returns: str (json list)</dt>
+        <dd>delta.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="patch"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">patch</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">path</span>,
+        <span class="sig-arg">patch</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.sftp.server_interface-pysrc.html#SFTPServerInterface.patch">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Patch the given path with patch.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>path</code></strong> (str) - path.</li>
+        <li><strong class="pname"><code>patch</code></strong> (str (json list)) - patch data.</li>
+    </ul></dd>
+    <dt>Returns: int</dt>
+        <dd>return code.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="poll"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">poll</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.sftp.server_interface-pysrc.html#SFTPServerInterface.poll">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Poll for events observed by the watchdog file system observer.</p>
+  <dl class="fields">
+    <dt>Returns: str (json list)</dt>
+        <dd>list of events.</dd>
+  </dl>
+</td></tr></table>
+</div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
@@ -886,18 +1128,13 @@ paramiko.SFTPServerInterface --+
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Tue Jul 30 19:27:28 2013
+    Generated by Epydoc 3.0.1 on Fri Sep 27 11:13:06 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

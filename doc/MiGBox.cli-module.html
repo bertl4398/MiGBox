@@ -30,12 +30,7 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table width="100%" cellpadding="0" cellspacing="0">
@@ -94,15 +89,15 @@
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="run"></a><span class="summary-sig-name">run</span>(<span class="summary-sig-arg">mode</span>,
-        <span class="summary-sig-arg">src</span>,
-        <span class="summary-sig-arg">dst</span>,
-        <span class="summary-sig-arg">host</span>,
-        <span class="summary-sig-arg">port</span>,
+        <span class="summary-sig-arg">source</span>,
+        <span class="summary-sig-arg">destination</span>,
+        <span class="summary-sig-arg">sftp_host</span>,
+        <span class="summary-sig-arg">sftp_port</span>,
         <span class="summary-sig-arg">hostkey</span>,
         <span class="summary-sig-arg">userkey</span>,
-        <span class="summary-sig-arg">log_file</span>,
-        <span class="summary-sig-arg">log_level</span>,
-        <span class="summary-sig-arg">mountpath</span>)</span></td>
+        <span class="summary-sig-arg">mountpath</span>,
+        <span class="summary-sig-arg">logfile</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">loglevel</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">INFO</code><code class="variable-quote">'</code></span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="MiGBox.cli-pysrc.html#run">source&nbsp;code</a></span>
             
@@ -134,15 +129,15 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="MiGBox.cli-module.html#HEADER" class="summary-name">HEADER</a> = <code title="'''Command line interface for MiGBox - version 0.2
+        <a href="MiGBox.cli-module.html#header" class="summary-name">header</a> = <code title="'''
+Command line interface for MiGBox - version 0.2
 Copyright (c) 2013 Benjamin Ertl
 
 MiGBox comes with ABSOLUTELY NO WARRANTY. This is free software,
 and you are welcome to redistribute it under certain conditions.
 
 type \'start\'   to start synchronizing
-type \'stop\'    to stop synchronizing
-..."><code class="variable-quote">'</code><code class="variable-string">Command line interface for MiGBox - version 0.2\nCop</code><code class="variable-ellipsis">...</code></code>
+..."><code class="variable-quote">'</code><code class="variable-string">\nCommand line interface for MiGBox - version 0.2\nC</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -171,26 +166,26 @@ type \'stop\'    to stop synchronizing
   </td>
 </tr>
 </table>
-<a name="HEADER"></a>
+<a name="header"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">HEADER</h3>
+  <h3 class="epydoc">header</h3>
   
   <dl class="fields">
   </dl>
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'''</code><code class="variable-string">Command line interface for MiGBox - version 0.2</code>
+<code class="variable-quote">'''</code><code class="variable-string"></code>
+<code class="variable-string">Command line interface for MiGBox - version 0.2</code>
 <code class="variable-string">Copyright (c) 2013 Benjamin Ertl</code>
 <code class="variable-string"></code>
 <code class="variable-string">MiGBox comes with ABSOLUTELY NO WARRANTY. This is free software,</code>
 <code class="variable-string">and you are welcome to redistribute it under certain conditions.</code>
 <code class="variable-string"></code>
 <code class="variable-string">type \'start\'   to start synchronizing</code>
-<code class="variable-string">type \'stop\'    to stop synchronizing</code>
 <code class="variable-ellipsis">...</code>
 </pre></td></tr></table>
 </dd>
@@ -218,18 +213,13 @@ type \'stop\'    to stop synchronizing
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Tue Jul 30 19:27:28 2013
+    Generated by Epydoc 3.0.1 on Fri Sep 27 11:13:04 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

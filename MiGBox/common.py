@@ -141,9 +141,7 @@ def read_config(configfile, server=False):
 def print_vars(vars_):
     """
     Print the given variables in the form of
-    C{{'section': {'option': value}}} as:
-    section
-        option value
+    C{{'section': {'option': value}}}. 
 
     @param vars_: dictionary of dictionaries.
     @type vars_: dict

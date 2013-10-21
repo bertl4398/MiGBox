@@ -30,12 +30,7 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table width="100%" cellpadding="0" cellspacing="0">
@@ -62,10 +57,47 @@
 </table>
 <!-- ==================== MODULE DESCRIPTION ==================== -->
 <h1 class="epydoc">Module sync</h1><p class="nomargin-top"><span class="codelink"><a href="MiGBox.sync.sync-pysrc.html">source&nbsp;code</a></span></p>
-<p>Synchronization methods to synchronize between file system 
+<p>Synchronization methods and classes to synchronize between file system
   abstractions see <a href="MiGBox.fs.filesystem.FileSystem-class.html" 
   class="link">MiGBox.FileSystem</a>.</p>
 
+<!-- ==================== CLASSES ==================== -->
+<a name="section-Classes"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Classes</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Classes"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="MiGBox.sync.sync.EventQueue-class.html" class="summary-name">EventQueue</a><br />
+      This class is used to keep track of the file system events and is 
+        as for now the default python queue.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="MiGBox.sync.sync.EventHandler-class.html" class="summary-name">EventHandler</a><br />
+      This class handles all events observed from the watchdog observer 
+        by putting them into an event queue, that will be processed by the 
+        synchronization thread.
+    </td>
+  </tr>
+</table>
 <!-- ==================== FUNCTIONS ==================== -->
 <a name="section-Functions"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -89,10 +121,51 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a href="MiGBox.sync.sync-module.html#sync_events" class="summary-sig-name">sync_events</a>(<span class="summary-sig-arg">src</span>,
+        <span class="summary-sig-arg">dst</span>,
+        <span class="summary-sig-arg">eventQueue</span>,
+        <span class="summary-sig-arg">stop</span>,
+        <span class="summary-sig-arg">lock</span>=<span class="summary-sig-default">threading.Lock()</span>)</span><br />
+      Sync events from the <code>eventQueue</code> between <code>src</code>
+      and <code>dst</code>.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sync.sync-pysrc.html#sync_events">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">str</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.sync.sync-module.html#get_sync_path" class="summary-sig-name">get_sync_path</a>(<span class="summary-sig-arg">src</span>,
+        <span class="summary-sig-arg">dst</span>,
+        <span class="summary-sig-arg">path</span>)</span><br />
+      Get the synchronization path for <code>dst</code> from the 
+      <code>path</code> on <code>src</code>.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sync.sync-pysrc.html#get_sync_path">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a href="MiGBox.sync.sync-module.html#sync_all_files" class="summary-sig-name">sync_all_files</a>(<span class="summary-sig-arg">src</span>,
         <span class="summary-sig-arg">dst</span>,
-        <span class="summary-sig-arg">path</span>,
-        <span class="summary-sig-arg">modified</span>=<span class="summary-sig-default">True</span>)</span><br />
+        <span class="summary-sig-arg">path</span>=<span class="summary-sig-default">None</span>)</span><br />
       Synchronize all files from <code>src</code> file system abstraction 
       to <code>dst</code> file system abstraction starting at 
       <code>path</code> and continuing recursively.</td>
@@ -154,13 +227,13 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="MiGBox.sync.sync-module.html#move_file" class="summary-sig-name">move_file</a>(<span class="summary-sig-arg">src</span>,
+          <td><span class="summary-sig"><a href="MiGBox.sync.sync-module.html#move" class="summary-sig-name">move</a>(<span class="summary-sig-arg">src</span>,
         <span class="summary-sig-arg">src_path</span>,
         <span class="summary-sig-arg">dst_path</span>)</span><br />
-      Move a file from <code>src</code> <code>src_path</code> to 
+      Move a file/directory from <code>src</code> <code>src_path</code> to 
       <code>dst_path</code> on the same file system.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="MiGBox.sync.sync-pysrc.html#move_file">source&nbsp;code</a></span>
+            <span class="codelink"><a href="MiGBox.sync.sync-pysrc.html#move">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -194,9 +267,29 @@
         <tr>
           <td><span class="summary-sig"><a href="MiGBox.sync.sync-module.html#remove_dir" class="summary-sig-name">remove_dir</a>(<span class="summary-sig-arg">src</span>,
         <span class="summary-sig-arg">path</span>)</span><br />
-      Remove a directory from <code>src</code> given by <code>path</code>.</td>
+      Remove an empty directory from <code>src</code> given by 
+      <code>path</code>.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="MiGBox.sync.sync-pysrc.html#remove_dir">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.sync.sync-module.html#remove_dirs" class="summary-sig-name">remove_dirs</a>(<span class="summary-sig-arg">src</span>,
+        <span class="summary-sig-arg">path</span>)</span><br />
+      Remove a directory tree of empyt directories from <code>src</code> 
+      given by <code>path</code>.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sync.sync-pysrc.html#remove_dirs">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -240,6 +333,20 @@
     </table>
   </td>
 </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="sync_logger"></a><span class="summary-name">sync_logger</span> = <code title="logging.getLogger(&quot;sync&quot;)">logging.getLogger(&quot;sync&quot;)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="event_logger"></a><span class="summary-name">event_logger</span> = <code title="logging.getLogger(&quot;event&quot;)">logging.getLogger(&quot;event&quot;)</code>
+    </td>
+  </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -280,6 +387,72 @@
   </td>
 </tr>
 </table>
+<a name="sync_events"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">sync_events</span>(<span class="sig-arg">src</span>,
+        <span class="sig-arg">dst</span>,
+        <span class="sig-arg">eventQueue</span>,
+        <span class="sig-arg">stop</span>,
+        <span class="sig-arg">lock</span>=<span class="sig-default">threading.Lock()</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.sync.sync-pysrc.html#sync_events">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Sync events from the <code>eventQueue</code> between <code>src</code> 
+  and <code>dst</code>.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>src</code></strong> (<a href="MiGBox.fs.filesystem.FileSystem-class.html" 
+          class="link">MiGBox.FileSystem</a>) - source file system abstraction.</li>
+        <li><strong class="pname"><code>dst</code></strong> (<a href="MiGBox.fs.filesystem.FileSystem-class.html" 
+          class="link">MiGBox.FileSystem</a>) - destination file system abstraction.</li>
+        <li><strong class="pname"><code>eventQueue</code></strong> (<a href="MiGBox.sync.sync.EventQueue-class.html" 
+          class="link">MiGBox.sync.EventQueue</a>) - event queue.</li>
+        <li><strong class="pname"><code>stop</code></strong> (python threading event) - stop event.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="get_sync_path"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_sync_path</span>(<span class="sig-arg">src</span>,
+        <span class="sig-arg">dst</span>,
+        <span class="sig-arg">path</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.sync.sync-pysrc.html#get_sync_path">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Get the synchronization path for <code>dst</code> from the 
+  <code>path</code> on <code>src</code>.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>src</code></strong> (<a href="MiGBox.fs.filesystem.FileSystem-class.html" 
+          class="link">MiGBox.FileSystem</a>) - source file system abstraction.</li>
+        <li><strong class="pname"><code>dst</code></strong> (<a href="MiGBox.fs.filesystem.FileSystem-class.html" 
+          class="link">MiGBox.FileSystem</a>) - destination file system abstraction.</li>
+        <li><strong class="pname"><code>path</code></strong> (str) - the path.</li>
+    </ul></dd>
+    <dt>Returns: str</dt>
+        <dd>synchronization path.</dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="sync_all_files"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -289,8 +462,7 @@
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">sync_all_files</span>(<span class="sig-arg">src</span>,
         <span class="sig-arg">dst</span>,
-        <span class="sig-arg">path</span>,
-        <span class="sig-arg">modified</span>=<span class="sig-default">True</span>)</span>
+        <span class="sig-arg">path</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="MiGBox.sync.sync-pysrc.html#sync_all_files">source&nbsp;code</a></span>&nbsp;
@@ -308,7 +480,6 @@
         <li><strong class="pname"><code>dst</code></strong> (<a href="MiGBox.fs.filesystem.FileSystem-class.html" 
           class="link">MiGBox.FileSystem</a>) - destination file system abstraction.</li>
         <li><strong class="pname"><code>path</code></strong> (str) - root path</li>
-        <li><strong class="pname"><code>modified</code></strong> (bool) - two-way synchronize modified files.</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -380,23 +551,23 @@
   </dl>
 </td></tr></table>
 </div>
-<a name="move_file"></a>
+<a name="move"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">move_file</span>(<span class="sig-arg">src</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">move</span>(<span class="sig-arg">src</span>,
         <span class="sig-arg">src_path</span>,
         <span class="sig-arg">dst_path</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="MiGBox.sync.sync-pysrc.html#move_file">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="MiGBox.sync.sync-pysrc.html#move">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
-  <p>Move a file from <code>src</code> <code>src_path</code> to 
+  <p>Move a file/directory from <code>src</code> <code>src_path</code> to 
   <code>dst_path</code> on the same file system.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
@@ -450,8 +621,35 @@
     </td>
   </tr></table>
   
-  <p>Remove a directory from <code>src</code> given by 
+  <p>Remove an empty directory from <code>src</code> given by 
   <code>path</code>.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>src</code></strong> (<a href="MiGBox.fs.filesystem.FileSystem-class.html" 
+          class="link">MiGBox.FileSystem</a>) - source file system abstraction.</li>
+        <li><strong class="pname"><code>path</code></strong> (str) - path.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="remove_dirs"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">remove_dirs</span>(<span class="sig-arg">src</span>,
+        <span class="sig-arg">path</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.sync.sync-pysrc.html#remove_dirs">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Remove a directory tree of empyt directories from <code>src</code> 
+  given by <code>path</code>.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
@@ -554,18 +752,13 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Tue Jul 30 19:27:28 2013
+    Generated by Epydoc 3.0.1 on Fri Sep 27 11:13:04 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

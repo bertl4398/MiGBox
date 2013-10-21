@@ -30,12 +30,7 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table width="100%" cellpadding="0" cellspacing="0">
@@ -64,31 +59,6 @@
 <h1 class="epydoc">Module syncd</h1><p class="nomargin-top"><span class="codelink"><a href="MiGBox.sync.syncd-pysrc.html">source&nbsp;code</a></span></p>
 <p>Sync daemon for MiGBox.</p>
 
-<!-- ==================== CLASSES ==================== -->
-<a name="section-Classes"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Classes</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-Classes"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="MiGBox.sync.syncd.EventHandler-class.html" class="summary-name">EventHandler</a>
-    </td>
-  </tr>
-</table>
 <!-- ==================== FUNCTIONS ==================== -->
 <a name="section-Functions"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -112,16 +82,56 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a name="poll_events"></a><span class="summary-sig-name">poll_events</span>(<span class="summary-sig-arg">local</span>,
+        <span class="summary-sig-arg">remote</span>,
+        <span class="summary-sig-arg">stop</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sync.syncd-pysrc.html#poll_events">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="sync_all"></a><span class="summary-sig-name">sync_all</span>(<span class="summary-sig-arg">local</span>,
+        <span class="summary-sig-arg">remote</span>,
+        <span class="summary-sig-arg">stop</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.sync.syncd-pysrc.html#sync_all">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a name="run"></a><span class="summary-sig-name">run</span>(<span class="summary-sig-arg">mode</span>,
-        <span class="summary-sig-arg">src_path</span>,
-        <span class="summary-sig-arg">dst_path</span>,
-        <span class="summary-sig-arg">host</span>,
-        <span class="summary-sig-arg">port</span>,
+        <span class="summary-sig-arg">source</span>,
+        <span class="summary-sig-arg">destination</span>,
+        <span class="summary-sig-arg">sftp_host</span>,
+        <span class="summary-sig-arg">sftp_port</span>,
         <span class="summary-sig-arg">hostkey</span>,
         <span class="summary-sig-arg">userkey</span>,
-        <span class="summary-sig-arg">log_file</span>,
-        <span class="summary-sig-arg">log_level</span>,
-        <span class="summary-sig-arg">event</span>=<span class="summary-sig-default">threading.Event()</span>)</span></td>
+        <span class="summary-sig-arg">keypass</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">username</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">password</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">logfile</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">loglevel</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">INFO</code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">stopsync</span>=<span class="summary-sig-default">threading.Event()</span>,
+        <span class="summary-sig-arg">**kargs</span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="MiGBox.sync.syncd-pysrc.html#run">source&nbsp;code</a></span>
             
@@ -153,6 +163,27 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a name="thread_lock"></a><span class="summary-name">thread_lock</span> = <code title="threading.Lock()">threading.Lock()</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="sync_all_thread"></a><span class="summary-name">sync_all_thread</span> = <code title="None">None</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="poll_thread"></a><span class="summary-name">poll_thread</span> = <code title="None">None</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'MiGBox.sync'"><code class="variable-quote">'</code><code class="variable-string">MiGBox.sync</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
@@ -177,18 +208,13 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Tue Jul 30 19:27:28 2013
+    Generated by Epydoc 3.0.1 on Fri Sep 27 11:13:04 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

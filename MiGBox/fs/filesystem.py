@@ -57,8 +57,8 @@ class FileSystem(object):
 
         @param path: path.
         @type path: str
-        @param *largs: no or more path parts.
-        @type *largs: str
+        @param largs: no or more path parts.
+        @type largs: str
         @return: joint path.
         @rtype: str
         """

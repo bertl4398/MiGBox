@@ -30,12 +30,7 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table width="100%" cellpadding="0" cellspacing="0">
@@ -68,7 +63,7 @@
 
 <hr />
 <div class="fields">      <p><strong>Version:</strong>
-        0.3
+        0.6
       </p>
       <p><strong>Author:</strong>
         Benjamin Ertl
@@ -134,14 +129,14 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="run"></a><span class="summary-sig-name">run</span>(<span class="summary-sig-arg">host</span>,
+          <td><span class="summary-sig"><a href="MiGBox.sftp.server-module.html#run" class="summary-sig-name">run</a>(<span class="summary-sig-arg">host</span>,
         <span class="summary-sig-arg">port</span>,
-        <span class="summary-sig-arg">backlog</span>,
         <span class="summary-sig-arg">hostkey</span>,
         <span class="summary-sig-arg">userkey</span>,
-        <span class="summary-sig-arg">root_path</span>,
-        <span class="summary-sig-arg">log_file</span>,
-        <span class="summary-sig-arg">log_level</span>)</span><br />
+        <span class="summary-sig-arg">rootpath</span>,
+        <span class="summary-sig-arg">backlog</span>=<span class="summary-sig-default">0</span>,
+        <span class="summary-sig-arg">logfile</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">loglevel</span>=<span class="summary-sig-default">None</span>)</span><br />
       Main entry point to run the sftp server.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="MiGBox.sftp.server-pysrc.html#run">source&nbsp;code</a></span>
@@ -174,15 +169,15 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="MiGBox.sftp.server-module.html#HEADER" class="summary-name">HEADER</a> = <code title="'''SFTP server for MiGBox - version 0.3
+        <a href="MiGBox.sftp.server-module.html#header" class="summary-name">header</a> = <code title="'''
+SFTP server for MiGBox - version 0.6
 Copyright (c) 2013 Benjamin Ertl
 
 MiGBox comes with ABSOLUTELY NO WARRANTY. This is free software,
 and you are welcome to redistribute it under certain conditions.
 
 type \'license\' to show license information
-type \'exit\' to shutdown the server
-..."><code class="variable-quote">'</code><code class="variable-string">SFTP server for MiGBox - version 0.3\nCopyright (c) </code><code class="variable-ellipsis">...</code></code>
+..."><code class="variable-quote">'</code><code class="variable-string">\nSFTP server for MiGBox - version 0.6\nCopyright (c</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -193,6 +188,62 @@ type \'exit\' to shutdown the server
     </td>
   </tr>
 </table>
+<!-- ==================== FUNCTION DETAILS ==================== -->
+<a name="section-FunctionDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Function Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-FunctionDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="run"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">run</span>(<span class="sig-arg">host</span>,
+        <span class="sig-arg">port</span>,
+        <span class="sig-arg">hostkey</span>,
+        <span class="sig-arg">userkey</span>,
+        <span class="sig-arg">rootpath</span>,
+        <span class="sig-arg">backlog</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">logfile</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">loglevel</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.sftp.server-pysrc.html#run">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Main entry point to run the sftp server.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>host</code></strong> (str) - server's name or ip address.</li>
+        <li><strong class="pname"><code>port</code></strong> (int) - server's port number for listening.</li>
+        <li><strong class="pname"><code>hostkey</code></strong> (str) - path to the server's private rsa key.</li>
+        <li><strong class="pname"><code>userkey</code></strong> (str) - path to the user's public rsa key.</li>
+        <li><strong class="pname"><code>rootpath</code></strong> (str) - path to be served via SFTP.</li>
+        <li><strong class="pname"><code>backlog</code></strong> (int) - maximum number of queued connections.</li>
+        <li><strong class="pname"><code>logfile</code></strong> (str) - path to the server's log file.</li>
+        <li><strong class="pname"><code>loglevel</code></strong> (str) - log level, usually 'INFO' or 'DEBUG'</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
 <!-- ==================== VARIABLES DETAILS ==================== -->
 <a name="section-VariablesDetails"></a>
 <table class="details" border="1" cellpadding="3"
@@ -211,26 +262,26 @@ type \'exit\' to shutdown the server
   </td>
 </tr>
 </table>
-<a name="HEADER"></a>
+<a name="header"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">HEADER</h3>
+  <h3 class="epydoc">header</h3>
   
   <dl class="fields">
   </dl>
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-quote">'''</code><code class="variable-string">SFTP server for MiGBox - version 0.3</code>
+<code class="variable-quote">'''</code><code class="variable-string"></code>
+<code class="variable-string">SFTP server for MiGBox - version 0.6</code>
 <code class="variable-string">Copyright (c) 2013 Benjamin Ertl</code>
 <code class="variable-string"></code>
 <code class="variable-string">MiGBox comes with ABSOLUTELY NO WARRANTY. This is free software,</code>
 <code class="variable-string">and you are welcome to redistribute it under certain conditions.</code>
 <code class="variable-string"></code>
 <code class="variable-string">type \'license\' to show license information</code>
-<code class="variable-string">type \'exit\' to shutdown the server</code>
 <code class="variable-ellipsis">...</code>
 </pre></td></tr></table>
 </dd>
@@ -258,18 +309,13 @@ type \'exit\' to shutdown the server
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Tue Jul 30 19:27:28 2013
+    Generated by Epydoc 3.0.1 on Fri Sep 27 11:13:04 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

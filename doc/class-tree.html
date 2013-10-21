@@ -30,12 +30,7 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table width="100%" cellpadding="0" cellspacing="0">
@@ -60,17 +55,14 @@
 </b></center><br />
 <h1 class="epydoc">Class Hierarchy</h1>
 <ul class="nomargin-top">
-    <li> <strong class="uidlink">ctypes.Structure</strong>
+    <li> <strong class="uidlink">Queue.Queue</strong>:
+      <em class="summary">Create a queue object with a given maximum size.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="MiGBox.sync.sync.EventQueue-class.html">MiGBox.sync.sync.EventQueue</a></strong>:
+      <em class="summary">This class is used to keep track of the file system events and is 
+        as for now the default python queue.</em>
     </li>
-    <li> <strong class="uidlink">ctypes.Structure</strong>
-    </li>
-    <li> <strong class="uidlink">ctypes.Structure</strong>
-    </li>
-    <li> <strong class="uidlink">ctypes.Structure</strong>
-    </li>
-    <li> <strong class="uidlink">ctypes.Structure</strong>
-    </li>
-    <li> <strong class="uidlink">ctypes.Structure</strong>
+    </ul>
     </li>
     <li> <strong class="uidlink">object</strong>:
       <em class="summary">The most base type</em>
@@ -115,7 +107,10 @@
     <li> <strong class="uidlink">watchdog.events.FileSystemEventHandler</strong>:
       <em class="summary">Base file system event handler that you can override methods from.</em>
     <ul>
-    <li> <strong class="uidlink"><a href="MiGBox.sync.syncd.EventHandler-class.html">MiGBox.sync.syncd.EventHandler</a></strong>
+    <li> <strong class="uidlink"><a href="MiGBox.sync.sync.EventHandler-class.html">MiGBox.sync.sync.EventHandler</a></strong>:
+      <em class="summary">This class handles all events observed from the watchdog observer 
+        by putting them into an event queue, that will be processed by the 
+        synchronization thread.</em>
     </li>
     </ul>
     </li>
@@ -208,14 +203,19 @@
     <li> <strong class="uidlink">PyQt4.QtGui.QDialog</strong>:
       <em class="summary">QDialog(QWidget parent=None, Qt.WindowFlags flags=0)</em>
     <ul>
-    <li> <strong class="uidlink"><a href="MiGBox.gui.ui.OptionsUi-class.html">MiGBox.gui.ui.OptionsUi</a></strong>
+    <li> <strong class="uidlink"><a href="MiGBox.gui.ui._KeyPassUi-class.html" onclick="show_private();">MiGBox.gui.ui._KeyPassUi</a></strong>:
+      <em class="summary">Class for the user's key password input dialog.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="MiGBox.gui.ui._OptionsUi-class.html" onclick="show_private();">MiGBox.gui.ui._OptionsUi</a></strong>:
+      <em class="summary">Class for app internal options dialog.</em>
     </li>
     </ul>
     </li>
     <li> <strong class="uidlink">PyQt4.QtGui.QMainWindow</strong>:
       <em class="summary">QMainWindow(QWidget parent=None, Qt.WindowFlags flags=0)</em>
     <ul>
-    <li> <strong class="uidlink"><a href="MiGBox.gui.ui.AppUi-class.html">MiGBox.gui.ui.AppUi</a></strong>
+    <li> <strong class="uidlink"><a href="MiGBox.gui.ui.AppUi-class.html">MiGBox.gui.ui.AppUi</a></strong>:
+      <em class="summary">MiGBox graphical user interface main window.</em>
     </li>
     </ul>
     </li>
@@ -235,7 +235,13 @@
     <li> <strong class="uidlink">PyQt4.QtCore.QThread</strong>:
       <em class="summary">QThread(QObject parent=None)</em>
     <ul>
-    <li> <strong class="uidlink"><a href="MiGBox.gui.ui.SyncThread-class.html">MiGBox.gui.ui.SyncThread</a></strong>
+    <li> <strong class="uidlink"><a href="MiGBox.gui.ui.SyncThread-class.html">MiGBox.gui.ui.SyncThread</a></strong>:
+      <em class="summary">This class implements the thread that runs for synchronization, 
+        triggerd by the graphical user interface.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="MiGBox.gui.ui._OtpThread-class.html" onclick="show_private();">MiGBox.gui.ui._OtpThread</a></strong>:
+      <em class="summary">This class implements the thread that runs for generating one-time 
+        passwords, triggered by the graphical user interface.</em>
     </li>
     </ul>
     </li>
@@ -245,14 +251,19 @@
     <li> <strong class="uidlink">PyQt4.QtGui.QDialog</strong>:
       <em class="summary">QDialog(QWidget parent=None, Qt.WindowFlags flags=0)</em>
     <ul>
-    <li> <strong class="uidlink"><a href="MiGBox.gui.ui.OptionsUi-class.html">MiGBox.gui.ui.OptionsUi</a></strong>
+    <li> <strong class="uidlink"><a href="MiGBox.gui.ui._KeyPassUi-class.html" onclick="show_private();">MiGBox.gui.ui._KeyPassUi</a></strong>:
+      <em class="summary">Class for the user's key password input dialog.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="MiGBox.gui.ui._OptionsUi-class.html" onclick="show_private();">MiGBox.gui.ui._OptionsUi</a></strong>:
+      <em class="summary">Class for app internal options dialog.</em>
     </li>
     </ul>
     </li>
     <li> <strong class="uidlink">PyQt4.QtGui.QMainWindow</strong>:
       <em class="summary">QMainWindow(QWidget parent=None, Qt.WindowFlags flags=0)</em>
     <ul>
-    <li> <strong class="uidlink"><a href="MiGBox.gui.ui.AppUi-class.html">MiGBox.gui.ui.AppUi</a></strong>
+    <li> <strong class="uidlink"><a href="MiGBox.gui.ui.AppUi-class.html">MiGBox.gui.ui.AppUi</a></strong>:
+      <em class="summary">MiGBox graphical user interface main window.</em>
     </li>
     </ul>
     </li>
@@ -296,18 +307,13 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Tue Jul 30 19:27:28 2013
+    Generated by Epydoc 3.0.1 on Fri Sep 27 11:13:04 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

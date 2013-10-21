@@ -83,8 +83,6 @@ class SFTPServerInterface(paramiko.SFTPServerInterface):
 
         @param server: SFTP server associated with this interface.
         @type server: ServerInterface
-        @param root: local root path for SFTP operations on this interface.
-        @type root: str
         """
         super(paramiko.SFTPServerInterface, self).__init__(*largs, **kwargs)
         self.root = os.path.normpath(server.root)

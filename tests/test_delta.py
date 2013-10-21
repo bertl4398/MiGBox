@@ -3,15 +3,12 @@ import unittest
 import os
 import zlib
 import hashlib
+import base64
+import filecmp
 
-from MiGBox.sync.delta import weakchecksum, strongchecksum, blockchecksums, delta
+from MiGBox.sync.delta import weakchecksum, strongchecksum, blockchecksums, delta, patch
 
 class DeltaTest(unittest.TestCase):
-
-    def tearDown(self):
-        os.remove('.tmp')
-        os.remove('.tmp1')
-        os.remove('.tmp2')
 
     def test_weakchecksum(self):
         data = 'hello'
@@ -41,6 +38,8 @@ class DeltaTest(unittest.TestCase):
 
         h2 = blockchecksums('.tmp')
 
+        os.remove('.tmp')
+
         self.failUnlessEqual(h1, h2)
 
     def test_delta_equal(self):
@@ -50,6 +49,8 @@ class DeltaTest(unittest.TestCase):
             f.write(data)
 
         d = delta('.tmp', blockchecksums('.tmp'))
+
+        os.remove('.tmp')
 
         self.failUnlessEqual([(0, '')], d)
 
@@ -64,7 +65,29 @@ class DeltaTest(unittest.TestCase):
 
         d = delta('.tmp1', blockchecksums('.tmp2'))
 
-        self.failUnlessEqual([(0, 'hello')], d)
+        os.remove('.tmp1')
+        os.remove('.tmp2')
+
+        self.failUnlessEqual([(0, base64.b64encode(data))], d)
+
+    def test_delta_patch(self):
+        data = 'hello'
+
+        with open('.tmp1', 'wb') as f:
+            f.write(data)
+
+        new = open('.tmp2', 'wb')
+        new.close()
+
+        d = delta('.tmp1', blockchecksums('.tmp2'))
+
+        patchname = patch('.tmp2', d)
+
+        self.assertTrue(filecmp.cmp('.tmp1',patchname))
+
+        os.remove('.tmp1')
+        os.remove('.tmp2')
+        os.remove(patchname)
 
 if __name__ == '__main__':
     unittest.main()

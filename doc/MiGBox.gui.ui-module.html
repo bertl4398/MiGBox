@@ -30,12 +30,7 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table width="100%" cellpadding="0" cellspacing="0">
@@ -86,21 +81,42 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="MiGBox.gui.ui.SyncThread-class.html" class="summary-name">SyncThread</a>
+        <a href="MiGBox.gui.ui.SyncThread-class.html" class="summary-name">SyncThread</a><br />
+      This class implements the thread that runs for synchronization, 
+        triggerd by the graphical user interface.
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="MiGBox.gui.ui._KeyPassUi-class.html" class="summary-name" onclick="show_private();">_KeyPassUi</a><br />
+      Class for the user's key password input dialog.
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="MiGBox.gui.ui._OtpThread-class.html" class="summary-name" onclick="show_private();">_OtpThread</a><br />
+      This class implements the thread that runs for generating one-time 
+        passwords, triggered by the graphical user interface.
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="MiGBox.gui.ui._OptionsUi-class.html" class="summary-name" onclick="show_private();">_OptionsUi</a><br />
+      Class for app internal options dialog.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="MiGBox.gui.ui.OptionsUi-class.html" class="summary-name">OptionsUi</a>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="MiGBox.gui.ui.AppUi-class.html" class="summary-name">AppUi</a>
+        <a href="MiGBox.gui.ui.AppUi-class.html" class="summary-name">AppUi</a><br />
+      MiGBox graphical user interface main window.
     </td>
   </tr>
 </table>
@@ -121,22 +137,6 @@
     </table>
   </td>
 </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="run"></a><span class="summary-sig-name">run</span>(<span class="summary-sig-arg">configfile</span>=<span class="summary-sig-default">None</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="MiGBox.gui.ui-pysrc.html#run">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">QTextStream</span>
@@ -203,6 +203,34 @@
     </table>
   </td>
 </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_vars"></a><span class="summary-name">_vars</span> = <code title="{}"><code class="variable-group">{</code><code class="variable-group">}</code></code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_key_pass"></a><span class="summary-name">_key_pass</span> = <code title="''"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_otp_user"></a><span class="summary-name">_otp_user</span> = <code title="''"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_otp_pass"></a><span class="summary-name">_otp_pass</span> = <code title="''"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -285,7 +313,7 @@ _4 -x Py_v3'}"><code class="variable-group">{</code><code class="variable-quote"
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="qApp"></a><span class="summary-name">qApp</span> = <code title="&lt;PyQt4.QtGui.QApplication object at 0x1611170&gt;">&lt;PyQt4.QtGui.QApplication object at 0x1611170&gt;</code>
+        <a name="qApp"></a><span class="summary-name">qApp</span> = <code title="&lt;PyQt4.QtGui.QApplication object at 0x2b3fb00&gt;">&lt;PyQt4.QtGui.QApplication object at 0x2b3fb00&gt;</code>
     </td>
   </tr>
 </table>
@@ -347,18 +375,13 @@ _4 -x Py_v3'}"><code class="variable-group">{</code><code class="variable-quote"
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Tue Jul 30 19:27:28 2013
+    Generated by Epydoc 3.0.1 on Fri Sep 27 11:13:04 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

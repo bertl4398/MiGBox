@@ -30,12 +30,7 @@
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table width="100%" cellpadding="0" cellspacing="0">
@@ -64,6 +59,99 @@
 <p>MiGBox common module. Provides common functions and constants for all 
   MiGBox modules.</p>
 
+<!-- ==================== FUNCTIONS ==================== -->
+<a name="section-Functions"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Functions</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Functions"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.common-module.html#write_config" class="summary-sig-name">write_config</a>(<span class="summary-sig-arg">configfile</span>,
+        <span class="summary-sig-arg">values</span>,
+        <span class="summary-sig-arg">server</span>=<span class="summary-sig-default">False</span>)</span><br />
+      Write the given values to the given configfile.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.common-pysrc.html#write_config">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">dict</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.common-module.html#read_config" class="summary-sig-name">read_config</a>(<span class="summary-sig-arg">configfile</span>,
+        <span class="summary-sig-arg">server</span>=<span class="summary-sig-default">False</span>)</span><br />
+      Read the given configfile and return a dictionary with all sections, 
+      options and values in the form of</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.common-pysrc.html#read_config">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.common-module.html#print_vars" class="summary-sig-name">print_vars</a>(<span class="summary-sig-arg">vars_</span>)</span><br />
+      Print the given variables in the form of <code>{'section': {'option':
+      value}}</code>.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.common-pysrc.html#print_vars">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">dict</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="MiGBox.common-module.html#get_vars" class="summary-sig-name">get_vars</a>(<span class="summary-sig-arg">vars_</span>)</span><br />
+      Return the given variables in the from of <code>{'section': 
+      {'option': value}}</code> as a dictionary of <code>{'option': 
+      value}</code>.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="MiGBox.common-pysrc.html#get_vars">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
 <!-- ==================== VARIABLES ==================== -->
 <a name="section-Variables"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -85,14 +173,7 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="migbox_path"></a><span class="summary-name">migbox_path</span> = <code title="'/home/benjamin/migsync'"><code class="variable-quote">'</code><code class="variable-string">/home/benjamin/migsync</code><code class="variable-quote">'</code></code>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="MiGBox.common-module.html#ABOUT" class="summary-name">ABOUT</a> = <code title="'''
+        <a href="MiGBox.common-module.html#about" class="summary-name">about</a> = <code title="'''
 MiGBox - File Synchronization for the Minimum Intrusion Grid (MiG)
 
 Copyright (c) 2013 Benjamin Ertl
@@ -107,10 +188,168 @@ as published by the Free Software Foundation; either version
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a href="MiGBox.common-module.html#default_migbox" class="summary-name">default_migbox</a> = <code title="'''
+[Sync]
+source =
+destination =
+[Connection]
+sftp_host =
+sftp_port =
+[Logging]
+..."><code class="variable-quote">'</code><code class="variable-string">\n[Sync]\nsource =\ndestination =\n[Connecti</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="MiGBox.common-module.html#default_server" class="summary-name">default_server</a> = <code title="'''
+[ROOT]
+rootpath =
+[Connection]
+host =
+port =
+backlog =
+[Logging]
+..."><code class="variable-quote">'</code><code class="variable-string">\n[ROOT]\nrootpath =\n[Connection]\nhost =\n</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'MiGBox'"><code class="variable-quote">'</code><code class="variable-string">MiGBox</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
 </table>
+<!-- ==================== FUNCTION DETAILS ==================== -->
+<a name="section-FunctionDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Function Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-FunctionDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="write_config"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">write_config</span>(<span class="sig-arg">configfile</span>,
+        <span class="sig-arg">values</span>,
+        <span class="sig-arg">server</span>=<span class="sig-default">False</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.common-pysrc.html#write_config">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Write the given values to the given configfile.</p>
+  <p>Values are expected to be in the form of</p>
+  <p><code>{'section': {'option': value}}</code></p>
+  <p>Writes always the default structure.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>configfile</code></strong> (str) - path to the config file.</li>
+        <li><strong class="pname"><code>values</code></strong> (dict) - configuration values.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="read_config"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">read_config</span>(<span class="sig-arg">configfile</span>,
+        <span class="sig-arg">server</span>=<span class="sig-default">False</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.common-pysrc.html#read_config">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Read the given configfile and return a dictionary with all sections, 
+  options and values in the form of</p>
+  <p><code>{'section': {'option': value}}</code></p>
+  <p>A default configuration file is read first to set the right 
+  structure.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>configfile</code></strong> (str) - path to the config file.</li>
+    </ul></dd>
+    <dt>Returns: dict</dt>
+        <dd>dictionary of all values.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="print_vars"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">print_vars</span>(<span class="sig-arg">vars_</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.common-pysrc.html#print_vars">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Print the given variables in the form of <code>{'section': {'option': 
+  value}}</code>.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>vars_</code></strong> (dict) - dictionary of dictionaries.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="get_vars"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_vars</span>(<span class="sig-arg">vars_</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="MiGBox.common-pysrc.html#get_vars">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return the given variables in the from of <code>{'section': {'option':
+  value}}</code> as a dictionary of <code>{'option': value}</code>.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>vars_</code></strong> (dict) - dictionary of dictionaries.</li>
+    </ul></dd>
+    <dt>Returns: dict</dt>
+        <dd>dictionary of named values.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
 <!-- ==================== VARIABLES DETAILS ==================== -->
 <a name="section-VariablesDetails"></a>
 <table class="details" border="1" cellpadding="3"
@@ -129,12 +368,12 @@ as published by the Free Software Foundation; either version
   </td>
 </tr>
 </table>
-<a name="ABOUT"></a>
+<a name="about"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">ABOUT</h3>
+  <h3 class="epydoc">about</h3>
   
   <dl class="fields">
   </dl>
@@ -149,6 +388,58 @@ as published by the Free Software Foundation; either version
 <code class="variable-string">This program is free software; you can redistribute it and/or</code>
 <code class="variable-string">modify it under the terms of the GNU General Public License</code>
 <code class="variable-string">as published by the Free Software Foundation; either version</code>
+<code class="variable-ellipsis">...</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="default_migbox"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">default_migbox</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-quote">'''</code><code class="variable-string"></code>
+<code class="variable-string">[Sync]</code>
+<code class="variable-string">source =</code>
+<code class="variable-string">destination =</code>
+<code class="variable-string">[Connection]</code>
+<code class="variable-string">sftp_host =</code>
+<code class="variable-string">sftp_port =</code>
+<code class="variable-string">[Logging]</code>
+<code class="variable-ellipsis">...</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="default_server"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">default_server</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-quote">'''</code><code class="variable-string"></code>
+<code class="variable-string">[ROOT]</code>
+<code class="variable-string">rootpath =</code>
+<code class="variable-string">[Connection]</code>
+<code class="variable-string">host =</code>
+<code class="variable-string">port =</code>
+<code class="variable-string">backlog =</code>
+<code class="variable-string">[Logging]</code>
 <code class="variable-ellipsis">...</code>
 </pre></td></tr></table>
 </dd>
@@ -176,18 +467,13 @@ as published by the Free Software Foundation; either version
       <th>&nbsp;&nbsp;&nbsp;<a
         href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
 
-  <!-- Project homepage -->
-      <th class="navbar" align="right" width="100%">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><th class="navbar" align="center"
-            >MiGBox Documentation</th>
-          </tr></table></th>
+      <th class="navbar" width="100%"></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Tue Jul 30 19:27:28 2013
+    Generated by Epydoc 3.0.1 on Fri Sep 27 11:13:04 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
