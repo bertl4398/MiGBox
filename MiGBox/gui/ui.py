@@ -554,10 +554,12 @@ class AppUi(QMainWindow):
         if not os.path.isdir(_vars["Sync"]["source"]):
             msgBox = QMessageBox.warning(self, "MiGBox - Sync",
                 "Not a valid source path.", QMessageBox.Ok)
+            return
         elif not self.sftp and not os.path.isdir(_vars["Sync"]["destination"]):
             msgBox = QMessageBox.warning(self, "MiGBox - Sync",
                 "Not a valid destination path.", QMessageBox.Ok)
-        else:
+            return
+        elif self.sftp:
             try:
                 key = paramiko.RSAKey.from_private_key_file(_vars["KeyAuth"]["userkey"])
             except paramiko.PasswordRequiredException:
@@ -565,20 +567,20 @@ class AppUi(QMainWindow):
                 r = dialog.exec_()
                 if not r:
                     return
-            _vars["Logging"]["loglevel"] = str(self.logLevel.currentText())
-            self.srcPathButton.setEnabled(False)
-            self.dstPathButton.setEnabled(False)
-            self.optionsButton.setEnabled(False)
-            self.syncButton.setEnabled(False)
-            self.syncAction.setEnabled(False)
-            self.logPathButton.setEnabled(False)
-            self.logLevel.setEnabled(False)
-            self.stopAction.setEnabled(True)
-            self.stopButton.setEnabled(True)
-            self.srcPathEdit.setReadOnly(True)
-            self.dstPathEdit.setReadOnly(True)
-            self.thread.event.clear()
-            self.thread.sync(self.remoteCheckBox.isChecked())
+        _vars["Logging"]["loglevel"] = str(self.logLevel.currentText())
+        self.srcPathButton.setEnabled(False)
+        self.dstPathButton.setEnabled(False)
+        self.optionsButton.setEnabled(False)
+        self.syncButton.setEnabled(False)
+        self.syncAction.setEnabled(False)
+        self.logPathButton.setEnabled(False)
+        self.logLevel.setEnabled(False)
+        self.stopAction.setEnabled(True)
+        self.stopButton.setEnabled(True)
+        self.srcPathEdit.setReadOnly(True)
+        self.dstPathEdit.setReadOnly(True)
+        self.thread.event.clear()
+        self.thread.sync(self.remoteCheckBox.isChecked())
 
     def _updateUi(self):
         self.srcPathButton.setEnabled(True)
